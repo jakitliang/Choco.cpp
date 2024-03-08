@@ -5,65 +5,85 @@
 #include "cc/string.h"
 #include <cstring>
 
-CC::Type<char (*)[]>::Type() : var(Pointer::Alloc<Var<char>>(1)), count(Pointer::Alloc<Size>(1)) {
-    var->ptr = Pointer::Alloc<Type<char>>(0);
+CC::Object<char (*)[]>::Object() : object(Alloc()), count(Var<Size>::Alloc(1)) {
+    *object = Slice<char>::Alloc(0);
     *count = 0;
 }
 
-CC::Type<char (*)[]>::Type(const Type & arr) : var(Pointer::Retain<Var<char>>(arr.var)),
-                                               count(Pointer::Retain<Size>(arr.count)) {}
+CC::Object<char (*)[]>::Object(const Object & arr) : object(Retain(arr.object)),
+                                                     count(Var<Size>::Retain(arr.count)) {}
 
-CC::Type<char (*)[]>::Type(Type && arr) : var(Pointer::Retain<Var<char>>(arr.var)),
-                                count(Pointer::Retain<Size>(arr.count)) {}
+CC::Object<char (*)[]>::Object(Object && arr) noexcept : object(Retain(arr.object)),
+                                                         count(Var<Size>::Retain(arr.count)) {}
 
-CC::Type<char (*)[]>::Type(const char * str, Size length) : var(Pointer::Alloc<Var<char>>(1)),
-                                                  count(Pointer::Alloc<Size>(1)) {
-    var->ptr = Pointer::Alloc<Type<char>>(length);
-    Pointer::ReplaceElements(var->ptr, 0, str, length);
+CC::Object<char (*)[]>::Object(const char * str, Size length) : object(Alloc()),
+                                                                count(Var<Size>::Alloc(1)) {
+    *object = Slice<char>::Alloc(length);
+    Pointer::ReplaceElements(*object, 0, str, length);
     *count = length;
 }
 
-CC::Type<char (*)[]>::Type(const char *str) : var(Pointer::Alloc<Var<char>>(1)),
-                                              count(Pointer::Alloc<Size>(1)) {
+CC::Object<char (*)[]>::Object(const char *str) : object(Alloc()),
+                                                  count(Var<Size>::Alloc(1)) {
     auto length = strlen(str);
-    var->ptr = Pointer::Alloc<Type<char>>(length);
-    Pointer::ReplaceElements(var->ptr, 0, str, length);
+    *object = Slice<char>::Alloc(length);
+    Pointer::ReplaceElements(*object, 0, str, length);
     *count = length;
 }
 
-CC::Type<char (*)[]>::~Type() {
-    Pointer::Release(var->ptr);
-    Pointer::Release(var);
+CC::Object<char (*)[]>::Object(const CC::Byte *bytes, CC::Size length) {
+    *object = Slice<char>::Alloc(length);
+    Pointer::ReplaceElements(*object, 0, bytes, length);
+    *count = length;
+}
+
+CC::Object<char (*)[]>::~Object() {
+    if (object == nullptr) return;
+
+    auto slice = *object;
+    if (Pointer::Release(object)) {
+        Pointer::Release(slice);
+    }
+
     Pointer::Release(count);
-    var = nullptr;
+
+    object = nullptr;
     count = nullptr;
 }
 
-CC::Value<char> * CC::Type<char (*)[]>::begin() {
-    return &var->ptr[0];
+char * CC::Object<char (*)[]>::begin() {
+    return &(**object)[0];
 }
 
-CC::Value<char> * CC::Type<char (*)[]>::end() {
-    return &var->ptr[Count()];
+char * CC::Object<char (*)[]>::end() {
+    return &(**object)[Count()];
 }
 
-CC::Size CC::Type<char (*)[]>::Count() {
+CC::Size CC::Object<char (*)[]>::Count() {
     return *count;
 }
 
-CC::Size CC::Type<char (*)[]>::Capacity() {
-    return ((Pointer) var->ptr).Count();
+CC::Size CC::Object<char (*)[]>::Length() const {
+    return *count;
 }
 
-char & CC::Type<char (*)[]>::operator[](Size index) {
-    return var->ptr[index].value;
+bool CC::Object<char (*)[]>::IsEmpty() const {
+    return Length() == 0;
 }
 
-const char & CC::Type<char (*)[]>::operator[](Size index) const {
-    return var->ptr[index].value;
+CC::Size CC::Object<char (*)[]>::Capacity() {
+    return Pointer::Count(*object);
 }
 
-void CC::Type<char (*)[]>::Insert(Size index, const char * str, Size cnt) {
+char & CC::Object<char (*)[]>::operator[](Size index) {
+    return (**object)[index];
+}
+
+const char & CC::Object<char (*)[]>::operator[](Size index) const {
+    return (**object)[index];
+}
+
+void CC::Object<char (*)[]>::Insert(Size index, const char * str, Size cnt) {
     if (cnt < 1) return;
 
     auto indexEnd = Count() + cnt;
@@ -84,7 +104,7 @@ void CC::Type<char (*)[]>::Insert(Size index, const char * str, Size cnt) {
     }
 
     if (indexEnd > Capacity()) {
-        var->ptr = Pointer::ReAlloc<Type<char>>(var->ptr, indexEnd);
+        *object = Slice<char>::ReAlloc(*object, indexEnd);
     }
 
     // Move the data [index .. Count()] to the end
@@ -96,52 +116,72 @@ void CC::Type<char (*)[]>::Insert(Size index, const char * str, Size cnt) {
 
     if (index < Count()) {
         // Move part 3 to the end
-        Pointer::ReplaceElements(var->ptr,
+        Pointer::ReplaceElements(*object,
                                  index + cnt,
-                                 Pointer::Element(var->ptr, index),
+                                 Pointer::Element(*object, index),
                                  Count() - index);
     }
 
     // Insert part 2 into data
-    Pointer::ReplaceElements(var->ptr, index, str, cnt);
+    Pointer::ReplaceElements(*object, index, str, cnt);
 
     *count += cnt;
 }
 
-void CC::Type<char (*)[]>::Insert(Size index, const char & t) {
+void CC::Object<char (*)[]>::Insert(Size index, const char & t) {
     Insert(index, &t, 1);
 }
 
-void CC::Type<char (*)[]>::Push(const char * str, Size cnt) {
+void CC::Object<char (*)[]>::Push(const char * str, Size cnt) {
     Insert(Count(), str, cnt);
 }
 
-void CC::Type<char (*)[]>::Push(const char * str) {
+void CC::Object<char (*)[]>::Push(const char * str) {
     Insert(Count(), str, strlen(str));
 }
 
-void CC::Type<char (*)[]>::Push(const char & t) {
+void CC::Object<char (*)[]>::Push(const char & t) {
     Insert(Count(), t);
 }
 
-void CC::Type<char (*)[]>::Delete(Size index, Size cnt) {}
+void CC::Object<char (*)[]>::Delete(Size index, Size cnt) {
+    if (cnt < 1) return;
 
-void CC::Type<char (*)[]>::Delete(Size index) {
     if (index >= Count()) return;
 
-    if (index == Count() - 1) {
-        *count -=1;
+    // Erase
+    // Part 1             Part 2              // Part 3
+    // data[0 .. index] + erase[0 .. count] + data[index .. last]
+    // Part 1                                 // Part 3
+    // data[0 .. index]         +             data[index .. last]
+
+    auto indexEnd = index + cnt;
+
+    // Case 1: From index remove to the data.end
+    // x: place to remove
+    // | | | |x|x|
+    if (indexEnd >= Count()) {
+        *count = index;
         return;
     }
 
-    Pointer::ReplaceElements(var->ptr,
-                             index,
-                             Pointer::Element(var->ptr, index + 1),
-                             Count() - index - 1);
+    Pointer::ReplaceElements(*object, index, Pointer::Element(*object, indexEnd), Count() - indexEnd);
 
-    *count -= 1;
+    *count -= cnt;
 }
 
-CC::Size CC::Type<char (*)[]>::Length(char *str) {
+void CC::Object<char (*)[]>::Delete(Size index) {
+    Delete(index, 1);
+}
+
+CC::Size CC::Object<char (*)[]>::Length(char *str) {
     return strlen(str);
+}
+
+char * CC::Object<char (*)[]>::cString() {
+    return reinterpret_cast<char *>(*object);
+}
+
+const char * CC::Object<char (*)[]>::cString() const {
+    return reinterpret_cast<const char *>(*object);
 }

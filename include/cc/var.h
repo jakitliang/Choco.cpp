@@ -5,64 +5,58 @@
 #ifndef CC_VAR_H
 #define CC_VAR_H
 
-#include "cc/value.h"
 #include "cc/pointer.h"
 
 namespace CC {
-    template<>
-    struct Type<void *> : Object {
-        Object * ptr;
+    template<typename T>
+    struct Object<T *> {
+        using Class = T *;
+        using ImmutableClass = const T *;
 
-        Type() : ptr(Pointer::Alloc<Object>(1)) {
-            *ptr = Object();
+        Class object;
+
+        Object() : object(Alloc(1)) {
+            *object = T();
         }
 
-        Type(const Type & var) : ptr(Pointer::Retain<Object>(var.ptr)) {}
+        Object(const Object & o) : object(Retain(o.object)) {}
 
-        Type(Type && var) : ptr(Pointer::Retain<Object>(var.ptr)) {}
+        Object(Object && o) noexcept : object(Retain(o.object)) {}
 
-        ~Type() {
-            Pointer::Release(ptr);
-            ptr = nullptr;
+        ~Object() {
+            Pointer::Release(object);
+            object = nullptr;
         }
 
-        Object & operator*() { return *ptr; }
+        T & operator*() { return *object; }
 
-        const Object & operator*() const { return *ptr; }
+        const T & operator*() const { return *object; }
 
-        Object * operator->() { return ptr; }
+        T * operator->() { return object; }
 
-        const Object * operator->() const { return ptr; }
+        const T * operator->() const { return object; }
+
+        // Static methods for lifecycle
+
+        static Class Alloc(Size count) {
+            return static_cast<Class>(Pointer::Alloc(sizeof(T), count));
+        }
+
+        static Class Retain(Class object) {
+            return static_cast<Class>(Pointer::Retain(object));
+        }
+
+        static Class ReAlloc(Class object, Size count) {
+            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        }
+
+        static bool Release(Class object) {
+            return Pointer::Release(object);
+        }
     };
 
     template<typename T>
-    struct Type<T *> : Object {
-        Type<T> * ptr;
-
-        Type() : ptr(Pointer::Alloc<Type<T>>(1)) {
-            *ptr = Type<T>();
-        }
-
-        Type(const Type & var) : ptr(Pointer::Retain<Type<T>>(var.ptr)) {}
-
-        Type(Type && var) : ptr(Pointer::Retain<Type<T>>(var.ptr)) {}
-
-        ~Type() {
-            Pointer::Release(ptr);
-            ptr = nullptr;
-        }
-
-        T & operator*() { return ptr->value; }
-
-        const T & operator*() const { return ptr->value; }
-
-        T * operator->() { return &ptr->value; }
-
-        const T * operator->() const { return ptr->value; }
-    };
-
-    template<typename T>
-    using Var = Type<T *>;
+    using Var = Object<T *>;
 }
 
 #endif //CC_VAR_H

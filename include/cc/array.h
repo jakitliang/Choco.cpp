@@ -5,40 +5,49 @@
 #ifndef CC_ARRAY_H
 #define CC_ARRAY_H
 
-#include "cc/var.h"
-#include "cc/pointer.h"
+#include "var.h"
+#include "slice.h"
 
 namespace CC {
     template<typename T>
-    struct Type<T (*)[]> : Object {
-        Var<T> * var;
+    struct Object<T (*)[]> {
+        using Class = T (**)[];
+        using ImmutableClass = const T (**)[];
+
+        Class object;
         Size * count;
 
-        Type() : var(Pointer::Alloc<Var<T>>(1)), count(Pointer::Alloc<Size>(1)) {
-            var->ptr = Pointer::Alloc<Type<T>>(0);
+        Object() : object(Alloc()), count(Var<Size>::Alloc(1)) {
+            *object = Slice<T>::Alloc(0);
             *count = 0;
         }
 
-        Type(const Type & arr) : var(Pointer::Retain<Var<T>>(arr.var)),
-                                 count(Pointer::Retain<Size>(arr.count)) {}
+        Object(const Object & arr) : object(Retain(arr.object)),
+                                     count(Var<Size>::Retain(arr.count)) {}
 
-        Type(Type && arr) : var(Pointer::Retain<Var<T>>(arr.var)),
-                            count(Pointer::Retain<Size>(arr.count)) {}
+        Object(Object && arr) : object(Retain(arr.object)),
+                                count(Var<Size>::Retain(arr.count)) {}
 
-        ~Type() {
-            Pointer::Release(var->ptr);
-            Pointer::Release(var);
+        ~Object() {
+            if (object == nullptr) return;
+
+            auto slice = *object;
+            if (Pointer::Release(object)) {
+                Pointer::Release(slice);
+            }
+
             Pointer::Release(count);
-            var = nullptr;
+
+            object = nullptr;
             count = nullptr;
         }
 
-        Value<T> * begin() {
-            return &var->ptr[0];
+        T * begin() {
+            return &(**object)[0];
         }
 
-        Value<T> * end() {
-            return &var->ptr[Count()];
+        T * end() {
+            return &(**object)[Count()];
         }
 
         Size Count() {
@@ -46,15 +55,15 @@ namespace CC {
         }
 
         Size Capacity() {
-            return ((Pointer) var->ptr).Count();
+            return Pointer::Count(*object);
         }
 
         T & operator[](Size index) {
-            return var->ptr[index].value;
+            return (**object)[index];
         }
 
         const T & operator[](Size index) const {
-            return var->ptr[index].value;
+            return (**object)[index];
         }
 
         // Algorithms
@@ -80,7 +89,7 @@ namespace CC {
             }
 
             if (indexEnd > Capacity()) {
-                var->ptr = Pointer::ReAlloc<Type<T>>(var->ptr, indexEnd);
+                *object = Slice<T>::ReAlloc(*object, indexEnd);
             }
 
             // Move the data [index .. Count()] to the end
@@ -92,14 +101,14 @@ namespace CC {
 
             if (index < Count()) {
                 // Move part 3 to the end
-                Pointer::ReplaceElements(var->ptr,
+                Pointer::ReplaceElements(*object,
                                          index + cnt,
-                                         Pointer::Element(var->ptr, index),
+                                         Pointer::Element(*object, index),
                                          Count() - index);
             }
 
             // Insert part 2 into data
-            Pointer::ReplaceElements(var->ptr, index, elements, cnt);
+            Pointer::ReplaceElements(*object, index, elements, cnt);
 
             *count += cnt;
         }
@@ -116,27 +125,57 @@ namespace CC {
             Insert(Count(), t);
         }
 
-        void Delete(Size index, Size cnt) {}
+        void Delete(Size index, Size cnt) {
+            if (cnt < 1) return;
 
-        void Delete(Size index) {
             if (index >= Count()) return;
 
-            if (index == Count() - 1) {
-                *count -=1;
+            // Erase
+            // Part 1             Part 2              // Part 3
+            // data[0 .. index] + erase[0 .. count] + data[index .. last]
+            // Part 1                                 // Part 3
+            // data[0 .. index]         +             data[index .. last]
+
+            auto indexEnd = index + cnt;
+
+            // Case 1: From index remove to the data.end
+            // x: place to remove
+            // | | | |x|x|
+            if (indexEnd >= Count()) {
+                *count = index;
                 return;
             }
 
-            Pointer::ReplaceElements(var->ptr,
-                                     index,
-                                     Pointer::Element(var->ptr, index + 1),
-                                     Count() - index - 1);
+            Pointer::ReplaceElements(*object, index, Pointer::Element(*object, indexEnd), Count() - indexEnd);
 
-            *count -= 1;
+            *count -= cnt;
+        }
+
+        void Delete(Size index) {
+            Delete(index, 1);
+        }
+
+        // Static methods for lifecycle
+
+        static Class Alloc() {
+            return static_cast<Class>(Pointer::Alloc(sizeof(Class), 1));
+        }
+
+        static Class Retain(Class object) {
+            return static_cast<Class>(Pointer::Retain(object));
+        }
+
+        static Class ReAlloc(Class object, Size count) {
+            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        }
+
+        static bool Release(Class object) {
+            return Pointer::Release(object);
         }
     };
 
     template<typename T>
-    using Array = Type<T (*)[]>;
+    using Array = Object<T (*)[]>;
 }
 
 #endif //CC_ARRAY_H

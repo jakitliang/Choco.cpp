@@ -9,23 +9,29 @@
 #include "cc/object.h"
 
 namespace CC {
-    struct Pointer {
-        using Initializer = void (*)(void *);
-        using Finalizer = void (*)(void *);
+    template<>
+    struct Object<void *> {
+        using Class = void *;
+        using ImmutableClass = const void *;
+        using Initializer = void (*)(Class);
+        using Finalizer = void (*)(Class);
 
-        void * ptr;
+        Class object;
 
-        Pointer() = default;
+        Object() = default;
 
-        Pointer(void * const & p);
+        template<typename T>
+        Object(const Object<T *> & o) {
+            object = Retain(o.object);
+        }
 
-        Pointer(Object * const & object);
+        ~Object();
 
         // Methods
 
-        void * Element(Size index);
+        Class Element(Size index);
 
-        const void * Element(Size index) const;
+        ImmutableClass Element(Size index) const;
 
         Size SizeOfElement() const;
 
@@ -33,11 +39,11 @@ namespace CC {
 
         Size Length() const;
 
-        void ReplaceElements(Size index, const void * elements, Size count);
+        void ReplaceElements(Size index, ImmutableClass elements, Size count);
 
         // Operators
 
-        Pointer & operator=(void * const & p);
+        Object & operator=(Class const & p);
 
         operator void *();
 
@@ -45,43 +51,32 @@ namespace CC {
 
         // Static methods for lifecycle
 
-        static void * Alloc(Size size, Size count);
+        static Class Alloc(Size size, Size count);
 
-        template<typename T>
-        static T * Alloc(Size count) {
-            return static_cast<T *>(Alloc(sizeof(T), count));
-        }
+        static Class Retain(Class object);
 
-        static void * Retain(void * object);
+        static Class ReAlloc(Class object, Size count);
 
-        template<typename T>
-        static T * Retain(void * object) {
-            return static_cast<T *>(Retain(object));
-        }
-
-        static void * ReAlloc(void * object, Size count);
-
-        template<typename T>
-        static T * ReAlloc(void * object, Size count) {
-            return static_cast<T *>(ReAlloc(object, count));
-        }
-
-        static bool Release(void * object);
+        static bool Release(Class object);
 
         // Static methods for pointer
 
-        static void * Element(void * object, Size index);
+        static Class Element(Class object, Size index);
 
-        static const void * Element(const void * object, Size index);
+        static ImmutableClass Element(ImmutableClass object, Size index);
 
-        static Size SizeOfElement(const void * object);
+        static void ReplaceElements(Class object, Size index, ImmutableClass elements, Size count);
 
-        static Size Count(const void * object);
+        static void BlockCopy(Class object, Size objectIndex, ImmutableClass elements, Size elementsIndex, Size count);
 
-        static Size Length(const void * object);
+        static Size SizeOfElement(ImmutableClass object);
 
-        static void ReplaceElements(void * object, Size index, const void * elements, Size count);
+        static Size Count(ImmutableClass object);
+
+        static Size Length(ImmutableClass object);
     };
+
+    using Pointer = Object<void *>;
 }
 
 #endif //CC_POINTER_H

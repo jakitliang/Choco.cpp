@@ -2,80 +2,42 @@
 
 #include "cc/object.h"
 #include "cc/var.h"
-#include "cc/pointer.h"
+#include "cc/slice.h"
 #include "cc/array.h"
 #include "cc/string.h"
 
 using namespace std;
 using namespace CC;
 
-struct A : Object {
-    int a;
-    int b;
-};
-
-struct Test1 {
-    static const struct {
-        static void Echo () { cout << "Echo" << endl; }
-    } Object;
-};
-
-struct Test2 : Test1 {
-    int b;
-};
-
 int main() {
-    A a;
+    cout << is_pod<Object<int>>::value << endl;
+    cout << is_pod<Var<int>>::value << endl;
+    cout << is_pod<Slice<int>>::value << endl;
+    cout << is_pod<Array<int>>::value << endl;
+    cout << is_pod<String>::value << endl;
+    cout << "===================" << endl;
 
-    cout << is_pod<Object>::value << endl;
-    cout << is_standard_layout<A>::value << endl;
-    cout << is_pod<Test2>::value << endl;
-
-//    Test2 t2;
-//    t2.Object.Echo();
-
-//    cout << is
-
-//    cout << sizeof(Var<void>) << endl;
-
-//    {
-//        Var<int> i;
-//
-//        Var<int[]> z;
-//    }
-
-//    int * ip = static_cast<int *>(CC::Pointer::Alloc(4, 1));
-//
-//    ip = static_cast<int *>(CC::Pointer::ReAlloc(ip, 2));
-//
-//    cout << "count 2: " << ((CC::Pointer) ip).SizeOfElement() << endl;
-//
-//    CC::Pointer::Retain(ip);
-//
-//    CC::Pointer::Release(ip);
-//
-//    CC::Pointer::Release(ip);
+    cout << is_standard_layout<Object<int>>::value << endl;
+    cout << is_standard_layout<Var<int>>::value << endl;
+    cout << is_standard_layout<Slice<int>>::value << endl;
+    cout << is_standard_layout<Array<int>>::value << endl;
+    cout << is_standard_layout<String>::value << endl;
+    cout << "===================" << endl;
 
     {
-        CC::Array<int> arri;
-        cout << arri.Count() << endl;
-        cout << arri.Capacity() << endl;
-        arri.Insert(100, 111);
-        arri.Insert(100, 222);
-        arri.Insert(100, 333);
-        arri.Insert(100, 111);
-        arri.Insert(1, 222);
-        cout << arri.Count() << endl;
-        cout << arri.Capacity() << endl;
+        Var<int> i;
+        *i = 123;
+    }
 
-        for (auto & i : arri) {
-            cout << i << endl;
-        }
+    {
+        Array<int> ai;
 
-        cout << "------" << endl;
-        arri.Delete(0);
+        ai.Push(1);
+        int ais[] = {2,3,4,5};
 
-        for (auto & i : arri) {
+        ai.Push(ais, 4);
+
+        for (auto &i : ai) {
             cout << i << endl;
         }
     }
@@ -88,6 +50,8 @@ int main() {
         for (auto & c : s) {
             cout << c << endl;
         }
+
+        cout << s.cString() << endl;
     }
 
     return 0;

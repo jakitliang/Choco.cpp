@@ -4,7 +4,6 @@ add_library(
         main.cpp
         intptr.cpp
         pointer.cpp
-        var.cpp
         string.cpp
 )
 

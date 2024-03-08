@@ -18,68 +18,65 @@ using Page = struct {
     CC::Byte Flags[8];
 };
 
-CC::Pointer::Pointer(void *const &p) {
-    ptr = p;
+CC::Object<void *>::~Object() {
+    Release(object);
+    object = nullptr;
 }
 
-CC::Pointer::Pointer(CC::Object *const &object) {
-    ptr = object;
+CC::Object<void *>::Class CC::Object<void *>::Element(Size index) {
+    return (Byte *) object + SizeOfElement() * index;
 }
 
-void * CC::Pointer::Element(Size index) {
-    return (Byte *) ptr + SizeOfElement() * index;
+CC::Object<void *>::ImmutableClass CC::Object<void *>::Element(Size index) const {
+    return (const Byte *) object + SizeOfElement() * index;
 }
 
-const void * CC::Pointer::Element(Size index) const {
-    return (const Byte *) ptr + SizeOfElement() * index;
-}
-
-CC::Size CC::Pointer::SizeOfElement() const {
+CC::Size CC::Object<void *>::SizeOfElement() const {
     Page * page = nullptr;
 
-    if (ptr == nullptr) return 0;
+    if (object == nullptr) return 0;
 
-    page = reinterpret_cast<Page *>(ptr) - 1;
+    page = reinterpret_cast<Page *>(object) - 1;
 
     return page->SizeOfObject;
 }
 
-CC::Size CC::Pointer::Length() const {
+CC::Size CC::Object<void *>::Length() const {
     Page * page = nullptr;
 
-    if (ptr == nullptr) return 0;
+    if (object == nullptr) return 0;
 
-    page = reinterpret_cast<Page *>(ptr) - 1;
+    page = reinterpret_cast<Page *>(object) - 1;
 
-    return (UIntPtr) page->End - (UIntPtr) ptr;
+    return (UIntPtr) page->End - (UIntPtr) object;
 }
 
-CC::Size CC::Pointer::Count() const {
+CC::Size CC::Object<void *>::Count() const {
     return Length() / SizeOfElement();
 }
 
-void CC::Pointer::ReplaceElements(CC::Size index, const void *elements, CC::Size count) {
-    if (ptr == nullptr) return;
+void CC::Object<void *>::ReplaceElements(CC::Size index, ImmutableClass elements, CC::Size count) {
+    if (object == nullptr) return;
 
-    memmove((Byte *) ptr + SizeOfElement() * index, elements, SizeOfElement() * count);
+    memmove((Byte *) object + SizeOfElement() * index, elements, SizeOfElement() * count);
 }
 
-CC::Pointer &CC::Pointer::operator=(void *const &p) {
-    ptr = p;
+CC::Pointer &CC::Object<void *>::operator=(Class const &p) {
+    object = p;
     return *this;
 }
 
-CC::Pointer::operator void *() {
-    return ptr;
+CC::Object<void *>::operator void *() {
+    return object;
 }
 
-CC::Pointer::operator const void *() const {
-    return ptr;
+CC::Object<void *>::operator const void *() const {
+    return object;
 }
 
-void * CC::Pointer::Alloc(Size size, Size count) {
+CC::Object<void *>::Class CC::Object<void *>::Alloc(Size size, Size count) {
     auto page = static_cast<Page *>(malloc(sizeof(Page) + size * count + 1));
-    void * begin = nullptr;
+    Class begin = nullptr;
 
     if (page == nullptr) return nullptr;
 
@@ -98,9 +95,9 @@ void * CC::Pointer::Alloc(Size size, Size count) {
     return begin;
 }
 
-void * CC::Pointer::ReAlloc(void * object, Size count) {
+CC::Object<void *>::Class CC::Object<void *>::ReAlloc(Class object, Size count) {
     Page * page = nullptr;
-    void * begin = nullptr;
+    Class begin = nullptr;
     Page * newPage = nullptr;
 
     if (object == nullptr) return nullptr;
@@ -126,7 +123,7 @@ void * CC::Pointer::ReAlloc(void * object, Size count) {
     return begin;
 }
 
-void * CC::Pointer::Retain(void * object) {
+CC::Object<void *>::Class CC::Object<void *>::Retain(Class object) {
     Page * page = nullptr;
 
     if (object == nullptr) return nullptr;
@@ -141,7 +138,7 @@ void * CC::Pointer::Retain(void * object) {
     return object;
 }
 
-bool CC::Pointer::Release(void * object) {
+bool CC::Object<void *>::Release(Class object) {
     Page * page = nullptr;
 
     if (object == nullptr) return false;
@@ -163,15 +160,15 @@ bool CC::Pointer::Release(void * object) {
     return true;
 }
 
-void * CC::Pointer::Element(void * object, Size index) {
+CC::Object<void *>::Class CC::Object<void *>::Element(Class object, Size index) {
     return (Byte *) object + SizeOfElement(object) * index;
 }
 
-const void * CC::Pointer::Element(const void * object, Size index) {
+CC::Object<void *>::ImmutableClass CC::Object<void *>::Element(ImmutableClass object, Size index) {
     return (const Byte *) object + SizeOfElement(object) * index;
 }
 
-CC::Size CC::Pointer::SizeOfElement(const void * object) {
+CC::Size CC::Object<void *>::SizeOfElement(ImmutableClass object) {
     const Page * page = nullptr;
 
     if (object == nullptr) return 0;
@@ -181,11 +178,11 @@ CC::Size CC::Pointer::SizeOfElement(const void * object) {
     return page->SizeOfObject;
 }
 
-CC::Size CC::Pointer::Count(const void * object) {
+CC::Size CC::Object<void *>::Count(ImmutableClass object) {
     return Length(object) / SizeOfElement(object);
 }
 
-CC::Size CC::Pointer::Length(const void * object) {
+CC::Size CC::Object<void *>::Length(ImmutableClass object) {
     const Page * page = nullptr;
 
     if (object == nullptr) return 0;
@@ -195,8 +192,12 @@ CC::Size CC::Pointer::Length(const void * object) {
     return (UIntPtr) page->End - (UIntPtr) object;
 }
 
-void CC::Pointer::ReplaceElements(void *object, CC::Size index, const void *elements, CC::Size count) {
+void CC::Object<void *>::ReplaceElements(Class object, CC::Size index, ImmutableClass elements, CC::Size count) {
     memmove((Byte *) object + SizeOfElement(object) * index,
             elements,
             SizeOfElement(object) * count);
+}
+
+void CC::Object<void *>::BlockCopy(Class object, Size objectOffset, ImmutableClass elements, Size elementsOffset, Size count) {
+    memmove(Element(object, objectOffset), Element(elements, elementsOffset), count);
 }

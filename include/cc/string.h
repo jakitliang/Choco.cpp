@@ -5,30 +5,39 @@
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
-#include "cc/var.h"
-#include "cc/pointer.h"
+#include "var.h"
+#include "slice.h"
 
 namespace CC {
     template<>
-    struct Type<char (*)[]> : Object {
-        Var<char> * var;
+    struct Object<char (*)[]> {
+        using Class = char (**)[];
+        using ImmutableClass = const char (**)[];
+
+        Class object;
         Size * count;
 
-        Type();
+        Object();
 
-        Type(const Type & arr);
+        Object(const Object & arr);
 
-        Type(Type && arr) noexcept;
+        Object(Object && arr) noexcept;
 
-        Type(const char * str, Size length);
+        Object(const char * str, Size length);
 
-        Type(const char * str);
+        Object(const char * str);
 
-        ~Type();
+        Object(const Byte * bytes, Size length);
 
-        Value<char> * begin();
+        ~Object();
 
-        Value<char> * end();
+        char * begin();
+
+        char * end();
+
+        Size Length() const;
+
+        bool IsEmpty() const;
 
         Size Count();
 
@@ -55,9 +64,31 @@ namespace CC {
         void Delete(Size index);
 
         static Size Length(char * str);
+
+        char * cString();
+
+        const char * cString() const;
+
+        // Static methods for lifecycle
+
+        static Class Alloc() {
+            return static_cast<Class>(Pointer::Alloc(sizeof(Class), 1));
+        }
+
+        static Class Retain(Class object) {
+            return static_cast<Class>(Pointer::Retain(object));
+        }
+
+        static Class ReAlloc(Class object, Size count) {
+            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        }
+
+        static bool Release(Class object) {
+            return Pointer::Release(object);
+        }
     };
 
-    using String = Type<char (*)[]>;
+    using String = Object<char (*)[]>;
 }
 
 #endif //CC_STRING_H
