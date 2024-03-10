@@ -5,33 +5,33 @@
 #ifndef CC_POINTER_H
 #define CC_POINTER_H
 
-#include "cc/numeric.h"
-#include "cc/object.h"
+#include "cc/types.h"
+#include "cc/variant.h"
 
 namespace CC {
     template<>
-    struct Object<void *> {
-        using Class = void *;
-        using ImmutableClass = const void *;
-        using Initializer = void (*)(Class);
-        using Finalizer = void (*)(Class);
+    struct Variant<void *> {
+        using Type = void *;
+        using ImmutableType = const void *;
+        using Initializer = void (*)(Type);
+        using Finalizer = void (*)(Type);
 
-        Class object;
+        Type object;
 
-        Object() = default;
+        Variant() = default;
 
         template<typename T>
-        Object(const Object<T *> & o) {
+        Variant(const Variant<T *> & o) {
             object = Retain(o.object);
         }
 
-        ~Object();
+        ~Variant();
 
         // Methods
 
-        Class Element(Size index);
+        Type Element(Size index);
 
-        ImmutableClass Element(Size index) const;
+        ImmutableType Element(Size index) const;
 
         Size SizeOfElement() const;
 
@@ -39,11 +39,11 @@ namespace CC {
 
         Size Length() const;
 
-        void ReplaceElements(Size index, ImmutableClass elements, Size count);
+        void ReplaceElements(Size index, ImmutableType elements, Size count);
 
         // Operators
 
-        Object & operator=(Class const & p);
+        Variant & operator=(Type const & p);
 
         operator void *();
 
@@ -51,32 +51,32 @@ namespace CC {
 
         // Static methods for lifecycle
 
-        static Class Alloc(Size size, Size count);
+        static Type Alloc(Size size, Size count);
 
-        static Class Retain(Class object);
+        static Type Retain(Type object);
 
-        static Class ReAlloc(Class object, Size count);
+        static Type ReAlloc(Type object, Size count);
 
-        static bool Release(Class object);
+        static bool Release(Type object);
 
         // Static methods for pointer
 
-        static Class Element(Class object, Size index);
+        static Type Element(Type object, Size index);
 
-        static ImmutableClass Element(ImmutableClass object, Size index);
+        static ImmutableType Element(ImmutableType object, Size index);
 
-        static void ReplaceElements(Class object, Size index, ImmutableClass elements, Size count);
+        static void ReplaceElements(Type object, Size index, ImmutableType elements, Size count);
 
-        static void BlockCopy(Class object, Size objectIndex, ImmutableClass elements, Size elementsIndex, Size count);
+        static void BlockCopy(Type object, Size objectIndex, ImmutableType elements, Size elementsIndex, Size count);
 
-        static Size SizeOfElement(ImmutableClass object);
+        static Size SizeOfElement(ImmutableType object);
 
-        static Size Count(ImmutableClass object);
+        static Size Count(ImmutableType object);
 
-        static Size Length(ImmutableClass object);
+        static Size Length(ImmutableType object);
     };
 
-    using Pointer = Object<void *>;
+    using Pointer = Variant<void *>;
 }
 
 #endif //CC_POINTER_H

@@ -10,25 +10,25 @@
 
 namespace CC {
     template<typename T>
-    struct Object<T (*)[]> {
-        using Class = T (**)[];
-        using ImmutableClass = const T (**)[];
+    struct Variant<T (*)[]> {
+        using Type = T (**)[];
+        using ImmutableType = const T (**)[];
 
-        Class object;
+        Type object;
         Size * count;
 
-        Object() : object(Alloc()), count(Var<Size>::Alloc(1)) {
+        Variant() : object(Alloc()), count(Var<Size>::Alloc(1)) {
             *object = Slice<T>::Alloc(0);
             *count = 0;
         }
 
-        Object(const Object & arr) : object(Retain(arr.object)),
-                                     count(Var<Size>::Retain(arr.count)) {}
+        Variant(const Variant & arr) : object(Retain(arr.object)),
+                                       count(Var<Size>::Retain(arr.count)) {}
 
-        Object(Object && arr) : object(Retain(arr.object)),
-                                count(Var<Size>::Retain(arr.count)) {}
+        Variant(Variant && arr) : object(Retain(arr.object)),
+                                  count(Var<Size>::Retain(arr.count)) {}
 
-        ~Object() {
+        ~Variant() {
             if (object == nullptr) return;
 
             auto slice = *object;
@@ -157,25 +157,25 @@ namespace CC {
 
         // Static methods for lifecycle
 
-        static Class Alloc() {
-            return static_cast<Class>(Pointer::Alloc(sizeof(Class), 1));
+        static Type Alloc() {
+            return static_cast<Type>(Pointer::Alloc(sizeof(Type), 1));
         }
 
-        static Class Retain(Class object) {
-            return static_cast<Class>(Pointer::Retain(object));
+        static Type Retain(Type object) {
+            return static_cast<Type>(Pointer::Retain(object));
         }
 
-        static Class ReAlloc(Class object, Size count) {
-            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        static Type ReAlloc(Type object, Size count) {
+            return static_cast<Type>(Pointer::ReAlloc(object, count));
         }
 
-        static bool Release(Class object) {
+        static bool Release(Type object) {
             return Pointer::Release(object);
         }
     };
 
     template<typename T>
-    using Array = Object<T (*)[]>;
+    using Array = Variant<T (*)[]>;
 }
 
 #endif //CC_ARRAY_H

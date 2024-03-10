@@ -2,8 +2,8 @@
 // Created by JakitLiang<jakitliang@gmail.com> on 2024/3/5.
 //
 
-#ifndef CC_NUMERIC_H
-#define CC_NUMERIC_H
+#ifndef CC_TYPES_H
+#define CC_TYPES_H
 
 #include "cc/defines.h"
 
@@ -25,4 +25,4 @@ namespace CC {
 #endif
 }
 
-#endif //CC_NUMERIC_H
+#endif //CC_TYPES_H

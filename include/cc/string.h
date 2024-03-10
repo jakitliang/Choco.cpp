@@ -10,26 +10,26 @@
 
 namespace CC {
     template<>
-    struct Object<char (*)[]> {
-        using Class = char (**)[];
-        using ImmutableClass = const char (**)[];
+    struct Variant<char (*)[]> {
+        using Type = char (**)[];
+        using ImmutableType = const char (**)[];
 
-        Class object;
+        Type object;
         Size * count;
 
-        Object();
+        Variant();
 
-        Object(const Object & arr);
+        Variant(const Variant & arr);
 
-        Object(Object && arr) noexcept;
+        Variant(Variant && arr) noexcept;
 
-        Object(const char * str, Size length);
+        Variant(const char * str, Size length);
 
-        Object(const char * str);
+        Variant(const char * str);
 
-        Object(const Byte * bytes, Size length);
+        Variant(const Byte * bytes, Size length);
 
-        ~Object();
+        ~Variant();
 
         char * begin();
 
@@ -71,24 +71,24 @@ namespace CC {
 
         // Static methods for lifecycle
 
-        static Class Alloc() {
-            return static_cast<Class>(Pointer::Alloc(sizeof(Class), 1));
+        static Type Alloc() {
+            return static_cast<Type>(Pointer::Alloc(sizeof(Type), 1));
         }
 
-        static Class Retain(Class object) {
-            return static_cast<Class>(Pointer::Retain(object));
+        static Type Retain(Type object) {
+            return static_cast<Type>(Pointer::Retain(object));
         }
 
-        static Class ReAlloc(Class object, Size count) {
-            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        static Type ReAlloc(Type object, Size count) {
+            return static_cast<Type>(Pointer::ReAlloc(object, count));
         }
 
-        static bool Release(Class object) {
+        static bool Release(Type object) {
             return Pointer::Release(object);
         }
     };
 
-    using String = Object<char (*)[]>;
+    using String = Variant<char (*)[]>;
 }
 
 #endif //CC_STRING_H

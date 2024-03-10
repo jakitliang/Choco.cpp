@@ -1,5 +1,5 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/6.
+// Created by Jakit on 2024/3/10.
 //
 
 #ifndef CC_OBJECT_H
@@ -7,9 +7,12 @@
 
 namespace CC {
     template<typename T>
-    struct Object {
-        using Class = T;
-    };
+    struct Variant;
+
+    template<>
+    struct Variant<void> {};
+
+    using Object = Variant<void>;
 }
 
 #endif //CC_OBJECT_H

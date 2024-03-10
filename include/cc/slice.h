@@ -9,20 +9,20 @@
 
 namespace CC {
     template<typename T>
-    struct Object<T []> {
-        using Class = T(*)[];
+    struct Variant<T []> {
+        using Type = T(*)[];
 
-        Class object;
+        Type object;
 
-        Object() : object(Alloc(0)) {}
+        Variant() : object(Alloc(0)) {}
 
-        Object(const Object<T []> & slice) : object(Retain(slice.object)) {}
+        Variant(const Variant<T []> & slice) : object(Retain(slice.object)) {}
 
-        Object(Object<T []> && slice) : object(Retain(slice.object)) {}
+        Variant(Variant<T []> && slice) : object(Retain(slice.object)) {}
 
-        Object(const Size & count) : object(Alloc(count)) {}
+        Variant(const Size & count) : object(Alloc(count)) {}
 
-        ~Object() {
+        ~Variant() {
             Release(object);
             object = nullptr;
         }
@@ -43,25 +43,25 @@ namespace CC {
 
         // Static methods for lifecycle
 
-        static Class Alloc(Size count) {
-            return static_cast<Class>(Pointer::Alloc(sizeof(T), count));
+        static Type Alloc(Size count) {
+            return static_cast<Type>(Pointer::Alloc(sizeof(T), count));
         }
 
-        static Class Retain(Class object) {
-            return static_cast<Class>(Pointer::Retain(object));
+        static Type Retain(Type object) {
+            return static_cast<Type>(Pointer::Retain(object));
         }
 
-        static Class ReAlloc(Class object, Size count) {
-            return static_cast<Class>(Pointer::ReAlloc(object, count));
+        static Type ReAlloc(Type object, Size count) {
+            return static_cast<Type>(Pointer::ReAlloc(object, count));
         }
 
-        static bool Release(Class object) {
+        static bool Release(Type object) {
             return Pointer::Release(object);
         }
     };
 
     template<typename T>
-    using Slice = Object<T []>;
+    using Slice = Variant<T []>;
 }
 
 #endif //CC_SLICE_H
