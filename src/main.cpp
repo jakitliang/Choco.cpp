@@ -9,6 +9,10 @@
 using namespace std;
 using namespace CC;
 
+struct Test : Object {
+    int i;
+};
+
 int main() {
     cout << is_pod<Variant<int>>::value << endl;
     cout << is_pod<Var<int>>::value << endl;
@@ -24,10 +28,30 @@ int main() {
     cout << is_standard_layout<String>::value << endl;
     cout << "===================" << endl;
 
-    cout << "123 " << sizeof(void *) << ", size_t " << sizeof(size_t) << endl;
+    {
+        auto t = new Test;
+        auto r = new (t) Test[4];
+
+        for (auto & b : r->Inspect()) {
+            cout << b << endl;
+        }
+
+        delete [] r;
+        delete t;
+    }
 
     {
-        int i = 123;
+        auto vi = new Variant<int>;
+
+        cout << **vi << endl;
+        delete vi;
+    }
+
+    {
+        auto vi = new Variant<int []>(10);
+
+//        cout << **vi << endl;
+        delete vi;
     }
 
     {
@@ -41,8 +65,6 @@ int main() {
         for (auto & i : si) {
             cout << i << endl;
         }
-
-        Slice<long> sl = (long []){1, 2, 3};
     }
 
     {
@@ -68,6 +90,12 @@ int main() {
         }
 
         cout << s.cString() << endl;
+    }
+
+    {
+        void * p = malloc(1024);
+        cout << "p size: " << _msize(p) << endl;
+        free(p);
     }
 
     return 0;

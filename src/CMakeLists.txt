@@ -5,6 +5,6 @@ add_library(
         intptr.cpp
         pointer.cpp
         string.cpp
-)
+        zone.cpp)
 
 target_include_directories(cc-src PUBLIC ../)

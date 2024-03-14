@@ -5,12 +5,92 @@
 #ifndef CC_OBJECT_H
 #define CC_OBJECT_H
 
+#include "zone.h"
+
 namespace CC {
     template<typename T>
     struct Variant;
 
     template<>
-    struct Variant<void> {};
+    struct Variant<void> {
+        struct Inspector {
+            Byte * Bytes() {
+                return reinterpret_cast<Byte *>(this);
+            }
+
+            const Byte * Bytes() const {
+                return reinterpret_cast<const Byte *>(this);
+            }
+
+            Size size() {
+                return Zone::Size(this);
+            }
+
+            Size size() const {
+                return Zone::Size(this);
+            }
+
+            Byte & operator[](Size index) {
+                return reinterpret_cast<Byte *>(this)[index];
+            }
+
+            const Byte & operator[](Size index) const {
+                return reinterpret_cast<const Byte *>(this)[index];
+            }
+
+            Byte * begin() {
+                return reinterpret_cast<Byte *>(this);
+            }
+
+            const Byte * begin() const {
+                return reinterpret_cast<const Byte *>(this);
+            }
+
+            Byte * end() {
+                return reinterpret_cast<Byte *>(this) + size();
+            }
+
+            const Byte * end() const {
+                return reinterpret_cast<const Byte *>(this) + size();
+            }
+        };
+
+        Inspector & Inspect() {
+            return reinterpret_cast<Inspector &>(*this);
+        }
+
+        static void * operator new(Size size) {
+            return Zone::Alloc(size);
+        }
+
+        static void * operator new[](Size size) {
+            return Zone::Alloc(size);
+        }
+
+        static void * operator new(Size size, void * ptr) {
+            if (Zone::Size(ptr) != size) {
+                return Zone::ReAlloc(ptr, size);
+            }
+
+            return ptr;
+        }
+
+        static void * operator new[](Size size, void * ptr) {
+            if (Zone::Size(ptr) != size) {
+                return Zone::ReAlloc(ptr, size);
+            }
+
+            return ptr;
+        }
+
+        static void operator delete(void * object) {
+            Zone::Release(object);
+        }
+
+        static void operator delete[](void * object) {
+            Zone::Release(object);
+        }
+    };
 
     using Object = Variant<void>;
 }

@@ -71,5 +71,3 @@ CC::UIntPtr::operator void *() {
 CC::UIntPtr::operator const void *() const {
     return reinterpret_cast<const void *>(address);
 }
-
-

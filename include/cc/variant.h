@@ -8,24 +8,35 @@
 #include "cc/object.h"
 
 namespace CC {
-//    template<typename T>
-//    struct Variant;
-//
-//    template<>
-//    struct Variant<void> {
-//        template<typename T>
-//        static T Type(const T & object) {
-//            return {};
-//        }
-//    };
-
     template<typename T>
     struct Variant : Variant<void> {
-//        using Type = T;
-//        using ImmutableType = const T;
+        using Type = T;
+        using ImmutableType = const T;
 
-        static Variant<T> Class(const T & object) {
-            return {};
+        Type object;
+
+        Variant() : object(T()) {}
+
+        Variant(const Variant & v) = default;
+
+        Variant(const T & o) : object(o) {}
+
+        Variant(T && o) : object(static_cast<T &&>(o)) {}
+
+        ~Variant() {
+            object.~T();
+        }
+
+        Variant & operator=(const T & o) {
+            object = o;
+        }
+
+        Variant & operator=(T && o) {
+            object = static_cast<T &&>(o);
+        }
+
+        T & operator*() {
+            return object;
         }
     };
 }

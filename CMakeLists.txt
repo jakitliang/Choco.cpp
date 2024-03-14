@@ -7,4 +7,4 @@ include_directories(include)
 
 add_subdirectory(src)
 
-add_executable(cc $<TARGET_OBJECTS:cc-src> include/cc/object.h)
+add_executable(cc $<TARGET_OBJECTS:cc-src>)

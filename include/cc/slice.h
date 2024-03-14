@@ -10,7 +10,7 @@
 
 namespace CC {
     template<typename T>
-    struct Variant<T []> {
+    struct Variant<T []> : Variant<void> {
         using Type = T(*)[];
 
         Type object;
@@ -72,6 +72,10 @@ namespace CC {
 
         static bool Release(Type object) {
             return Pointer::Release(object);
+        }
+
+        static void * operator new(Size size) {
+            return Zone::Alloc(size);
         }
     };
 
