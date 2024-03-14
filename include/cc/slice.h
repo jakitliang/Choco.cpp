@@ -6,6 +6,7 @@
 #define CC_SLICE_H
 
 #include "cc/var.h"
+#include <initializer_list>
 
 namespace CC {
     template<typename T>
@@ -22,17 +23,31 @@ namespace CC {
 
         Variant(const Size & count) : object(Alloc(count)) {}
 
+        template<Size S>
+        Variant(const T (&arrRef)[S]) : object(Alloc(S)){
+            for (int i = 0; i < S; ++i) {
+                (*object)[i] = arrRef[i];
+            }
+        }
+
+        template<Size S>
+        Variant(T (&&arrRef)[S]) : object(Alloc(S)){
+            for (int i = 0; i < S; ++i) {
+                (*object)[i] = static_cast<T &&>(arrRef[i]);
+            }
+        }
+
         ~Variant() {
             Release(object);
             object = nullptr;
         }
 
         T * begin() {
-            return object;
+            return &(*object)[0];
         }
 
         T * end() {
-            return Pointer::Element(object, Pointer::Count(object));
+            return &(*object)[Pointer::Count(object)];
         }
 
         T & operator [](Size index) {

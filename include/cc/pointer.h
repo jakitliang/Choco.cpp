@@ -59,6 +59,8 @@ namespace CC {
 
         static bool Release(Type object);
 
+        static Type operator new(Size size);
+
         // Static methods for pointer
 
         static Type Element(Type object, Size index);

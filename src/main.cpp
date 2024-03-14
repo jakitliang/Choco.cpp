@@ -24,6 +24,8 @@ int main() {
     cout << is_standard_layout<String>::value << endl;
     cout << "===================" << endl;
 
+    cout << "123 " << sizeof(void *) << ", size_t " << sizeof(size_t) << endl;
+
     {
         int i = 123;
     }
@@ -31,6 +33,16 @@ int main() {
     {
         Var<int> i;
         *i = 123;
+    }
+
+    {
+        Slice<int> si({1, 2, 3});
+
+        for (auto & i : si) {
+            cout << i << endl;
+        }
+
+        Slice<long> sl = (long []){1, 2, 3};
     }
 
     {

@@ -28,6 +28,26 @@ namespace CC {
         Variant(Variant && arr) : object(Retain(arr.object)),
                                   count(Var<Size>::Retain(arr.count)) {}
 
+        template<Size S>
+        Variant(const T (&arrRef)[S]) : object(Alloc()){
+            *object = Slice<T>::Alloc(S);
+            *count = S;
+
+            for (int i = 0; i < S; ++i) {
+                (**object)[i] = arrRef[i];
+            }
+        }
+
+        template<Size S>
+        Variant(T (&&arrRef)[S]) : object(Alloc()){
+            *object = Slice<T>::Alloc(S);
+            *count = S;
+
+            for (int i = 0; i < S; ++i) {
+                (**object)[i] = static_cast<T &&>(arrRef[i]);
+            }
+        }
+
         ~Variant() {
             if (object == nullptr) return;
 

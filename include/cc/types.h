@@ -18,10 +18,12 @@ namespace CC {
     using UInt64 = unsigned long long;
     using Byte = UInt8;
 
-#ifdef CC_64
-    using Size = unsigned long long;
-#else
+#if defined(_WIN64)
+    using Size = unsigned __int64;
+#elif defined(_WIN32)
     using Size = unsigned int;
+#elif defined(__SIZE_TYPE__)
+    using Size = __SIZE_TYPE__;
 #endif
 }
 
