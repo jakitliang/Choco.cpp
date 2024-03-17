@@ -1,10 +1,10 @@
 
 add_library(
         cc-src OBJECT
-        main.cpp
         intptr.cpp
-        pointer.cpp
+        zone.cpp
+        #        pointer.cpp
         string.cpp
-        zone.cpp)
+)
 
 target_include_directories(cc-src PUBLIC ../)

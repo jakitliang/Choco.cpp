@@ -5,77 +5,101 @@
 #ifndef CC_SLICE_H
 #define CC_SLICE_H
 
-#include "cc/var.h"
-#include <initializer_list>
+#include "cc/variant.h"
+#include <iostream>
 
 namespace CC {
     template<typename T>
     struct Variant<T []> : Variant<void> {
-        using Type = T(*)[];
+        using Type = T[];
 
-        Type object;
+        Type & object;
 
-        Variant() : object(Alloc(0)) {}
+        Variant() : object(*reinterpret_cast<T (*)[]>(Zone::Alloc<T>(0))) {}
 
         Variant(const Variant<T []> & slice) : object(Retain(slice.object)) {}
 
         Variant(Variant<T []> && slice) : object(Retain(slice.object)) {}
 
-        Variant(const Size & count) : object(Alloc(count)) {}
-
-        template<Size S>
-        Variant(const T (&arrRef)[S]) : object(Alloc(S)){
-            for (int i = 0; i < S; ++i) {
-                (*object)[i] = arrRef[i];
+        Variant(const Size & count) : object(*reinterpret_cast<Type *>(Zone::Alloc<T>(count))) {
+            for (int i = 0; i < count; ++i) {
+                new (&object[i]) T();
             }
         }
 
         template<Size S>
-        Variant(T (&&arrRef)[S]) : object(Alloc(S)){
+        Variant(const T (&array)[S]) : object(*reinterpret_cast<Type *>(Zone::Alloc<T>(S))){
             for (int i = 0; i < S; ++i) {
-                (*object)[i] = static_cast<T &&>(arrRef[i]);
+                new (&object[i]) T(array[i]);
+            }
+        }
+
+        template<Size S>
+        Variant(T (&&array)[S]) : object(*reinterpret_cast<Type *>(Zone::Alloc<T>(S))){
+            for (int i = 0; i < S; ++i) {
+                new (&object[i]) T(static_cast<T &&>(array[i]));
+            }
+        }
+
+        Variant(const Variant<T []> & s1, const Variant<T []> & s2)
+            : object(*reinterpret_cast<Type *>(Zone::Alloc<T>(s1.Count() + s2.Count()))) {
+            int i = 0;
+            for (int j = 0; j < s1.Count(); ++i, ++j) {
+                new (&object[i]) T(s1[j]);
+            }
+            for (int j = 0; j < s2.Count(); ++i, ++j) {
+                new (&object[i]) T(s2[j]);
+            }
+        }
+
+        template<Size S>
+        Variant(const Variant<T []> & s1, const T (&&array)[S])
+                : object(*reinterpret_cast<Type *>(Zone::Alloc<T>(s1.Count() + S))) {
+            int i = 0;
+            for (int j = 0; j < s1.Count(); ++i, ++j) {
+                new (&object[i]) T(s1[j]);
+            }
+            for (int j = 0; j < S; ++i, ++j) {
+                new (&object[i]) T(array[j]);
             }
         }
 
         ~Variant() {
-            Release(object);
-            object = nullptr;
+            Release(object, [](Type & t) {
+                auto count = CC::Count<T>(t);
+                for (int i = 0; i < count; ++i) {
+                    t[i].~T();
+                }
+            });
         }
 
+        CC::Size Count() { return CC::Count<T>(object); }
+
+        CC::Size Count() const { return CC::Count<T>(object); }
+
         T * begin() {
-            return &(*object)[0];
+            return &object[0];
         }
 
         T * end() {
-            return &(*object)[Pointer::Count(object)];
+            return &object[Count()];
         }
 
         T & operator [](Size index) {
-            return (*object)[index];
+            return object[index];
         }
 
-        Size Count() const { return Pointer::Count(object); }
-
-        // Static methods for lifecycle
-
-        static Type Alloc(Size count) {
-            return static_cast<Type>(Pointer::Alloc(sizeof(T), count));
+        const T & operator [](Size index) const {
+            return object[index];
         }
 
-        static Type Retain(Type object) {
-            return static_cast<Type>(Pointer::Retain(object));
+        Variant operator+(const Variant & rhs) const {
+            return {*this, rhs};
         }
 
-        static Type ReAlloc(Type object, Size count) {
-            return static_cast<Type>(Pointer::ReAlloc(object, count));
-        }
-
-        static bool Release(Type object) {
-            return Pointer::Release(object);
-        }
-
-        static void * operator new(Size size) {
-            return Zone::Alloc(size);
+        template<Size S>
+        Variant operator+(const T (&rhs)[S]) const {
+            return {*this, rhs};
         }
     };
 

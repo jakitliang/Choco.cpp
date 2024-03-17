@@ -5,27 +5,25 @@
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
+#include "collection.h"
 #include "var.h"
-#include "slice.h"
 
 namespace CC {
     template<>
     struct Variant<char (*)[]> {
-        using Type = char (**)[];
-        using ImmutableType = const char (**)[];
+        using Type = Collection<char>;
 
-        Type object;
-        Size * count;
+        Type * object;
 
         Variant();
 
-        Variant(const Variant & arr);
+        Variant(const Variant & str);
 
-        Variant(Variant && arr) noexcept;
+        Variant(Variant && str) noexcept;
 
-        Variant(const char * str, Size length);
+        Variant(const char * cStr, Size length);
 
-        Variant(const char * str);
+        Variant(const char * cStr);
 
         Variant(const Byte * bytes, Size length);
 
@@ -37,54 +35,35 @@ namespace CC {
 
         Size Length() const;
 
-        bool IsEmpty() const;
+        char * cString();
 
-        Size Count();
-
-        Size Capacity();
+        const char * cString() const;
 
         char & operator[](Size index);
 
         const char & operator[](Size index) const;
 
+        bool operator!() const;
+
         // Algorithms
 
-        void Insert(Size index, const char * str, Size cnt);
+        void Insert(Size index, const char * str, Size length);
 
         void Insert(Size index, const char & t);
 
-        void Push(const char * str, Size cnt);
+        void Push(const char * str, Size length);
 
         void Push(const char * str);
 
         void Push(const char & t);
 
-        void Delete(Size index, Size cnt);
+        void Delete(Size index, Size length);
 
         void Delete(Size index);
 
-        static Size Length(char * str);
-
-        char * cString();
-
-        const char * cString() const;
-
-        // Static methods for lifecycle
-
-        static Type Alloc() {
-            return static_cast<Type>(Pointer::Alloc(sizeof(Type), 1));
-        }
-
-        static Type Retain(Type object) {
-            return static_cast<Type>(Pointer::Retain(object));
-        }
-
-        static Type ReAlloc(Type object, Size count) {
-            return static_cast<Type>(Pointer::ReAlloc(object, count));
-        }
-
-        static bool Release(Type object) {
-            return Pointer::Release(object);
+        template<typename T>
+        friend T & operator<<(T &os, const Variant & str) {
+            return os << str.cString();
         }
     };
 

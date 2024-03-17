@@ -5,9 +5,14 @@
 #include "cc/zone.h"
 #include <iostream>
 #include <unordered_map>
+#include <cstring>
 
 CC_C_BEGIN
+#if defined(_WINDOWS)
 #include <malloc.h>
+#elif defined(__GNUC__)
+#include <malloc.h>
+#endif
 CC_C_END
 
 using namespace std;
@@ -50,8 +55,9 @@ void *CC::Zone::ReAlloc(void *oldObject, CC::Size size) {
          << endl;
 
     MemoryMap[object] = {end, ret->second.Ref};
-    MemoryMap.erase(oldObject);
+    if (object == oldObject) return object; // Same address
 
+    MemoryMap.erase(oldObject);
     return object;
 }
 
@@ -91,11 +97,34 @@ bool CC::Zone::Release(void *object) {
     return true;
 }
 
-CC::Size CC::Zone::Size(void *object) {
+bool CC::Zone::Release(void * object, Finalizer finalizer) {
+    if (object == nullptr) return false;
+
+    auto ret = MemoryMap.find(object);
+    if (ret == MemoryMap.end()) return false;
+
+    ret->second.Ref -= 1;
+
+    cout << "Release <" << object << "> "
+         << "ref[" << ret->second.Ref << "] "
+         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
+         << (ret->second.Ref == 0 ? " freed!" : "") << endl;
+
+    if (ret->second.Ref > 0) return false;
+    (*finalizer)(object);
+    MemoryMap.erase(object);
+    free(object);
+
+    return true;
+}
+
+CC::Size CC::Zone::Count(void *object) {
     auto ret = MemoryMap.find(object);
 
     if (ret == MemoryMap.end()) {
 #ifdef _WINDOWS
+        return _msize(object);
+#elif defined(__MINGW64__) || defined(__MINGW32__)
         return _msize(object);
 #else
         return malloc_usable_size(object);
@@ -105,11 +134,13 @@ CC::Size CC::Zone::Size(void *object) {
     return (UInt64) ret->second.End - (UInt64) object;
 }
 
-CC::Size CC::Zone::Size(const void *object) {
+CC::Size CC::Zone::Count(const void *object) {
     auto ret = MemoryMap.find((void *) (CC::UInt64) object);
 
     if (ret == MemoryMap.end()) {
 #ifdef _WINDOWS
+        return _msize(((void *) (CC::UInt64) object));
+#elif defined(__MINGW64__) || defined(__MINGW32__)
         return _msize(((void *) (CC::UInt64) object));
 #else
         return malloc_usable_size(((void *) (CC::UInt64) object));
@@ -117,4 +148,16 @@ CC::Size CC::Zone::Size(const void *object) {
     }
 
     return (UInt64) ret->second.End - (UInt64) object;
+}
+
+void CC::Zone::Set(void * object, int n, Size size){
+    memset(object, n, size);
+}
+
+void CC::Zone::Zero(void *object, CC::Size size) {
+    std::memset(object, 0, size);
+}
+
+void CC::Zone::Replace(void * object, Size index, const void * elements, Size count) {
+    memmove((Byte *) object + index, elements, count);
 }

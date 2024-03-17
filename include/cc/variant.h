@@ -13,18 +13,24 @@ namespace CC {
         using Type = T;
         using ImmutableType = const T;
 
-        Type object;
+        Type & object;
 
-        Variant() : object(T()) {}
+        Variant() : object(Alloc<T>()) {}
 
-        Variant(const Variant & v) = default;
+        Variant(const Variant & v) : object(Retain(v.object)) {}
+
+        Variant(Variant && v) : object(Retain(v.object)) {}
 
         Variant(const T & o) : object(o) {}
 
         Variant(T && o) : object(static_cast<T &&>(o)) {}
 
         ~Variant() {
-            object.~T();
+            Release(object, true);
+        }
+
+        Inspector & Inspect() {
+            return reinterpret_cast<Inspector &>(object);
         }
 
         Variant & operator=(const T & o) {
@@ -36,6 +42,10 @@ namespace CC {
         }
 
         T & operator*() {
+            return object;
+        }
+
+        const T & operator*() const {
             return object;
         }
     };

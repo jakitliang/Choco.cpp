@@ -18,13 +18,27 @@ namespace CC {
     using UInt64 = unsigned long long;
     using Byte = UInt8;
 
+#if defined(_WINDOWS)
 #if defined(_WIN64)
-    using Size = unsigned __int64;
+    using Size = unsigned long long;
 #elif defined(_WIN32)
     using Size = unsigned int;
+#endif
 #elif defined(__SIZE_TYPE__)
     using Size = __SIZE_TYPE__;
 #endif
+
+
+    template<class T> struct RemoveAll { typedef T type; };
+    template<class T> struct RemoveAll<T*> : RemoveAll<T> {};
+    template<class T> struct RemoveAll<T&> : RemoveAll<T> {};
+
+//    template<class T> struct RemoveAll<T&&> : RemoveAll<T> {};
+//    template<class T> struct RemoveAll<T const> : RemoveAll<T> {};
+//    template<class T> struct RemoveAll<T volatile> : RemoveAll<T> {};
+//    template<class T> struct RemoveAll<T const volatile> : RemoveAll<T> {};
+//    template<class T> struct RemoveAll<T[]> : RemoveAll<T> {};
+//    template<class T, int N> struct RemoveAll<T[N]> : RemoveAll<T> {};
 }
 
 #endif //CC_TYPES_H

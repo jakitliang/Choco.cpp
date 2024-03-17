@@ -23,11 +23,11 @@ namespace CC {
             }
 
             Size size() {
-                return Zone::Size(this);
+                return Zone::Count(this);
             }
 
             Size size() const {
-                return Zone::Size(this);
+                return Zone::Count(this);
             }
 
             Byte & operator[](Size index) {
@@ -68,7 +68,7 @@ namespace CC {
         }
 
         static void * operator new(Size size, void * ptr) {
-            if (Zone::Size(ptr) != size) {
+            if (Zone::Count(ptr) != size) {
                 return Zone::ReAlloc(ptr, size);
             }
 
@@ -76,7 +76,7 @@ namespace CC {
         }
 
         static void * operator new[](Size size, void * ptr) {
-            if (Zone::Size(ptr) != size) {
+            if (Zone::Count(ptr) != size) {
                 return Zone::ReAlloc(ptr, size);
             }
 
