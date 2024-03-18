@@ -76,7 +76,7 @@ namespace CC {
         explicit TrivialData(Size count) : object(Entity::Alloc(count)), Count(0) {}
 
         ~TrivialData() {
-            if constexpr (!std::is_trivially_move_constructible<T>::value) {
+            if constexpr (!std::is_trivial<T>::value) {
                 for (int i = 0; i < Count; ++i) {
                     (*object)[i].~T();
                 }

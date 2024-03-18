@@ -3,7 +3,6 @@ add_library(
         cc-src OBJECT
         intptr.cpp
         zone.cpp
-        #        pointer.cpp
         string.cpp
 )
 

@@ -2,8 +2,9 @@
 // Created by Jakit on 2024/3/16.
 //
 
-#include "cc/array.h"
+#include "cc/vector.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 using namespace CC;
@@ -141,13 +142,14 @@ int main() {
 
         cout << "===================" << endl;
         a.Delete(1);
+        cout << "===================" << endl;
 
         int x = 4;
     }
+    cout << "===================" << endl;
 
     {
         vector<A> a;
-
 
         a.push_back(A());
         a.push_back(A());
@@ -155,8 +157,10 @@ int main() {
 
         cout << "===================" << endl;
         a.erase(a.begin() + 1);
+        cout << "===================" << endl;
         int x = 4;
     }
+    cout << "===================" << endl;
 
     return 0;
 }

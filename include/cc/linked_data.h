@@ -12,44 +12,50 @@ namespace CC {
     struct LinkedData {
         struct Node {
             Node * next;
+            T object;
 
             T & operator*() {
-                return *reinterpret_cast<T *>(this + 1);
+                return this->object;
             }
 
-            void Concat(const T * elements, Size count) {
-                for (int i = 0; i < count; ++i) {
-
-                }
-                CC::CopyConstruct<T>(reinterpret_cast<T *>(this + 1), 0, elements, 1);
+            const T & operator*() const {
+                return this->object;
             }
 
-            void Concat(T * elements, Size count) {
-                CC::MoveConstruct<T>(reinterpret_cast<T *>(this + 1), 0, elements, 1);
+            Node * Concat(const T * element) {
+                next = Alloc(element);
+                return next;
+            }
+
+            Node * Concat(T * element) {
+                next = Alloc(element);
+                return next;
             }
 
             static Node * Alloc(const T * element) {
-                auto ptr = Zone::Alloc(sizeof(Node) + sizeof(T));
-                CC::CopyConstruct<T>(&(**reinterpret_cast<Node *>(ptr)), 0, element, 1);
-                return reinterpret_cast<Node *>(ptr);
+                auto node = Zone::Alloc<Node>(1);
+                node->next = nullptr;
+                CC::CopyConstruct<T>(&node->object, 0, element, 1);
+                return node;
             }
 
             static Node * Alloc(T * element) {
-                auto ptr = Zone::Alloc(sizeof(Node) + sizeof(T));
-                CC::MoveConstruct<T>(&(**reinterpret_cast<Node *>(ptr)), 0, element, 1);
-                return reinterpret_cast<Node *>(ptr);
-            }
-
-            Node * Retain() {
-                return reinterpret_cast<Node *>(Zone::Retain(this));
+                auto node = Zone::Alloc<Node>(1);
+                node->next = nullptr;
+                CC::MoveConstruct<T>(&node->object, 0, element, 1);
+                return node;
             }
 
             bool Release() {
+                if constexpr (!std::is_trivial<T>::value) {
+                    object.~T();
+                }
                 return Zone::Release(this);
             }
         };
 
         Node * object;
+        Node * lastObject;
         Size Count;
 
         LinkedData() : object(nullptr), Count(0) {}
@@ -58,8 +64,6 @@ namespace CC {
         void Insert(Size index, E * elements, Size cnt) {
             if (cnt < 1) return;
 
-            auto indexEnd = Count + cnt;
-
             if (index > Count) {
                 index = Count; // Fix insert position
             }
@@ -67,13 +71,166 @@ namespace CC {
             if (object == nullptr) {
                 object = Node::Alloc(elements);
                 elements += 1;
-                cnt -= 1;
-                auto current = object;
+                lastObject = object;
 
-                object->Concat()
+                for (int i = 1; i < cnt; ++i) {
+                    lastObject = lastObject->Concat(&elements[i]);
+                }
+
+            } else {
+                if (index == Count) {
+                    // Append to end
+                    for (int i = 0; i < cnt; ++i)
+                        lastObject = lastObject->Concat(&elements[i]);
+
+                } else {
+                    // Insert to index
+                    // Get last
+                    Node * cur = object;
+                    Node * next = nullptr;
+                    for (int i = 0; i < index; ++i) {
+                        cur = cur->next;
+                    }
+                    next = cur->next;
+                    for (int i = 0; i < cnt; ++i) {
+                        cur = cur->Concat(&elements[i]);
+                    }
+                    cur->next = next;
+                }
             }
 
+            Count += cnt;
+        }
 
+        void Delete(Size index, Size cnt) {
+            int i = 0;
+            Node * cur = nullptr;
+            Node * prev = nullptr;
+            Node * next = nullptr;
+
+            if (cnt < 1) return;
+            if (index >= Count) return;
+
+            // Erase
+            // Part 1             Part 2              // Part 3
+            // data[0 .. index] + erase[0 .. count] + data[index .. last]
+            // Part 1                                 // Part 3
+            // data[0 .. index]         +             data[index .. last]
+            auto indexEnd = index + cnt;
+
+            cur = object;
+            for (i = 0; i < index; ++i) {
+                prev = cur;
+                cur = cur->next;
+            }
+
+            for (i = 0; i < cnt; ++i) {
+                next = cur->next;
+
+                // Case 1: From head remove to the data.end
+                // x: place to remove
+                // |?|?|x|x|x|
+                if (next == lastObject->next) {
+                    cur->Release();
+
+                    // Case 2: Remove all nodes
+                    // x: place to remove
+                    // |x|x|x|x|x|
+                    if (prev == nullptr) {
+                        object = lastObject = nullptr;
+                        Count = 0;
+                        return;
+                    }
+
+                    lastObject = prev;
+                    lastObject->next = nullptr;
+                    Count -= i + 1;
+                    return;
+                }
+
+                cur->Release();
+                cur = next;
+            }
+
+            // Case 3: From head remove to the data.end
+            // x: place to remove
+            // |x|x|?|?|?|
+            if (prev == nullptr) {
+                object = next;
+                Count -= i + 1;
+                return;
+            }
+
+            // Case 4: From head remove to the data.end
+            // x: place to remove
+            // | |x|x|x| |
+            prev->next = next;
+            Count -= i + 1;
+        }
+
+        struct Iterator {
+            Iterator() : cur(nullptr), prev(nullptr) {};
+
+            Iterator(const Iterator & iterator) : cur(iterator.cur), prev(iterator.prev) {}
+
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur), prev(iterator.prev) {}
+
+            explicit Iterator(Node * node) : cur(node) {}
+
+            // Incrementing means going through the list
+            Iterator & operator++() {
+                if (cur != nullptr) {
+                    prev = cur;
+                    cur = cur->next;
+                }
+
+                return *this;
+            }
+
+            // Post fixing is bad in general, but it has its usages
+            Iterator operator++(int) {
+                Iterator temp(static_cast<Iterator &&>(*this)); // Make a copy of the iterator
+                ++(*this);                                      // Increment
+                return static_cast<Iterator &&>(temp);          // Return the copy before increment
+            }
+
+            bool operator!=(Iterator &other) {
+                return this->cur != other.cur;
+            }
+
+            // It needs to be able to compare nodes
+            bool operator!=(const Iterator &other) {
+                return this->cur != other.cur;
+            }
+
+            // Return the data from the node (dereference operator)
+            T & operator*() {
+                return **this->cur;
+            }
+
+            const T & operator*() const {
+                return **this->cur;
+            }
+
+            Node * prev = nullptr;
+            Node * cur = nullptr;
+        };
+
+        T & operator[](Size index) {
+            if (index >= Count) abort();
+            auto cur = object;
+            for (int i = 0; i < index; ++i) {
+                cur = cur->next;
+            }
+            return **cur;
+        }
+
+        Iterator begin() {
+            return Iterator(this->object);
+        }
+
+        Iterator end() {
+            return Iterator();
         }
     };
 }

@@ -6,11 +6,11 @@
 #define CC_ARRAY_H
 
 #include "trivial_data.h"
-#include "var.h"
+#include "object.h"
 
 namespace CC {
     template<typename T>
-    struct Variant<T (*)[]> {
+    struct Variant<T []> : Variant<void> {
         using Type = TrivialData<T>;
         Type * object;
 
@@ -96,7 +96,7 @@ namespace CC {
     };
 
     template<typename T>
-    using Array = Variant<T (*)[]>;
+    using Vector = Variant<T []>;
 }
 
 #endif //CC_ARRAY_H

@@ -6,11 +6,9 @@
 #define CC_OBJECT_H
 
 #include "zone.h"
+#include "variant.h"
 
 namespace CC {
-    template<typename T>
-    struct Variant;
-
     template<>
     struct Variant<void> {
         struct Inspector {

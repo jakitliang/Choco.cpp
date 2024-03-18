@@ -5,12 +5,12 @@
 #ifndef CC_SLICE_H
 #define CC_SLICE_H
 
-#include "cc/variant.h"
+#include "cc/object.h"
 #include <iostream>
 
 namespace CC {
     template<typename T>
-    struct Variant<T []> : Variant<void> {
+    struct Variant<T (&)[]> : Variant<void> {
         using Type = T[];
 
         Type & object;
@@ -101,10 +101,14 @@ namespace CC {
         Variant operator+(const T (&rhs)[S]) const {
             return {*this, rhs};
         }
+
+        Inspector & Inspect() {
+            return reinterpret_cast<Inspector &>(object);
+        }
     };
 
     template<typename T>
-    using Slice = Variant<T []>;
+    using Slice = Variant<T (&)[]>;
 }
 
 #endif //CC_SLICE_H

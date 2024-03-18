@@ -6,7 +6,7 @@
 #define CC_STRING_H
 
 #include "trivial_data.h"
-#include "var.h"
+#include "local.h"
 
 namespace CC {
     template<>
