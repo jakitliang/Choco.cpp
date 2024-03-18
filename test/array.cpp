@@ -87,18 +87,75 @@ int main() {
     struct A {
         int * a;
 
-        A() : a(new int) { cout << "A()" << endl; }
+        A() : a(new int) {
+            cout << "A()" << endl;
+        }
 
         A(const A & a) : a(new int) {
             cout << "A() copy" << endl;
             *this->a = *a.a;
         }
 
-        ~A() { cout << "A<" << this << ">" << "~A().a<" << a << ">" << endl; delete a; }
+        A(A && a) : a(new int) {
+            cout << "A() move" << endl;
+            *this->a = *a.a;
+        }
+
+        ~A() {
+            cout << "A<" << this << ">" << "~A().a<" << a << ">" << endl;
+            delete a;
+        }
+
+        A & operator=(const A & a) {
+            cout << "A::operator= copy" << endl;
+            this->a = new int(*a.a);
+            return *this;
+        }
+
+        A & operator=(A && a) {
+            cout << "A::operator= move" << endl;
+            this->a = new int(*a.a);
+            return *this;
+        }
     };
 
     {
         Array<A> a;
+
+
+        // MoveCtor
+        a.Push(A());
+        a.Push(A());
+        a.Push(A());
+
+        // CopyCtor
+//        A tmp;
+//        a.Push(tmp);
+
+        // Move
+//        a[0] = A();
+
+        // Copy
+//        A tmp;
+//        a[0] = tmp;
+
+        cout << "===================" << endl;
+        a.Delete(1);
+
+        int x = 4;
+    }
+
+    {
+        vector<A> a;
+
+
+        a.push_back(A());
+        a.push_back(A());
+        a.push_back(A());
+
+        cout << "===================" << endl;
+        a.erase(a.begin() + 1);
+        int x = 4;
     }
 
     return 0;

@@ -5,13 +5,13 @@
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
-#include "collection.h"
+#include "trivial_data.h"
 #include "var.h"
 
 namespace CC {
     template<>
     struct Variant<char (*)[]> {
-        using Type = Collection<char>;
+        using Type = TrivialData<char>;
 
         Type * object;
 

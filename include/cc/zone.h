@@ -13,10 +13,6 @@
 #include <new>
 #endif
 
-CC_C_BEGIN
-#include <malloc.h>
-CC_C_END
-
 namespace CC {
     template<typename T>
     using Initializer = void (*)(T & object);
@@ -63,7 +59,9 @@ namespace CC {
 
         static void Zero(void * object, Size size);
 
-        static void Replace(void * object, Size index, const void * elements, Size count);
+        static void BlockCopy(void * object, Size index, const void * elements, Size count);
+
+//        static void Replace(void * object, Size index, const void * elements, Size count);
     };
 
     template<typename T>
@@ -150,8 +148,87 @@ namespace CC {
     }
 
     template<typename T>
-    static void Replace(T * object, Size index, const T * elements, Size count) {
-        Zone::Replace(object, sizeof(T) * index, elements, sizeof(T) * count);
+    void Construct(T * object, Size index, Size count) {
+        object = object + index;
+
+        if constexpr (std::is_trivial<T>::value) {
+            Zone::Set(&object, 0, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                new (&object[i]) T();
+            }
+        }
+    }
+
+    template<typename T>
+    static void Copy(T * object, Size index, const T * elements, Size count) {
+        object = object + index;
+
+        if constexpr (std::is_trivially_move_constructible<T>::value) {
+            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                object[i] = elements[i];
+            }
+        }
+    }
+
+    template<typename T>
+    static void CopyConstruct(T * object, Size index, const T * elements, Size count) {
+        object = object + index;
+
+        if constexpr (std::is_trivially_move_constructible<T>::value) {
+            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                new (&object[i]) T(elements[i]);
+            }
+        }
+    }
+
+    template<typename T>
+    static void Move(T * object, Size index, T * elements, Size count) {
+        object = object + index;
+
+        if constexpr (std::is_trivially_move_constructible<T>::value) {
+            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                object[i] = static_cast<T &&>(elements[i]);
+            }
+        }
+    }
+
+    template<typename T>
+    static void MoveConstruct(T * object, Size index, T * elements, Size count) {
+        object = object + index;
+
+        if constexpr (std::is_trivially_move_constructible<T>::value) {
+            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                new (&object[i]) T(static_cast<T &&>(elements[i]));
+            }
+        }
+    }
+
+    template<typename T>
+    void Destruct(T * object, Size index, Size count) {
+        object = reinterpret_cast<T *>(object) + index;
+
+        if constexpr (std::is_trivially_move_constructible<T>::value) {
+            Zone::Set(object, 0, sizeof(T) * count);
+
+        } else {
+            for (int i = 0; i < count; ++i) {
+                object[i].~T();
+            }
+        }
     }
 }
 

@@ -10,6 +10,8 @@
 CC_C_BEGIN
 #if defined(_WINDOWS)
 #include <malloc.h>
+#elif defined(__APPLE__)
+#include <malloc/malloc.h>
 #elif defined(__GNUC__)
 #include <malloc.h>
 #endif
@@ -126,6 +128,8 @@ CC::Size CC::Zone::Count(void *object) {
         return _msize(object);
 #elif defined(__MINGW64__) || defined(__MINGW32__)
         return _msize(object);
+#elif defined(__APPLE__)
+        return malloc_size(((void *) (CC::UInt64) object));
 #else
         return malloc_usable_size(object);
 #endif
@@ -142,6 +146,8 @@ CC::Size CC::Zone::Count(const void *object) {
         return _msize(((void *) (CC::UInt64) object));
 #elif defined(__MINGW64__) || defined(__MINGW32__)
         return _msize(((void *) (CC::UInt64) object));
+#elif defined(__APPLE__)
+        return malloc_size(((void *) (CC::UInt64) object));
 #else
         return malloc_usable_size(((void *) (CC::UInt64) object));
 #endif
@@ -158,6 +164,6 @@ void CC::Zone::Zero(void *object, CC::Size size) {
     std::memset(object, 0, size);
 }
 
-void CC::Zone::Replace(void * object, Size index, const void * elements, Size count) {
+void CC::Zone::BlockCopy(void * object, Size index, const void * elements, Size count) {
     memmove((Byte *) object + index, elements, count);
 }

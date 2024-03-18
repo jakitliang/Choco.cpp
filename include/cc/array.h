@@ -5,13 +5,13 @@
 #ifndef CC_ARRAY_H
 #define CC_ARRAY_H
 
-#include "collection.h"
+#include "trivial_data.h"
 #include "var.h"
 
 namespace CC {
     template<typename T>
     struct Variant<T (*)[]> {
-        using Type = Collection<T>;
+        using Type = TrivialData<T>;
         Type * object;
 
         Variant() : object(&Alloc<Type>()) {}
@@ -46,7 +46,15 @@ namespace CC {
             object->Insert(index, elements, count);
         }
 
+        void Insert(Size index, T * elements, Size count) {
+            object->Insert(index, elements, count);
+        }
+
         void Insert(Size index, const T & t) {
+            Insert(index, &t, 1);
+        }
+
+        void Insert(Size index, T && t) {
             Insert(index, &t, 1);
         }
 
@@ -54,8 +62,16 @@ namespace CC {
             Insert(Count(), elements, cnt);
         }
 
+        void Push(T * elements, Size cnt) {
+            Insert(Count(), elements, cnt);
+        }
+
         void Push(const T & t) {
             Insert(Count(), t);
+        }
+
+        void Push(T && t) {
+            Insert(Count(), static_cast<T &&>(t));
         }
 
         void Delete(Size index, Size count) {
@@ -68,6 +84,14 @@ namespace CC {
 
         Size Count() const {
             return object->Count;
+        }
+
+        T & operator[](Size index) {
+            return object->operator[](index);
+        }
+
+        const T & operator[](Size index) const {
+            return object->operator[](index);
         }
     };
 
