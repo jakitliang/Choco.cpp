@@ -37,7 +37,7 @@ void *CC::Zone::Alloc(CC::Size size) {
     return object;
 }
 
-void *CC::Zone::ReAlloc(void *oldObject, CC::Size size) {
+void *CC::Zone::ReAlloc(void *oldObject, CC::Size size, bool * result) {
     if (oldObject == nullptr) return nullptr;
 
     auto ret = MemoryMap.find(oldObject);
@@ -45,6 +45,7 @@ void *CC::Zone::ReAlloc(void *oldObject, CC::Size size) {
 
     auto object = realloc(oldObject, size + 1);
 
+    if (result != nullptr) *result = (object != nullptr);
     if (object == nullptr) return oldObject;
 
     Byte * end = (Byte *) object + size;
@@ -113,7 +114,7 @@ bool CC::Zone::Release(void * object, Finalizer finalizer) {
          << (ret->second.Ref == 0 ? " freed!" : "") << endl;
 
     if (ret->second.Ref > 0) return false;
-    (*finalizer)(object);
+    (*finalizer)(object, (Size) ret->second.End - (Size) object);
     MemoryMap.erase(object);
     free(object);
 

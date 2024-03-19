@@ -15,15 +15,19 @@ namespace CC {
 
         Type & object;
 
-        Variant() : object(Alloc<T>()) {}
+        Variant() : object(Make<T>()) {}
 
         Variant(const Variant & v) : object(Retain(v.object)) {}
 
         Variant(Variant && v) : object(Retain(v.object)) {}
 
-        Variant(const T & o) : object(o) {}
+        Variant(const T & o) {
+            object = o;
+        }
 
-        Variant(T && o) : object(static_cast<T &&>(o)) {}
+        Variant(T && o) {
+            object = static_cast<T &&>(o);
+        }
 
         ~Variant() {
             Release(object, true);

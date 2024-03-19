@@ -6,6 +6,8 @@
 //#include "cc/array.h"
 //#include "cc/string.h"
 
+#include <vector>
+
 using namespace std;
 using namespace CC;
 
@@ -59,6 +61,11 @@ int main() {
         auto j = i;
 
         cout << j.Inspect().size() << endl;
+    }
+
+    // Vector var
+    {
+        Var<vector<int>> v;
     }
 
     return 0;

@@ -18,7 +18,11 @@ namespace CC {
             }
 
             T & operator[](Size index) {
-                return reinterpret_cast<Type &>(*this)[index];
+                return reinterpret_cast<T *>(this)[index];
+            }
+
+            const T & operator[](Size index) const {
+                return reinterpret_cast<const T *>(this)[index];
             }
 
             void Replace(Size index, const T * elements, Size count, bool construct = true) {
@@ -56,15 +60,15 @@ namespace CC {
             // Live cycle methods
 
             static Entity * Alloc(Size count) {
-                return reinterpret_cast<Entity *>(Zone::Alloc<T>(count));
+                return reinterpret_cast<Entity *>(CC::Alloc<T>(count, false));
             }
 
             Entity * ReAlloc(Size count) {
-                return reinterpret_cast<Entity *>(Zone::ReAlloc<T>(reinterpret_cast<T *>(this), count));
+                return reinterpret_cast<Entity *>(CC::ReAlloc<T>(this, count));
             }
 
             bool Release() {
-                return Zone::Release(this);
+                return CC::Release(reinterpret_cast<T *>(this), false);
             }
         };
 

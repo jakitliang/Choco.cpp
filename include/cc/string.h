@@ -10,7 +10,7 @@
 
 namespace CC {
     template<>
-    struct Variant<char (*)[]> {
+    struct Variant<char []> {
         using Type = TrivialData<char>;
 
         Type * object;
@@ -67,7 +67,7 @@ namespace CC {
         }
     };
 
-    using String = Variant<char (*)[]>;
+    using String = Variant<char []>;
 }
 
 #endif //CC_STRING_H

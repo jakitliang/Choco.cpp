@@ -28,7 +28,7 @@ struct Test1 : Object {
 
 int main() {
 //    cout << is_pod<Slice<int>>::value << endl;
-//    cout << is_pod<Array<int>>::value << endl;
+//    cout << is_pod<Array<int>>::value << end;
 //    cout << is_pod<String>::value << endl;
     cout << "===================" << endl;
 
@@ -40,14 +40,14 @@ int main() {
 //    cout << "===================" << endl;
 
     {
-        Slice<int> i;
+        Slice<int, 1> i;
         cout << i.Count() << endl;
     }
 
     cout << "===================" << endl;
 
     {
-        Slice<int> i(10);
+        Slice<int, 10> i;
         i[0] = 123;
         cout << i.Count() << endl;
     }
@@ -55,7 +55,7 @@ int main() {
     cout << "===================" << endl;
 
     {
-        Slice<int> i({1, 2, 3});
+        Slice<int, 10> i({1, 2, 3});
 
         for (auto & item : i) {
             cout << item << endl;
@@ -65,8 +65,8 @@ int main() {
     cout << "===================" << endl;
 
     {
-        Slice<int> i({1, 2, 3});
-        Slice<int> j({4, 5, 6});
+        Slice<int, 3> i({1, 2, 3});
+        Slice<int, 3> j({4, 5, 6});
         auto k = i + j;
 
         for (auto & item : k) {
@@ -77,13 +77,20 @@ int main() {
     cout << "===================" << endl;
 
     {
-        Slice<int> i({1, 2, 3});
+        Slice<int, 3> i({1, 2, 3});
         int j[] = {4, 5, 6};
         auto k = i + j;
 
         for (auto & item : k) {
             cout << item << endl;
         }
+    }
+
+    cout << "===================" << endl;
+
+    {
+        Slice<int, 3> i({1, 2, 3});
+        auto j = i;
     }
 
     cout << "===================" << endl;
@@ -102,23 +109,23 @@ int main() {
     };
 
     {
-        Slice<A> s(5);
+        Slice<A, 5> s;
     }
 
     cout << "===================" << endl;
 
     {
-        Slice<A> s1(1);
-        Slice<A> s2(1);
-        Slice<A> s3 = s1 + s2;
+        Slice<A, 1> s1;
+        Slice<A, 1> s2;
+        auto s3 = s1 + s2;
     }
 
     cout << "===================" << endl;
 
     {
-        Slice<A> s1(1);
+        Slice<A, 1> s1;
         A s2[1];
-        Slice<A> s3 = s1 + s2;
+        auto s3 = s1 + s2;
     }
 
     return 0;

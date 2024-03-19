@@ -41,4 +41,10 @@ int main() {
 
         cout << j.Inspect().size() << endl;
     }
+
+    {
+        struct A {};
+        A aa;
+        Local<A> a = aa;
+    }
 }

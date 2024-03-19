@@ -6,7 +6,7 @@
 #define CC_VARIANT_H
 
 namespace CC {
-    template<typename T>
+    template<typename... T>
     struct Variant;
 }
 
