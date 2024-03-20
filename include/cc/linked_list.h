@@ -2,14 +2,16 @@
 // Created by liangjie on 2024/3/18.
 //
 
-#ifndef CHOCO_CPP_LIST_DATA_H
-#define CHOCO_CPP_LIST_DATA_H
+#ifndef CHOCO_CPP_LINKED_LIST_H
+#define CHOCO_CPP_LINKED_LIST_H
 
 #include "cc/zone.h"
+#include "cc/list.h"
+#include <cstdlib>
 
 namespace CC {
     template<typename T>
-    struct LinkedData {
+    struct LinkedList : List<T> {
         struct Node {
             Node * next;
             T object;
@@ -33,24 +35,22 @@ namespace CC {
             }
 
             static Node * Alloc(const T * element) {
-                auto node = Zone::Alloc<Node>(1);
+                auto node = CC::Alloc<Node>();
                 node->next = nullptr;
                 CC::CopyConstruct<T>(&node->object, 0, element, 1);
                 return node;
             }
 
             static Node * Alloc(T * element) {
-                auto node = Zone::Alloc<Node>(1);
+                auto node = CC::Alloc<Node>();
                 node->next = nullptr;
                 CC::MoveConstruct<T>(&node->object, 0, element, 1);
                 return node;
             }
 
             bool Release() {
-                if constexpr (!std::is_trivial<T>::value) {
-                    object.~T();
-                }
-                return Zone::Release(this);
+                Destruct(&object);
+                return CC::Release(this);
             }
         };
 
@@ -58,7 +58,7 @@ namespace CC {
         Node * lastObject;
         Size Count;
 
-        LinkedData() : object(nullptr), Count(0) {}
+        LinkedList() : object(nullptr), lastObject(nullptr), Count(0) {}
 
         template<typename E>
         void Insert(Size index, E * elements, Size cnt) {
@@ -100,6 +100,14 @@ namespace CC {
             }
 
             Count += cnt;
+        }
+
+        virtual void CopyInsert(Size index, const T * elements, Size count) {
+            Insert(index, elements, count);
+        }
+
+        virtual void MoveInsert(Size index, T * elements, Size count) {
+            Insert(index, elements, count);
         }
 
         void Delete(Size index, Size cnt) {
@@ -235,4 +243,4 @@ namespace CC {
     };
 }
 
-#endif //CHOCO_CPP_LIST_DATA_H
+#endif //CHOCO_CPP_LINKED_LIST_H

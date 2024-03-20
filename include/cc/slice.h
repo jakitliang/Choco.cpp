@@ -1,11 +1,11 @@
 //
-// Created by liangjie on 2024/3/8.
+// Created by Jakit Liang<jakitliang@gmail.com> on 2024/3/8.
 //
 
 #ifndef CC_SLICE_H
 #define CC_SLICE_H
 
-#include "cc/object.h"
+#include "cc/var.h"
 #include <iostream>
 
 namespace CC {
@@ -15,29 +15,24 @@ namespace CC {
 
         Type * object;
 
-        Variant() : object(reinterpret_cast<Type *>(Alloc<T>(S))) {}
+        Variant() : object(reinterpret_cast<Type *>(Make<T>(S))) {}
 
         Variant(const Variant & slice) : object(reinterpret_cast<Type *>(Retain(slice.object))) {}
 
-        Variant(Variant && slice) : object(reinterpret_cast<Type *>(Retain(slice.object))) {}
-
-        template<Size SS>
-        Variant(const T (&array)[SS]) : object(reinterpret_cast<Type *>(Alloc<T>(S))) {
-            Copy<T>(reinterpret_cast<T *>(object), 0, &array[0], S > SS ? SS : S);
+        Variant(Variant && slice) : object(reinterpret_cast<Type *>(Retain(slice.object))) {
+            Destroy(slice.object);
+            slice.object = nullptr;
         }
 
-        template<Size SS>
-        Variant(T (&&array)[SS]) : object(reinterpret_cast<Type *>(Alloc<T>(S))){
-            Move<T>(reinterpret_cast<T *>(object), 0, &array[0], S > SS ? SS : S);
-        }
+        Variant(const T (&array)[S]) : object(reinterpret_cast<Type *>(Clone(array))) {}
+
+        Variant(T (&&array)[S]) : object(reinterpret_cast<Type *>(Clone(static_cast<T (&&)[S]>(array)))) {}
 
         ~Variant() {
-            Release(reinterpret_cast<T *>(object));
+            Destroy(reinterpret_cast<T *>(object));
         }
 
-        CC::Size Count() { return CC::Count<T>(object); }
-
-        CC::Size Count() const { return CC::Count<T>(object); }
+        CC::Size Count() const { return S; }
 
         T * begin() {
             return &(*object)[0];
@@ -58,11 +53,11 @@ namespace CC {
         template<Size SS>
         Variant<T [S + SS]> operator+(const Variant<T [SS]> & rhs) const {
             Variant<T [S + SS]> slice;
-            CopyConstruct<T>(reinterpret_cast<T *>(slice.object),
+            Copy<T>(reinterpret_cast<T *>(slice.object),
                              0,
                              reinterpret_cast<T *>(object),
                              S);
-            CopyConstruct<T>(reinterpret_cast<T *>(slice.object),
+            Copy<T>(reinterpret_cast<T *>(slice.object),
                              S,
                              reinterpret_cast<const T *>(rhs.object),
                              SS);
@@ -72,11 +67,11 @@ namespace CC {
         template<Size SS>
         Variant<T [S + SS]> operator+(const T (&rhs)[SS]) const {
             Variant<T [S + SS]> slice;
-            CopyConstruct<T>(reinterpret_cast<T *>(slice.object),
+            Copy<T>(reinterpret_cast<T *>(slice.object),
                              0,
                              reinterpret_cast<T *>(object),
                              S);
-            CopyConstruct<T>(reinterpret_cast<T *>(slice.object),
+            Copy<T>(reinterpret_cast<T *>(slice.object),
                              S,
                              reinterpret_cast<const T *>(&rhs[0]),
                              SS);
@@ -86,10 +81,24 @@ namespace CC {
         Inspector & Inspect() {
             return reinterpret_cast<Inspector &>(*object);
         }
+
+        template<Size P1, Size P2>
+        Variant<T [P2 - P1]> Range() const {
+            static_assert(P2 > P1, "Illegal range");
+            static_assert(P2 <= S, "Illegal range");
+            Variant<T [P2 - P1]> slice;
+            Copy<T>(reinterpret_cast<T *>(slice.object),
+                    0,
+                    reinterpret_cast<T *>(object) + P1,
+                    P2 - P1);
+            return slice;
+        }
     };
 
     template<typename T, Size S>
-    using Slice = Variant<T [S]>;
+    Variant<T [S]> Slice(T (&&array)[S]) {
+        return {array};
+    }
 }
 
 #endif //CC_SLICE_H

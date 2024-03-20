@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "cc/var.h"
-#include "cc/local.h"
-#include "cc/slice.h"
+//#include "cc/local.h"
+//#include "cc/slice.h"
 //#include "cc/array.h"
 //#include "cc/string.h"
 
@@ -47,11 +47,28 @@ int main() {
 
     // Local var test
     {
-        int i1 = 123;
-        Var<int> i = i1;
-        auto j = i;
+//        int i1 = 123;
+//        Var<int> i = i1;
+//        auto j = i;
+//
+//        cout << j.Inspect().size() << endl;
 
-        cout << j.Inspect().size() << endl;
+        static int count = 1;
+
+        struct A {
+            int a;
+            A() : a(count) { count++; }
+
+            ~A() { cout << "~A()" << endl; }
+        };
+
+//        vector<Var<A>> v;
+//        v.emplace_back(Var<A>());
+//        v.push_back(static_cast<A &&>(a));
+
+        Var<A> s = A();
+        cout << s.is<A>() << endl;
+        cout << "===================" << endl;
     }
 
     cout << "===================" << endl;

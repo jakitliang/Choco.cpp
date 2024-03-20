@@ -1,8 +1,6 @@
 
 add_executable(TestZone zone.cpp $<TARGET_OBJECTS:cc-src>)
 
-add_executable(TestLocal local.cpp $<TARGET_OBJECTS:cc-src>)
-
 add_executable(TestVar var.cpp $<TARGET_OBJECTS:cc-src>)
 
 add_executable(TestSlice slice.cpp $<TARGET_OBJECTS:cc-src>)
@@ -14,3 +12,5 @@ add_executable(TestList list.cpp $<TARGET_OBJECTS:cc-src>)
 add_executable(TestString string.cpp $<TARGET_OBJECTS:cc-src>)
 
 add_executable(TestCommon common.cpp $<TARGET_OBJECTS:cc-src>)
+
+add_executable(TestLinkedList test_linked_list.cpp $<TARGET_OBJECTS:cc-src>)

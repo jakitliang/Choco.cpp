@@ -29,7 +29,7 @@ namespace CC {
 #endif
 
 
-    template<class T> struct RemoveAll { typedef T type; };
+    template<class T> struct RemoveAll { typedef T Type; };
     template<class T> struct RemoveAll<T*> : RemoveAll<T> {};
     template<class T> struct RemoveAll<T&> : RemoveAll<T> {};
 

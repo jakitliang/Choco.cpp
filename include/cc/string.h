@@ -1,12 +1,11 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/8.
+// Created by Jakit Liang<jakitliang@gmail.com> on 2024/3/8.
 //
 
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
-#include "trivial_data.h"
-#include "local.h"
+#include "vector.h"
 
 namespace CC {
     template<>

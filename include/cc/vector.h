@@ -1,102 +1,184 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/5.
+// Created by Jakit on 2024/3/17.
 //
 
-#ifndef CC_ARRAY_H
-#define CC_ARRAY_H
+#ifndef CHOCO_CPP_VECTOR_H
+#define CHOCO_CPP_VECTOR_H
 
-#include "trivial_data.h"
-#include "object.h"
+#include "cc/zone.h"
+#include "cc/list.h"
 
 namespace CC {
     template<typename T>
-    struct Variant<T []> : Variant<void> {
-        using Type = TrivialData<T>;
-        Type * object;
+    struct Vector {
+        struct Entity {
+            using Type = T [];
 
-        Variant() : object(&Alloc<Type>()) {}
+            Size Count() const {
+                return CC::Count<T>(this);
+            }
 
-        Variant(const Variant & arr) : object(&Retain(*arr.object)) {}
+            T & operator[](Size index) {
+                return reinterpret_cast<T *>(this)[index];
+            }
 
-        Variant(Variant && arr) : object(&Retain(*arr.object)) {}
+            const T & operator[](Size index) const {
+                return reinterpret_cast<const T *>(this)[index];
+            }
 
-        template<Size S>
-        Variant(const T (&array)[S]) : object(){
-            Replace(&object[0], 0, &array[0], S);
+            void Replace(Size index, const T * elements, Size count, bool construct = true) {
+                if (construct) {
+                    CC::CopyConstruct<T>(reinterpret_cast<T *>(this), index, elements, count);
+                    return;
+                }
+
+                CC::Copy<T>(reinterpret_cast<T *>(this), index, elements, count);
+            }
+
+            void Replace(Size index, T * elements, Size count, bool construct = true) {
+                if (construct) {
+                    CC::MoveConstruct<T>(reinterpret_cast<T *>(this), index, elements, count);
+                    return;
+                }
+
+                CC::Move<T>(reinterpret_cast<T *>(this), index, elements, count);
+            }
+
+            void Clear(Size index, Size count) {
+                CC::Destruct<T>(reinterpret_cast<T *>(this), index, count);
+            }
+
+            // Iterator methods
+
+            T * begin() {
+                return reinterpret_cast<T *>(this);
+            }
+
+            T * end() {
+                return reinterpret_cast<T *>(this) + CC::Count<T>(this);
+            }
+
+            // Live cycle methods
+
+            static Entity * Alloc(Size count) {
+                return reinterpret_cast<Entity *>(CC::Alloc<T>(count, false));
+            }
+
+            Entity * ReAlloc(Size count) {
+                return reinterpret_cast<Entity *>(CC::ReAlloc<T>(this, count));
+            }
+
+            bool Release() {
+                return CC::Release(reinterpret_cast<T *>(this), false);
+            }
+        };
+
+        Entity * object;
+        Size Count;
+
+        Vector() : object(Entity::Alloc(0)), Count(0) {}
+
+        explicit Vector(Size count) : object(Entity::Alloc(count)), Count(0) {}
+
+        ~Vector() {
+            if constexpr (!std::is_trivial<T>::value) {
+                for (int i = 0; i < Count; ++i) {
+                    (*object)[i].~T();
+                }
+            }
+            object->Release();
         }
 
-        template<Size S>
-        Variant(T (&&array)[S]) : object(*reinterpret_cast<T (*)[]>(Zone::Alloc<T>(S))){
-            Replace(&object[0], 0, &array[0], S);
+        T & operator[](Size index) {
+            if (index >= Count) abort();
+            return (*object)[index];
         }
 
-        ~Variant() {
-            Release(*object);
-        }
+        // Iterator methods
 
         T * begin() {
             return object->begin();
         }
 
         T * end() {
-            return object->end();
+            return reinterpret_cast<T *>(object) + Count;
         }
 
-        void Insert(Size index, const T * elements, Size count) {
-            object->Insert(index, elements, count);
+        // Common methods
+
+        template<typename E>
+        void Insert(Size index, E * elements, Size cnt) {
+            if (cnt < 1) return;
+
+            auto indexEnd = Count + cnt;
+
+            // Case: out of bound
+            // 0 1 2 3 4 5
+            //         |-|
+            // | | | |
+            // | | | |0|-:
+            // --------------------
+            // Aligned to the end
+            // 0 1 2 3 4 5
+            //       |-|
+            // | | | |
+            // | | | |-|
+            if (index > Count) {
+                index = Count; // Fix insert position
+            }
+
+            if (indexEnd > object->Count()) {
+                object = object->ReAlloc(indexEnd);
+            }
+
+            // Move the data [index .. Count()] to the end
+            // New data           elements[0 .. count]
+            // Part 1                                    // Part 3
+            // data[0 .. index]                          data[index .. last]
+            // Part 1             Part 2                 // Part 3
+            // data[0 .. index] + elements[0 .. count] + data[index .. last]
+
+            if (index < Count) {
+                // Move part 3 to the end
+                object->Replace(index + cnt,
+                                &(*object)[index],
+                                Count - index);
+            }
+
+            // Insert part 2 into data
+            object->Replace(index, elements, cnt);
+
+            Count += cnt;
         }
 
-        void Insert(Size index, T * elements, Size count) {
-            object->Insert(index, elements, count);
-        }
+        void Delete(Size index, Size cnt) {
+            if (cnt < 1) return;
 
-        void Insert(Size index, const T & t) {
-            Insert(index, &t, 1);
-        }
+            if (index >= Count) return;
 
-        void Insert(Size index, T && t) {
-            Insert(index, &t, 1);
-        }
+            // Erase
+            // Part 1             Part 2              // Part 3
+            // data[0 .. index] + erase[0 .. count] + data[index .. last]
+            // Part 1                                 // Part 3
+            // data[0 .. index]         +             data[index .. last]
 
-        void Push(const T * elements, Size cnt) {
-            Insert(Count(), elements, cnt);
-        }
+            auto indexEnd = index + cnt;
 
-        void Push(T * elements, Size cnt) {
-            Insert(Count(), elements, cnt);
-        }
+            // Case 1: From index remove to the data.end
+            // x: place to remove
+            // | | | |x|x|
+            if (indexEnd >= Count) {
+                object->Clear(index, Count - index);
+                Count = index;
+                return;
+            }
 
-        void Push(const T & t) {
-            Insert(Count(), t);
-        }
+            object->Replace(index, &(*object)[indexEnd], Count - indexEnd, false);
+            object->Clear(Count - cnt, cnt);
 
-        void Push(T && t) {
-            Insert(Count(), static_cast<T &&>(t));
-        }
-
-        void Delete(Size index, Size count) {
-            object->Delete(index, count);
-        }
-
-        void Delete(Size index) {
-            Delete(index, 1);
-        }
-
-        Size Count() const {
-            return object->Count;
-        }
-
-        T & operator[](Size index) {
-            return object->operator[](index);
-        }
-
-        const T & operator[](Size index) const {
-            return object->operator[](index);
+            Count -= cnt;
         }
     };
-
-    template<typename T>
-    using Vector = Variant<T []>;
 }
 
-#endif //CC_ARRAY_H
+#endif //CHOCO_CPP_VECTOR_H

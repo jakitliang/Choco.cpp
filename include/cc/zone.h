@@ -16,7 +16,7 @@
 
 namespace CC {
     struct Zone {
-        using Finalizer = void (*)(void * object, Size size);
+        using Finalizer = void (*)(void * object, Size index, Size size);
 
         struct Record {
             void *End;
@@ -42,9 +42,14 @@ namespace CC {
         static void Zero(void * object, Size size);
 
         static void BlockCopy(void * object, Size index, const void * elements, Size count);
-
-//        static void Replace(void * object, Size index, const void * elements, Size count);
     };
+
+    template<typename T>
+    void Swap(T & lhs, T & rhs) {
+        T    tmp = static_cast<T &&>(lhs);
+        lhs      = static_cast<T &&>(rhs);
+        rhs      = static_cast<T &&>(tmp);
+    }
 
     template<typename T>
     static CC::Size Count(void * object) {
@@ -60,7 +65,7 @@ namespace CC {
     T * Construct(T * object, Size index, Size count) {
         auto target = object + index;
 
-        if constexpr (std::is_trivial<T>::value) {
+        if constexpr (std::is_trivially_constructible<T>::value) {
             Zone::Set(target, 0, sizeof(T) * count);
 
         } else {
@@ -73,17 +78,29 @@ namespace CC {
     }
 
     template<typename T>
-    static void Copy(T * object, Size index, const T * elements, Size count) {
-        object = object + index;
+    T * Construct(T * object) {
+        return Construct(object, 0, 1);
+    }
+
+    template<typename T>
+    static T * Copy(T * object, Size index, const T * elements, Size count) {
+        auto target = object + index;
 
         if constexpr (std::is_trivially_copy_assignable<T>::value) {
-            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+            Zone::BlockCopy(target, 0, elements, sizeof(T) * count);
 
         } else {
             for (int i = 0; i < count; ++i) {
-                object[i] = elements[i];
+                target[i] = elements[i];
             }
         }
+
+        return object;
+    }
+
+    template<typename T>
+    static T * Copy(T * object, const T * element) {
+        return Copy(object, 0, element, 1);
     }
 
     template<typename T>
@@ -103,17 +120,29 @@ namespace CC {
     }
 
     template<typename T>
-    static void Move(T * object, Size index, T * elements, Size count) {
-        object = object + index;
+    static T * CopyConstruct(T * object, const T * element) {
+        return CopyConstruct(object, 0, element, 1);
+    }
+
+    template<typename T>
+    static T * Move(T * object, Size index, T * elements, Size count) {
+        auto target = object + index;
 
         if constexpr (std::is_trivially_move_assignable<T>::value) {
-            Zone::BlockCopy(object, 0, elements, sizeof(T) * count);
+            Zone::BlockCopy(target, 0, elements, sizeof(T) * count);
 
         } else {
             for (int i = 0; i < count; ++i) {
-                object[i] = static_cast<T &&>(elements[i]);
+                target[i] = static_cast<T &&>(elements[i]);
             }
         }
+
+        return object;
+    }
+
+    template<typename T>
+    static T * Move(T * object, T * element) {
+        return Move(object, 0, element, 1);
     }
 
     template<typename T>
@@ -133,10 +162,15 @@ namespace CC {
     }
 
     template<typename T>
-    void Destruct(T * object, Size index, Size count) {
+    static T * MoveConstruct(T * object, T * element) {
+        return MoveConstruct(object, 0, element, 1);
+    }
+
+    template<typename T>
+    void * Destruct(T * object, Size index, Size count) {
         auto target = object + index;
 
-        if constexpr (std::is_trivial<T>::value) {
+        if constexpr (std::is_trivially_destructible<T>::value) {
             Zone::Set(target, 0, sizeof(T) * count);
 
         } else {
@@ -144,46 +178,53 @@ namespace CC {
                 target[i].~T();
             }
         }
+
+        return nullptr;
     }
 
     template<typename T>
-    T * Alloc(bool construct = true) {
-        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(sizeof(T))), 0, 1);
+    void * Destruct(T * object) {
+        return Destruct(object, 0, 1);
+    }
 
+    template<typename T>
+    T * Alloc() {
         return static_cast<T *>(Zone::Alloc(sizeof(T)));
     }
 
     template<typename T>
-    T * Alloc(Size count, bool construct = true) {
-        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(count * sizeof(T))), 0, count);
-
+    T * Alloc(Size count) {
         return static_cast<T *>(Zone::Alloc(count * sizeof(T)));
     }
 
     template<typename T>
-    T & Make(bool construct = true) { return *Alloc<T>(construct); }
+    T * Make() {
+        return Construct<T>(static_cast<T *>(Zone::Alloc(sizeof(T))), 0, 1);
+    }
 
     template<typename T>
-    T & Make(Size count, bool construct = true) { return *Alloc<T>(count, construct); }
+    T * Make(Size count) {
+        return Construct<T>(static_cast<T *>(Zone::Alloc(count * sizeof(T))), 0, count);
+    }
 
     template<typename T>
     T * Clone(const T & copyObject) {
-        return CopyConstruct<T>(Alloc<T>(false), 0, &copyObject, 1);
+        return CopyConstruct<T>(Alloc<T>(), 0, &copyObject, 1);
     }
 
     template<typename T>
     T * Clone(T && moveObject) {
-        return MoveConstruct<T>(Alloc<T>(false), 0, &moveObject, 1);
+        return MoveConstruct<T>(Alloc<T>(), 0, &moveObject, 1);
     }
 
-    template<typename T>
-    T & ReMake(const T & copyObject) {
-        return *Clone(copyObject);
+    template<typename T, Size S>
+    T * Clone(const T (&copyObject)[S]) {
+        return CopyConstruct<T>(Alloc<T>(S), 0, &copyObject[0], S);
     }
 
-    template<typename T>
-    T & ReMake(T && moveObject) {
-        return *Clone(static_cast<T &&>(moveObject));
+    template<typename T, Size S>
+    T * Clone(T (&&moveObject)[S]) {
+        return MoveConstruct<T>(Alloc<T>(S), 0, &moveObject[0], S);
     }
 
     template<typename T>
@@ -206,26 +247,17 @@ namespace CC {
     }
 
     template<typename T>
-    T & Retain(T & object) {
-        return *Retain(&object);
-    }
-
-    template<typename T>
-    bool Release(T * object, bool destruct = true) {
-        static const auto destructor = [](void * o, Size size) {
-            Destruct<T>(static_cast<T *>(o), 0, size / sizeof(T));
-        };
-
-        if (destruct) {
-            return Zone::Release(object, destructor);
-        }
-
+    bool Release(T * object) {
         return Zone::Release(object);
     }
 
     template<typename T>
-    bool Release(T & object, bool destruct = true) {
-        return Release<T>(&object, destruct);
+    bool Destroy(T * object) {
+        static const auto destructor = [](void * o, Size index, Size size) {
+            Destruct<T>(static_cast<T *>(o), index, size / sizeof(T));
+        };
+
+        return Zone::Release(object, destructor);
     }
 }
 

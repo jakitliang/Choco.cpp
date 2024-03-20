@@ -14,18 +14,21 @@ namespace CC {
 
         Type * object;
 
-        Variant() : object(Alloc<T>()) {}
+        Variant() : object(Make<T>()) {}
 
         Variant(const Variant & v) : object(Retain(v.object)) {}
 
-        Variant(Variant && v) : object(Retain(v.object)) {}
+        Variant(Variant && v) : object(Retain(v.object)) {
+            Destroy(v.object);
+            v.object = nullptr;
+        }
 
-        Variant(const T & o) : object(*o) {}
+        Variant(const T & o) : object(Clone(o)) {}
 
-        Variant(T && o) : object(static_cast<T &&>(o)) {}
+        Variant(T && o) : object(Clone(static_cast<T &&>(o))) {}
 
         ~Variant() {
-            Release(object);
+            Destroy(object);
         }
 
         Inspector & Inspect() {
@@ -33,11 +36,11 @@ namespace CC {
         }
 
         Variant & operator=(const T & o) {
-            *object = o;
+            Copy(object, 0, &o, 1);
         }
 
         Variant & operator=(T && o) {
-            *object = static_cast<T &&>(o);
+            Move(object, 0, &o, 1);
         }
 
         T & operator*() {
@@ -46,6 +49,10 @@ namespace CC {
 
         const T & operator*() const {
             return *object;
+        }
+
+        template<typename D> bool is() {
+            return std::is_base_of<typename RemoveAll<T>::Type, D>::value;
         }
     };
 

@@ -30,53 +30,29 @@ int main() {
 
     // Initializer and retain
     {
-        int & i = Alloc<int>(0);
-        i = 123456;
-        int & j = Retain(i);
+        auto i = Alloc<int>();
+        * i = 123456;
+        auto j = Retain(i);
         Release(i);
         Release(j);
     }
 
+    cout << "=============" << endl;
+
     // Copy assign
     {
         int j = 333;
-        int & i = Alloc<int>(j);
+        auto i = Clone(j);
         Release(i);
     }
 
+    cout << "=============" << endl;
+
     // C++17 aggregate init
     {
-        auto & t = Alloc<Test>({{}, 1});
-        cout << t.i << endl;
+        auto t = Clone({1, 2, 3});
+        cout << t[0] << endl;
         Release(t);
-    }
-
-    // Passing class member as initializer
-    {
-        auto & t = Alloc<Test1>(&Test1::Init);
-        cout << t.i << endl;
-        Release(t);
-    }
-
-    // Default destruct and default destruct
-    {
-        auto & t = Alloc<Test1>(true);
-        cout << t.i << endl;
-        Release(t, true);
-    }
-
-    // Inspect and user-defined finalizer
-    {
-        auto & t = Alloc<Test>();
-        t.i = 6513408;
-
-        for (auto & b : t.Inspect()) {
-            cout << b << endl;
-        }
-
-        Release(t, [](Test & o) {
-            cout << o.i << endl;
-        });
     }
 
     return 0;

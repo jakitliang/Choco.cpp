@@ -114,7 +114,7 @@ bool CC::Zone::Release(void * object, Finalizer finalizer) {
          << (ret->second.Ref == 0 ? " freed!" : "") << endl;
 
     if (ret->second.Ref > 0) return false;
-    (*finalizer)(object, (Size) ret->second.End - (Size) object);
+    (*finalizer)(object, 0, (Size) ret->second.End - (Size) object);
     MemoryMap.erase(object);
     free(object);
 

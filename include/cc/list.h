@@ -1,54 +1,31 @@
 //
-// Created by Jakit on 2024/3/18.
+// Created by Jakit on 2024/3/21.
 //
 
 #ifndef CHOCO_CPP_LIST_H
 #define CHOCO_CPP_LIST_H
 
-#include "linked_data.h"
-#include "object.h"
+#include "types.h"
 
 namespace CC {
     template<typename T>
-    struct Variant<T *> : Variant<void> {
-        using Type = LinkedData<T>;
-        using Iterator = typename LinkedData<T>::Iterator;
-        Type * object;
+    struct List {
+        struct Iterator {
+            virtual Iterator begin() = 0;
 
-        Variant() : object(&Alloc<Type>()) {}
+            virtual Iterator end() = 0;
+        };
 
-        Variant(const Variant & arr) : object(&Retain(*arr.object)) {}
+        virtual void CopyInsert(Size index, const T * elements, Size count) = 0;
 
-        Variant(Variant && arr) : object(&Retain(*arr.object)) {}
-
-        template<Size S>
-        Variant(const T (&array)[S]) : object(){
-            Replace(&object[0], 0, &array[0], S);
-        }
-
-        template<Size S>
-        Variant(T (&&array)[S]) : object(*reinterpret_cast<T (*)[]>(Zone::Alloc<T>(S))){
-            Replace(&object[0], 0, &array[0], S);
-        }
-
-        ~Variant() {
-            Release(*object);
-        }
-
-        void Insert(Size index, const T * elements, Size count) {
-            object->Insert(index, elements, count);
-        }
-
-        void Insert(Size index, T * elements, Size count) {
-            object->Insert(index, elements, count);
-        }
+        virtual void MoveInsert(Size index, T * elements, Size count) = 0;
 
         void Insert(Size index, const T & t) {
-            Insert(index, &t, 1);
+            CopyInsert(index, &t, 1);
         }
 
         void Insert(Size index, T && t) {
-            Insert(index, &t, 1);
+            MoveInsert(index, &t, 1);
         }
 
         void Push(const T * elements, Size cnt) {
@@ -67,37 +44,22 @@ namespace CC {
             Insert(Count(), static_cast<T &&>(t));
         }
 
-        void Delete(Size index, Size count) {
-            object->Delete(index, count);
-        }
+        virtual void Delete(Size index, Size count) = 0;
 
         void Delete(Size index) {
             Delete(index, 1);
         }
 
-        Size Count() const {
-            return object->Count;
-        }
+        virtual Size Count() const = 0;
 
-        T & operator[](Size index) {
-            return object->operator[](index);
-        }
+        virtual T & operator[](Size index) = 0;
 
-        const T & operator[](Size index) const {
-            return object->operator[](index);
-        }
+        virtual const T & operator[](Size index) const = 0;
 
-        Iterator begin() {
-            return this->object->begin();
-        }
+        virtual auto begin() = 0;
 
-        Iterator end() {
-            return this->object->end();
-        }
+        virtual auto end() = 0;
     };
-
-    template<typename T>
-    using List = Variant<T *>;
 }
 
 #endif //CHOCO_CPP_LIST_H
