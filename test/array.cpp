@@ -123,7 +123,6 @@ int main() {
     {
         Array<A> a;
 
-
         // MoveCtor
         a.Push(A());
         a.Push(A());

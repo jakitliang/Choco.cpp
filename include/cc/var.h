@@ -20,7 +20,7 @@ namespace CC {
 
         Variant(Variant && v) : object(Retain(v.object)) {}
 
-        Variant(const T & o) : object(o) {}
+        Variant(const T & o) : object(*o) {}
 
         Variant(T && o) : object(static_cast<T &&>(o)) {}
 

@@ -47,88 +47,6 @@ namespace CC {
     };
 
     template<typename T>
-    T * Alloc(bool construct = true) {
-        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(sizeof(T))), 0, 1);
-
-        return static_cast<T *>(Zone::Alloc(sizeof(T)));
-    }
-
-    template<typename T>
-    T * Alloc(Size count, bool construct = true) {
-        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(count * sizeof(T))), 0, count);
-
-        return static_cast<T *>(Zone::Alloc(count * sizeof(T)));
-    }
-
-    template<typename T>
-    T & Make(bool construct = true) { return *Alloc<T>(construct); }
-
-    template<typename T>
-    T & Make(Size count, bool construct = true) { return *Alloc<T>(count, construct); }
-
-    template<typename T>
-    T * Clone(const T & copyObject) {
-        return CopyConstruct<T>(Alloc<T>(false), 0, &copyObject, 1);
-    }
-
-    template<typename T>
-    T * Clone(T && moveObject) {
-        return MoveConstruct<T>(Alloc<T>(false), 0, &moveObject, 1);
-    }
-
-    template<typename T>
-    T & ReMake(const T & copyObject) {
-        return *Clone(copyObject);
-    }
-
-    template<typename T>
-    T & ReMake(T && moveObject) {
-        return *Clone(static_cast<T &&>(moveObject));
-    }
-
-    template<typename T>
-    T * ReAlloc(void * oldObject, Size count, bool construct = false) {
-        bool result = false;
-        Size oldCount = count;
-        if (construct) oldCount = Count<T>(oldObject);
-
-        auto object = static_cast<T *>(Zone::ReAlloc(oldObject, count * sizeof(T), &result));
-        if (!construct) return object;
-
-        if (result && count > oldCount) Construct<T>(object, oldCount, count - oldCount);
-
-        return object;
-    }
-
-    template<typename T>
-    T * Retain(T * object) {
-        return static_cast<T *>(Zone::Retain(object));
-    }
-
-    template<typename T>
-    T & Retain(T & object) {
-        return *Retain(&object);
-    }
-
-    template<typename T>
-    bool Release(T * object, bool destruct = true) {
-        static const auto destructor = [](void * o, Size size) {
-            Destruct<T>(static_cast<T *>(o), 0, size / sizeof(T));
-        };
-
-        if (destruct) {
-            return Zone::Release(object, destructor);
-        }
-
-        return Zone::Release(object);
-    }
-
-    template<typename T>
-    bool Release(T & object, bool destruct = true) {
-        return Release<T>(&object, destruct);
-    }
-
-    template<typename T>
     static CC::Size Count(void * object) {
         return object == nullptr ? 0 : Zone::Count(object) / sizeof(T);
     }
@@ -226,6 +144,88 @@ namespace CC {
                 target[i].~T();
             }
         }
+    }
+
+    template<typename T>
+    T * Alloc(bool construct = true) {
+        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(sizeof(T))), 0, 1);
+
+        return static_cast<T *>(Zone::Alloc(sizeof(T)));
+    }
+
+    template<typename T>
+    T * Alloc(Size count, bool construct = true) {
+        if (construct) return Construct<T>(static_cast<T *>(Zone::Alloc(count * sizeof(T))), 0, count);
+
+        return static_cast<T *>(Zone::Alloc(count * sizeof(T)));
+    }
+
+    template<typename T>
+    T & Make(bool construct = true) { return *Alloc<T>(construct); }
+
+    template<typename T>
+    T & Make(Size count, bool construct = true) { return *Alloc<T>(count, construct); }
+
+    template<typename T>
+    T * Clone(const T & copyObject) {
+        return CopyConstruct<T>(Alloc<T>(false), 0, &copyObject, 1);
+    }
+
+    template<typename T>
+    T * Clone(T && moveObject) {
+        return MoveConstruct<T>(Alloc<T>(false), 0, &moveObject, 1);
+    }
+
+    template<typename T>
+    T & ReMake(const T & copyObject) {
+        return *Clone(copyObject);
+    }
+
+    template<typename T>
+    T & ReMake(T && moveObject) {
+        return *Clone(static_cast<T &&>(moveObject));
+    }
+
+    template<typename T>
+    T * ReAlloc(void * oldObject, Size count, bool construct = false) {
+        bool result = false;
+        Size oldCount = count;
+        if (construct) oldCount = Count<T>(oldObject);
+
+        auto object = static_cast<T *>(Zone::ReAlloc(oldObject, count * sizeof(T), &result));
+        if (!construct) return object;
+
+        if (result && count > oldCount) Construct<T>(object, oldCount, count - oldCount);
+
+        return object;
+    }
+
+    template<typename T>
+    T * Retain(T * object) {
+        return static_cast<T *>(Zone::Retain(object));
+    }
+
+    template<typename T>
+    T & Retain(T & object) {
+        return *Retain(&object);
+    }
+
+    template<typename T>
+    bool Release(T * object, bool destruct = true) {
+        static const auto destructor = [](void * o, Size size) {
+            Destruct<T>(static_cast<T *>(o), 0, size / sizeof(T));
+        };
+
+        if (destruct) {
+            return Zone::Release(object, destructor);
+        }
+
+        return Zone::Release(object);
+    }
+
+    template<typename T>
+    bool Release(T & object, bool destruct = true) {
+        return Release<T>(&object, destruct);
     }
 }
 

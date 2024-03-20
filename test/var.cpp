@@ -47,7 +47,8 @@ int main() {
 
     // Local var test
     {
-        Var<int &> i;
+        int i1 = 123;
+        Var<int> i = i1;
         auto j = i;
 
         cout << j.Inspect().size() << endl;
@@ -56,17 +57,17 @@ int main() {
     cout << "===================" << endl;
 
     // Slice var test
-    {
-        Var<int (&)[]> i;
-        auto j = i;
+//    {
+//        Var<int (&)[]> i;
+//        auto j = i;
+//
+//        cout << j.Inspect().size() << endl;
+//    }
 
-        cout << j.Inspect().size() << endl;
-    }
-
-    // Vector var
-    {
-        Var<vector<int>> v;
-    }
+//    // Vector var
+//    {
+//        Var<vector<int>> v;
+//    }
 
     return 0;
 }
