@@ -11,7 +11,7 @@
 
 namespace CC {
     template<typename T>
-    struct LinkedList : List<T> {
+    struct LinkedList : IList<T>, Variant<IList<T>> {
         struct Node {
             Node * next;
             T object;
@@ -102,15 +102,15 @@ namespace CC {
             Count += cnt;
         }
 
-        virtual void CopyInsert(Size index, const T * elements, Size count) {
+        void CopyInsert(Size index, const T * elements, Size count) override {
             Insert(index, elements, count);
         }
 
-        virtual void MoveInsert(Size index, T * elements, Size count) {
+        void MoveInsert(Size index, T * elements, Size count) override {
             Insert(index, elements, count);
         }
 
-        void Delete(Size index, Size cnt) {
+        void Delete(Size index, Size cnt) override {
             int i = 0;
             Node * cur = nullptr;
             Node * prev = nullptr;
@@ -224,7 +224,16 @@ namespace CC {
             Node * cur = nullptr;
         };
 
-        T & operator[](Size index) {
+        T & operator[](Size index) override {
+            if (index >= Count) abort();
+            auto cur = object;
+            for (int i = 0; i < index; ++i) {
+                cur = cur->next;
+            }
+            return **cur;
+        }
+
+        const T & operator[](Size index) const override {
             if (index >= Count) abort();
             auto cur = object;
             for (int i = 0; i < index; ++i) {

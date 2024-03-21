@@ -14,7 +14,7 @@ namespace CC {
 
         Type * object;
 
-        Variant() : object(Make<T>()) {}
+        Variant() : object(std::is_abstract<Type>::value ? nullptr : Make<T>()) {}
 
         Variant(const Variant & v) : object(Retain(v.object)) {}
 

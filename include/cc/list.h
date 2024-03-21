@@ -5,27 +5,42 @@
 #ifndef CHOCO_CPP_LIST_H
 #define CHOCO_CPP_LIST_H
 
-#include "types.h"
+#include "cc/var.h"
 
 namespace CC {
     template<typename T>
-    struct List {
-        struct Iterator {
-            virtual Iterator begin() = 0;
-
-            virtual Iterator end() = 0;
-        };
-
+    struct IList {
         virtual void CopyInsert(Size index, const T * elements, Size count) = 0;
 
         virtual void MoveInsert(Size index, T * elements, Size count) = 0;
 
+        virtual void Delete(Size index, Size count) = 0;
+
+        virtual T & operator[](Size index) = 0;
+
+        virtual const T & operator[](Size index) const = 0;
+    };
+
+    template<typename T>
+    struct Variant<IList<T>> {
+        using Type = IList<T>;
+
+        Type * object;
+
+        Variant() : object(nullptr) {}
+
+        Variant(Type * && o) : object(o) { o = nullptr; }
+
+        ~Variant() {
+            Release(object);
+        }
+
         void Insert(Size index, const T & t) {
-            CopyInsert(index, &t, 1);
+            object->CopyInsert(index, &t, 1);
         }
 
         void Insert(Size index, T && t) {
-            MoveInsert(index, &t, 1);
+            object->MoveInsert(index, &t, 1);
         }
 
         void Push(const T * elements, Size cnt) {
@@ -44,21 +59,29 @@ namespace CC {
             Insert(Count(), static_cast<T &&>(t));
         }
 
-        virtual void Delete(Size index, Size count) = 0;
-
         void Delete(Size index) {
-            Delete(index, 1);
+            object->Delete(index, 1);
         }
 
-        virtual Size Count() const = 0;
+        Size Count() const {
+            return object->count();
+        }
 
-        virtual T & operator[](Size index) = 0;
+        T & operator[](Size index) {
+            return object->operator[](index);
+        }
 
-        virtual const T & operator[](Size index) const = 0;
+        virtual const T & operator[](Size index) const {
+            return object->operator[](index);
+        }
 
-        virtual auto begin() = 0;
-
-        virtual auto end() = 0;
+//        auto begin() {
+//            return object->begin();
+//        };
+//
+//        auto end() {
+//            return object->end();
+//        }
     };
 }
 
