@@ -14,7 +14,7 @@ using namespace std;
 namespace CC {
     template<typename T>
     struct IList {
-//        virtual ~IList() {};
+        virtual ~IList() = default;
 
         virtual void CopyInsert(Size index, const T * elements, Size count) = 0;
 
@@ -114,7 +114,7 @@ namespace CC {
 
         Variant(Variant && var) : object(var.object) { var.object = nullptr; }
 
-        ~Variant() {
+        ~Variant() override {
             Destroy(object);
         }
 

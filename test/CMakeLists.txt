@@ -14,3 +14,5 @@ add_executable(TestString string.cpp $<TARGET_OBJECTS:cc-src>)
 add_executable(TestCommon common.cpp $<TARGET_OBJECTS:cc-src>)
 
 add_executable(TestLinkedList test_linked_list.cpp $<TARGET_OBJECTS:cc-src>)
+
+add_executable(TestVector test_vector.cpp $<TARGET_OBJECTS:cc-src>)

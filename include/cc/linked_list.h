@@ -2,8 +2,8 @@
 // Created by liangjie on 2024/3/18.
 //
 
-#ifndef CHOCO_CPP_LINKED_H
-#define CHOCO_CPP_LINKED_H
+#ifndef CHOCO_CPP_LINKED_LIST_H
+#define CHOCO_CPP_LINKED_LIST_H
 
 #include "cc/list.h"
 #include <iostream>
@@ -73,16 +73,16 @@ namespace CC {
             list.count = 0;
         }
 
-        ~Linked() {
-            if (object != nullptr) {
-                object->Release();
-                object = nullptr;
+        ~Linked() override {
+            if (object == nullptr) return;
+            Node * cur = object;
+            Node * next;
+            for (int i = 0; i < count; ++i) {
+                next = cur->next;
+                cur->Release();
+                cur = next;
             }
-
-            if (lastObject != nullptr) {
-                lastObject->Release();
-                lastObject = nullptr;
-            }
+            lastObject = nullptr;
 
             count = 0;
         }
@@ -282,6 +282,9 @@ namespace CC {
             return Iterator();
         }
     };
+
+    template<typename T>
+    using LinkedList = Var<IList<Linked<T>>>;
 }
 
-#endif //CHOCO_CPP_LINKED_H
+#endif //CHOCO_CPP_LINKED_LIST_H

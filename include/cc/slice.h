@@ -19,8 +19,7 @@ namespace CC {
 
         Variant(const Variant & slice) : object(reinterpret_cast<Type *>(Retain(slice.object))) {}
 
-        Variant(Variant && slice) : object(reinterpret_cast<Type *>(Retain(slice.object))) {
-            Destroy(slice.object);
+        Variant(Variant && slice) : object(reinterpret_cast<Type *>(slice.object)) {
             slice.object = nullptr;
         }
 

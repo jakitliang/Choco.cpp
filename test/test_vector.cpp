@@ -2,25 +2,32 @@
 // Created by Jakit on 2024/3/21.
 //
 
-#include "cc/linked_list.h"
+#include "cc/vector.h"
+
+#include "cc/list.h"
+
+template<typename T>
+struct A {};
 
 int main() {
     {
-        CC::Var<CC::IList<CC::Linked<int>>> i;
+        CC::Var<CC::IList<CC::Trivial<int>>> i;
         i.Push(123);
     }
 
     cout << "===============" << endl;
 
     {
-        CC::List<CC::Linked<int>> s;
+        CC::List<CC::Trivial<int>> s;
         s.Insert(0, 123);
     }
 
     cout << "===============" << endl;
 
     {
-        CC::LinkedList<int> s;
+        CC::Vector<int> s;
         s.Insert(0, 123);
     }
+
+    int a = 1;
 }

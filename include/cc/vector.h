@@ -9,7 +9,7 @@
 
 namespace CC {
     template<typename T>
-    struct Vector : IList<T> {
+    struct Trivial : IList<T> {
         struct Entity {
             using Type = T [];
 
@@ -85,15 +85,15 @@ namespace CC {
         Entity * object;
         Size count;
 
-        Vector() : object(Entity::Make(0)), count(0) {}
+        Trivial() : object(Entity::Make(0)), count(0) {}
 
-        Vector(const Vector & vector) : object(Entity::Clone(vector.object)), count(vector.count) {}
+        Trivial(const Trivial & vector) : object(Entity::Clone(vector.object)), count(vector.count) {}
 
-        Vector(Vector && vector) : object(vector.object), count(vector.count) { vector.object = nullptr; vector.count = 0; }
+        Trivial(Trivial && vector) : object(vector.object), count(vector.count) { vector.object = nullptr; vector.count = 0; }
 
-        explicit Vector(Size count) : object(Entity::Make(count)), count(0) {}
+        explicit Trivial(Size count) : object(Entity::Make(count)), count(0) {}
 
-        ~Vector() override {
+        ~Trivial() override {
 //            if constexpr (!std::is_trivial<T>::value) {
 //                for (int i = 0; i < count; ++i) {
 //                    (*object)[i].~T();
@@ -213,6 +213,9 @@ namespace CC {
             return reinterpret_cast<T *>(object) + count;
         }
     };
+
+    template<typename T>
+    using Vector = Var<IList<Trivial<T>>>;
 }
 
 #endif //CHOCO_CPP_VECTOR_H

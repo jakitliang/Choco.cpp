@@ -33,4 +33,6 @@
 
 # Idea files
 .idea
+
 cmake-*
+.DS_Store
