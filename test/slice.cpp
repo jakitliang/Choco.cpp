@@ -2,7 +2,7 @@
 // Created by Jakit on 2024/3/16.
 //
 
-#include "cc/slice.h"
+#include "cc/array.h"
 #include <iostream>
 
 using namespace std;

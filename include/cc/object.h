@@ -53,13 +53,8 @@ namespace CC {
             }
         };
 
-        Inspector & Inspect() {
+        virtual Inspector & Inspect() {
             return reinterpret_cast<Inspector &>(*this);
-        }
-
-        template<typename D>
-        bool is() {
-            return std::is_base_of<typename RemoveAll<decltype(this)>::Type, D>::value;
         }
 
         static void * operator new(Size size) {

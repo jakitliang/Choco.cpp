@@ -28,7 +28,7 @@ namespace CC {
             Destroy(object);
         }
 
-        Inspector & Inspect() {
+        Inspector & Inspect() override {
             return reinterpret_cast<Inspector &>(*object);
         }
 
@@ -46,6 +46,14 @@ namespace CC {
 
         const T & operator*() const {
             return *object;
+        }
+
+        T * operator->() {
+            return object;
+        }
+
+        const T * operator->() const {
+            return object;
         }
 
         template<typename D> bool is() {

@@ -6,6 +6,7 @@
 #define CHOCO_CPP_LIST_H
 
 #include "cc/var.h"
+#include "cc/sequence.h"
 
 #include <iostream>
 
@@ -13,7 +14,7 @@ using namespace std;
 
 namespace CC {
     template<typename T>
-    struct IList {
+    struct IList : Sequence<T> {
         virtual ~IList() = default;
 
         virtual void CopyInsert(Size index, const T * elements, Size count) = 0;
@@ -29,19 +30,19 @@ namespace CC {
         }
 
         void Push(const T * elements, Size cnt) {
-            Insert(Count(), elements, cnt);
+            Insert(this->Count(), elements, cnt);
         }
 
         void Push(T * elements, Size cnt) {
-            Insert(Count(), elements, cnt);
+            Insert(this->Count(), elements, cnt);
         }
 
         void Push(const T & t) {
-            Insert(Count(), t);
+            Insert(this->Count(), t);
         }
 
         void Push(T && t) {
-            Insert(Count(), static_cast<T &&>(t));
+            Insert(this->Count(), static_cast<T &&>(t));
         }
 
         virtual void Delete(Size index, Size count) = 0;
@@ -49,12 +50,6 @@ namespace CC {
         void Delete(Size index) {
             Delete(index, 1);
         }
-
-        virtual Size Count() const = 0;
-
-        virtual T & operator[](Size index) = 0;
-
-        virtual const T & operator[](Size index) const = 0;
     };
 
     template<typename T, template<typename> class List>
@@ -70,7 +65,7 @@ namespace CC {
 
         Variant() : object(nullptr) {}
 
-        explicit Variant(Type * && o) : object(o) { o = nullptr; }
+        Variant(Type * && o) : object(o) { o = nullptr; }
 
         ~Variant() override {
             object->~IList();
