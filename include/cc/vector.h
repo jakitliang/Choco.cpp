@@ -5,12 +5,11 @@
 #ifndef CHOCO_CPP_VECTOR_H
 #define CHOCO_CPP_VECTOR_H
 
-#include "cc/zone.h"
 #include "cc/list.h"
 
 namespace CC {
     template<typename T>
-    struct Vector {
+    struct Vector : IList<T> {
         struct Entity {
             using Type = T [];
 
@@ -26,26 +25,26 @@ namespace CC {
                 return reinterpret_cast<const T *>(this)[index];
             }
 
-            void Replace(Size index, const T * elements, Size count, bool construct = true) {
+            void Replace(Size index, const T * elements, Size cnt, bool construct = true) {
                 if (construct) {
-                    CC::CopyConstruct<T>(reinterpret_cast<T *>(this), index, elements, count);
+                    CC::CopyConstruct<T>(reinterpret_cast<T *>(this), index, elements, cnt);
                     return;
                 }
 
-                CC::Copy<T>(reinterpret_cast<T *>(this), index, elements, count);
+                CC::Copy<T>(reinterpret_cast<T *>(this), index, elements, cnt);
             }
 
-            void Replace(Size index, T * elements, Size count, bool construct = true) {
+            void Replace(Size index, T * elements, Size cnt, bool construct = true) {
                 if (construct) {
-                    CC::MoveConstruct<T>(reinterpret_cast<T *>(this), index, elements, count);
+                    CC::MoveConstruct<T>(reinterpret_cast<T *>(this), index, elements, cnt);
                     return;
                 }
 
-                CC::Move<T>(reinterpret_cast<T *>(this), index, elements, count);
+                CC::Move<T>(reinterpret_cast<T *>(this), index, elements, cnt);
             }
 
-            void Clear(Size index, Size count) {
-                CC::Destruct<T>(reinterpret_cast<T *>(this), index, count);
+            void Clear(Size index, Size cnt) {
+                CC::Destruct<T>(reinterpret_cast<T *>(this), index, cnt);
             }
 
             // Iterator methods
@@ -60,48 +59,51 @@ namespace CC {
 
             // Live cycle methods
 
-            static Entity * Alloc(Size count) {
-                return reinterpret_cast<Entity *>(CC::Alloc<T>(count, false));
+            static Entity * Alloc(Size cnt) {
+                return reinterpret_cast<Entity *>(CC::Alloc<T>(cnt));
             }
 
-            Entity * ReAlloc(Size count) {
-                return reinterpret_cast<Entity *>(CC::ReAlloc<T>(this, count));
+            static Entity * Make(Size cnt) {
+                return reinterpret_cast<Entity *>(CC::Make<T>(cnt));
+            }
+
+            static Entity * Clone(const Entity * entity) {
+                auto ptr = CC::Alloc<T>(entity->Count());
+                CC::CopyConstruct(ptr, 0, reinterpret_cast<const T *>(entity), entity->Count());
+                return reinterpret_cast<Entity *>(ptr);
+            }
+
+            Entity * ReAlloc(Size cnt) {
+                return reinterpret_cast<Entity *>(CC::ReAlloc<T>(this, cnt));
             }
 
             bool Release() {
-                return CC::Release(reinterpret_cast<T *>(this), false);
+                return CC::Destroy(reinterpret_cast<T *>(this));
             }
         };
 
         Entity * object;
-        Size Count;
+        Size count;
 
-        Vector() : object(Entity::Alloc(0)), Count(0) {}
+        Vector() : object(Entity::Make(0)), count(0) {}
 
-        explicit Vector(Size count) : object(Entity::Alloc(count)), Count(0) {}
+        Vector(const Vector & vector) : object(Entity::Clone(vector.object)), count(vector.count) {}
 
-        ~Vector() {
-            if constexpr (!std::is_trivial<T>::value) {
-                for (int i = 0; i < Count; ++i) {
-                    (*object)[i].~T();
-                }
-            }
+        Vector(Vector && vector) : object(vector.object), count(vector.count) { vector.object = nullptr; vector.count = 0; }
+
+        explicit Vector(Size count) : object(Entity::Make(count)), count(0) {}
+
+        ~Vector() override {
+//            if constexpr (!std::is_trivial<T>::value) {
+//                for (int i = 0; i < count; ++i) {
+//                    (*object)[i].~T();
+//                }
+//            }
+
+            if (object == nullptr) return;
             object->Release();
-        }
-
-        T & operator[](Size index) {
-            if (index >= Count) abort();
-            return (*object)[index];
-        }
-
-        // Iterator methods
-
-        T * begin() {
-            return object->begin();
-        }
-
-        T * end() {
-            return reinterpret_cast<T *>(object) + Count;
+            object = nullptr;
+            count = 0;
         }
 
         // Common methods
@@ -110,7 +112,7 @@ namespace CC {
         void Insert(Size index, E * elements, Size cnt) {
             if (cnt < 1) return;
 
-            auto indexEnd = Count + cnt;
+            auto indexEnd = count + cnt;
 
             // Case: out of bound
             // 0 1 2 3 4 5
@@ -123,8 +125,8 @@ namespace CC {
             //       |-|
             // | | | |
             // | | | |-|
-            if (index > Count) {
-                index = Count; // Fix insert position
+            if (index > count) {
+                index = count; // Fix insert position
             }
 
             if (indexEnd > object->Count()) {
@@ -138,23 +140,31 @@ namespace CC {
             // Part 1             Part 2                 // Part 3
             // data[0 .. index] + elements[0 .. count] + data[index .. last]
 
-            if (index < Count) {
+            if (index < count) {
                 // Move part 3 to the end
                 object->Replace(index + cnt,
                                 &(*object)[index],
-                                Count - index);
+                                count - index);
             }
 
             // Insert part 2 into data
             object->Replace(index, elements, cnt);
 
-            Count += cnt;
+            count += cnt;
         }
 
-        void Delete(Size index, Size cnt) {
+        void CopyInsert(Size index, const T * elements, Size cnt) override {
+            Insert(index, elements, cnt);
+        }
+
+        void MoveInsert(Size index, T * elements, Size cnt) override {
+            Insert(index, elements, cnt);
+        }
+
+        void Delete(Size index, Size cnt) override {
             if (cnt < 1) return;
 
-            if (index >= Count) return;
+            if (index >= count) return;
 
             // Erase
             // Part 1             Part 2              // Part 3
@@ -167,16 +177,40 @@ namespace CC {
             // Case 1: From index remove to the data.end
             // x: place to remove
             // | | | |x|x|
-            if (indexEnd >= Count) {
-                object->Clear(index, Count - index);
-                Count = index;
+            if (indexEnd >= count) {
+                object->Clear(index, count - index);
+                count = index;
                 return;
             }
 
-            object->Replace(index, &(*object)[indexEnd], Count - indexEnd, false);
-            object->Clear(Count - cnt, cnt);
+            object->Replace(index, &(*object)[indexEnd], count - indexEnd, false);
+            object->Clear(count - cnt, cnt);
 
-            Count -= cnt;
+            count -= cnt;
+        }
+
+        Size Count() const override {
+            return count;
+        }
+
+        T & operator[](Size index) override {
+            if (index >= count) abort();
+            return (*object)[index];
+        }
+
+        const T & operator[](Size index) const override {
+            if (index >= count) abort();
+            return (*object)[index];
+        }
+
+        // Iterator methods
+
+        T * begin() {
+            return object->begin();
+        }
+
+        T * end() {
+            return reinterpret_cast<T *>(object) + count;
         }
     };
 }

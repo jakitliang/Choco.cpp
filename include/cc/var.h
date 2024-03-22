@@ -18,10 +18,7 @@ namespace CC {
 
         Variant(const Variant & v) : object(Retain(v.object)) {}
 
-        Variant(Variant && v) : object(Retain(v.object)) {
-            Destroy(v.object);
-            v.object = nullptr;
-        }
+        Variant(Variant && v) : object(v.object) { v.object = nullptr; }
 
         Variant(const T & o) : object(Clone(o)) {}
 

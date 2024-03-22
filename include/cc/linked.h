@@ -2,16 +2,17 @@
 // Created by liangjie on 2024/3/18.
 //
 
-#ifndef CHOCO_CPP_LINKED_LIST_H
-#define CHOCO_CPP_LINKED_LIST_H
+#ifndef CHOCO_CPP_LINKED_H
+#define CHOCO_CPP_LINKED_H
 
-#include "cc/zone.h"
 #include "cc/list.h"
-#include <cstdlib>
+#include <iostream>
+
+using namespace std;
 
 namespace CC {
     template<typename T>
-    struct LinkedList : IList<T>, Variant<IList<T>> {
+    struct Linked : IList<T> {
         struct Node {
             Node * next;
             T object;
@@ -56,16 +57,43 @@ namespace CC {
 
         Node * object;
         Node * lastObject;
-        Size Count;
+        Size count;
 
-        LinkedList() : object(nullptr), lastObject(nullptr), Count(0) {}
+        Linked() : object(nullptr), lastObject(nullptr), count(0) {}
+
+        Linked(const Linked & list) : object(nullptr), lastObject(nullptr), count(0) {
+            for (auto item : list) {
+                this->Push(item);
+            }
+        }
+
+        Linked(Linked && list) : object(list.object), lastObject(list.lastObject), count(list.count) {
+            list.object = nullptr;
+            list.lastObject = nullptr;
+            list.count = 0;
+        }
+
+        ~Linked() {
+            if (object != nullptr) {
+                object->Release();
+                object = nullptr;
+            }
+
+            if (lastObject != nullptr) {
+                lastObject->Release();
+                lastObject = nullptr;
+            }
+
+            count = 0;
+        }
 
         template<typename E>
         void Insert(Size index, E * elements, Size cnt) {
+            cout << sizeof(E) << endl;
             if (cnt < 1) return;
 
-            if (index > Count) {
-                index = Count; // Fix insert position
+            if (index > count) {
+                index = count; // Fix insert position
             }
 
             if (object == nullptr) {
@@ -78,7 +106,7 @@ namespace CC {
                 }
 
             } else {
-                if (index == Count) {
+                if (index == count) {
                     // Append to end
                     for (int i = 0; i < cnt; ++i)
                         lastObject = lastObject->Concat(&elements[i]);
@@ -99,15 +127,15 @@ namespace CC {
                 }
             }
 
-            Count += cnt;
+            count += cnt;
         }
 
-        void CopyInsert(Size index, const T * elements, Size count) override {
-            Insert(index, elements, count);
+        void CopyInsert(Size index, const T * elements, Size cnt) override {
+            Insert(index, elements, cnt);
         }
 
-        void MoveInsert(Size index, T * elements, Size count) override {
-            Insert(index, elements, count);
+        void MoveInsert(Size index, T * elements, Size cnt) override {
+            Insert(index, elements, cnt);
         }
 
         void Delete(Size index, Size cnt) override {
@@ -117,7 +145,7 @@ namespace CC {
             Node * next = nullptr;
 
             if (cnt < 1) return;
-            if (index >= Count) return;
+            if (index >= count) return;
 
             // Erase
             // Part 1             Part 2              // Part 3
@@ -146,13 +174,13 @@ namespace CC {
                     // |x|x|x|x|x|
                     if (prev == nullptr) {
                         object = lastObject = nullptr;
-                        Count = 0;
+                        count = 0;
                         return;
                     }
 
                     lastObject = prev;
                     lastObject->next = nullptr;
-                    Count -= i + 1;
+                    count -= i + 1;
                     return;
                 }
 
@@ -165,7 +193,7 @@ namespace CC {
             // |x|x|?|?|?|
             if (prev == nullptr) {
                 object = next;
-                Count -= i + 1;
+                count -= i + 1;
                 return;
             }
 
@@ -173,7 +201,29 @@ namespace CC {
             // x: place to remove
             // | |x|x|x| |
             prev->next = next;
-            Count -= i + 1;
+            count -= i + 1;
+        }
+
+        Size Count() const override {
+            return count;
+        }
+
+        T & operator[](Size index) override {
+            if (index >= count) abort();
+            auto cur = object;
+            for (int i = 0; i < index; ++i) {
+                cur = cur->next;
+            }
+            return **cur;
+        }
+
+        const T & operator[](Size index) const override {
+            if (index >= count) abort();
+            auto cur = object;
+            for (int i = 0; i < index; ++i) {
+                cur = cur->next;
+            }
+            return **cur;
         }
 
         struct Iterator {
@@ -224,24 +274,6 @@ namespace CC {
             Node * cur = nullptr;
         };
 
-        T & operator[](Size index) override {
-            if (index >= Count) abort();
-            auto cur = object;
-            for (int i = 0; i < index; ++i) {
-                cur = cur->next;
-            }
-            return **cur;
-        }
-
-        const T & operator[](Size index) const override {
-            if (index >= Count) abort();
-            auto cur = object;
-            for (int i = 0; i < index; ++i) {
-                cur = cur->next;
-            }
-            return **cur;
-        }
-
         Iterator begin() {
             return Iterator(this->object);
         }
@@ -252,4 +284,4 @@ namespace CC {
     };
 }
 
-#endif //CHOCO_CPP_LINKED_LIST_H
+#endif //CHOCO_CPP_LINKED_H
