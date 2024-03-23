@@ -74,7 +74,7 @@ namespace CC {
             }
 
             Entity * ReAlloc(Size cnt) {
-                return reinterpret_cast<Entity *>(CC::ReAlloc<T>(this, cnt));
+                return reinterpret_cast<Entity *>(CC::ReMake<T>(this, cnt));
             }
 
             bool Release() {
@@ -205,17 +205,69 @@ namespace CC {
 
         // Iterator methods
 
-        T * begin() {
-            return object->begin();
+        struct Iterator {
+            Iterator() : cur(nullptr) {};
+
+            Iterator(const Iterator & iterator) : cur(iterator.cur) {}
+
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur) {}
+
+            explicit Iterator(T * && object) : cur(object) { object = nullptr; }
+
+            // Incrementing means going through the list
+            Iterator & operator++() {
+                if (cur == nullptr) return *this;
+                cur = ++cur;
+                return *this;
+            }
+
+            Iterator & operator+(Size index) {
+                if (cur == nullptr) return *this;
+
+                for (Size i = 0; i < index; ++i) {
+                    cur = ++cur;
+                }
+
+                return *this;
+            }
+
+            // It needs to be able to compare nodes
+            bool operator!=(const Iterator &other) {
+                return this->cur != other.cur;
+            }
+
+            bool operator==(const Iterator &other) {
+                return this->cur == other.cur;
+            }
+
+            // Return the data from the node (dereference operator)
+            T & operator*() {
+                return *this->cur;
+            }
+
+            const T & operator*() const {
+                return *this->cur;
+            }
+
+            template<typename OS>
+            friend OS & operator<<(OS & os, const Iterator & iterator) {
+                return os << *iterator;
+            }
+
+            T * cur;
+        };
+
+        Iterator begin() {
+            return Iterator(object->begin());
         }
 
-        T * end() {
-            return reinterpret_cast<T *>(object) + count;
+        Iterator end() {
+            return Iterator(object->end());
         }
     };
 
     template<typename T>
-    using Vector = Var<IList<Trivial<T>>>;
+    using Vector = List<Trivial<T>>;
 }
 
 #endif //CHOCO_CPP_VECTOR_H

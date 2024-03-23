@@ -28,17 +28,15 @@ namespace CC {
     using Size = __SIZE_TYPE__;
 #endif
 
-
-    template<class T> struct RemoveAll { typedef T Type; };
-    template<class T> struct RemoveAll<T*> : RemoveAll<T> {};
-    template<class T> struct RemoveAll<T&> : RemoveAll<T> {};
-
-//    template<class T> struct RemoveAll<T&&> : RemoveAll<T> {};
-//    template<class T> struct RemoveAll<T const> : RemoveAll<T> {};
-//    template<class T> struct RemoveAll<T volatile> : RemoveAll<T> {};
-//    template<class T> struct RemoveAll<T const volatile> : RemoveAll<T> {};
-//    template<class T> struct RemoveAll<T[]> : RemoveAll<T> {};
-//    template<class T, int N> struct RemoveAll<T[N]> : RemoveAll<T> {};
+    template<class T> struct Decay { typedef T Type; };
+    template<class T> struct Decay<T*> : Decay<T> {};
+    template<class T> struct Decay<T&> : Decay<T> {};
+    template<class T> struct Decay<T&&> : Decay<T> {};
+    template<class T> struct Decay<T const> : Decay<T> {};
+    template<class T> struct Decay<T volatile> : Decay<T> {};
+    template<class T> struct Decay<T const volatile> : Decay<T> {};
+    template<class T> struct Decay<T[]> : Decay<T> {};
+    template<class T, int N> struct Decay<T[N]> : Decay<T> {};
 }
 
 #endif //CC_TYPES_H

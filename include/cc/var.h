@@ -32,6 +32,25 @@ namespace CC {
             return reinterpret_cast<Inspector &>(*object);
         }
 
+        Variant & operator=(const Variant & var) {
+            if (this == &var) return *this;
+
+            Destroy(object);
+            object = Retain(var.object);
+
+            return *this;
+        }
+
+        Variant & operator=(Variant && var) {
+            if (this == &var) return *this;
+
+            Destroy(object);
+            object = var.object;
+            var.object = nullptr;
+
+            return *this;
+        }
+
         Variant & operator=(const T & o) {
             Copy(object, 0, &o, 1);
         }
@@ -56,8 +75,8 @@ namespace CC {
             return object;
         }
 
-        template<typename D> bool is() {
-            return std::is_base_of<typename RemoveAll<T>::Type, D>::value;
+        template<typename D> bool Is() {
+            return std::is_base_of<typename Decay<T>::Type, D>::value;
         }
     };
 

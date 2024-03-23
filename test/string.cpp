@@ -8,24 +8,6 @@
 using namespace std;
 using namespace CC;
 
-struct Test : Object {
-    int i;
-};
-
-struct Test1 : Object {
-    int i;
-
-    Test1() = default;
-
-    void Init() {
-        i = 0;
-    }
-
-    ~Test1() {
-        cout << "Test1::~Test()" << endl;
-    }
-};
-
 int main() {
 //    cout << is_pod<Slice<int>>::value << endl;
 //    cout << is_pod<Array<int>>::value << endl;
@@ -63,6 +45,18 @@ int main() {
         for (auto & c : s) {
             cout << c << endl;
         }
+
+        cout << s << endl;
+    }
+
+    cout << "===================" << endl;
+
+    {
+        String s = "Hello!";
+
+        cout << s << endl;
+
+        s.Insert(5, " demo");
 
         cout << s << endl;
     }

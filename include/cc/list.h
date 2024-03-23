@@ -52,64 +52,33 @@ namespace CC {
         }
     };
 
-    template<typename T, template<typename> class List>
-    struct IList<List<T>> : IList<T> {
-        using Type = List<T>;
-    };
-
     template<typename T>
-    struct Variant<IList<T>> : IList<T> {
-        using Type = IList<T>;
+    struct List;
+
+    template<typename T, template<typename> class L>
+    struct List<L<T>> : IList<T> {
+        using Type = L<T>;
+        static_assert(std::is_base_of<IList<T>, Type>::value, "Illegal List type");
 
         Type * object;
 
-        Variant() : object(nullptr) {}
+        List() : object(Make<Type>()) {}
 
-        Variant(Type * && o) : object(o) { o = nullptr; }
+        List(const List & list) : object(Retain(list.object)) {}
 
-        ~Variant() override {
-            object->~IList();
-            Release(object);
+        List(List && list) : object(list.object) { list.object = nullptr; }
+
+        template<Size S>
+        List(const T (&o)[S]) : object(Make<Type>()) {
+            object->Push(&o[0], S);
         }
 
-        void CopyInsert(Size index, const T * elements, Size count) override {
-            object->CopyInsert(index, elements, count);
+        template<Size S>
+        List(T (&&o)[S]) : object(Make<Type>()) {
+            object->Push(&o[0], S);
         }
 
-        void MoveInsert(Size index, T * elements, Size count) override {
-            object->MoveInsert(index, elements, count);
-        }
-
-        void Delete(Size index, Size count) override {
-            object->Delete(index, count);
-        }
-
-        Size Count() const override {
-            return object->Count();
-        }
-
-        T & operator[](Size index) override {
-            return object->operator[](index);
-        }
-
-        const T & operator[](Size index) const override {
-            return object->operator[](index);
-        }
-    };
-
-    template<typename T, template<typename> class List>
-    struct Variant<IList<List<T>>> : IList<T> {
-        using Type = typename IList<List<T>>::Type;
-
-        Type * object;
-
-        Variant() : object(Make<Type>()) {}
-
-        Variant(const Variant & var) : object(Retain(var.object)) {}
-
-        Variant(Variant && var) : object(var.object) { var.object = nullptr; }
-
-        ~Variant() override {
+        ~List() override {
             Destroy(object);
         }
 
@@ -129,6 +98,25 @@ namespace CC {
             return object->Count();
         }
 
+        List & operator=(const List & list) {
+            if (this == &list) return *this;
+
+            Destroy(object);
+            object = Retain(list.object);
+
+            return *this;
+        }
+
+        List & operator=(List && list) {
+            if (this == &list) return *this;
+
+            Destroy(object);
+            object = list.object;
+            list.object = nullptr;
+
+            return *this;
+        }
+
         T & operator[](Size index) override {
             return object->operator[](index);
         }
@@ -141,13 +129,18 @@ namespace CC {
             return object->begin();
         }
 
+        auto begin() const {
+            return object->begin();
+        }
+
         auto end() {
             return object->end();
         }
-    };
 
-    template<typename T>
-    using List = Variant<IList<T>>;
+        auto end() const {
+            return object->end();
+        }
+    };
 }
 
 #endif //CHOCO_CPP_LIST_H

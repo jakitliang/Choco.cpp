@@ -167,7 +167,7 @@ namespace CC {
     }
 
     template<typename T>
-    void * Destruct(T * object, Size index, Size count) {
+    T * Destruct(T * object, Size index, Size count) {
         auto target = object + index;
 
         if constexpr (std::is_trivially_destructible<T>::value) {
@@ -183,7 +183,7 @@ namespace CC {
     }
 
     template<typename T>
-    void * Destruct(T * object) {
+    T * Destruct(T * object) {
         return Destruct(object, 0, 1);
     }
 
@@ -228,13 +228,19 @@ namespace CC {
     }
 
     template<typename T>
-    T * ReAlloc(void * oldObject, Size count, bool construct = false) {
+    T * ReAlloc(void * oldObject, Size count) {
         bool result = false;
-        Size oldCount = count;
-        if (construct) oldCount = Count<T>(oldObject);
+        return static_cast<T *>(Zone::ReAlloc(oldObject, count * sizeof(T), &result));
+    }
+
+    template<typename T>
+    T * ReMake(void * oldObject, Size count) {
+        bool result = false;
+        Size oldCount = Count<T>(oldObject);
+
+        if (oldCount > count) Destruct<T>(reinterpret_cast<T *>(oldObject), count, oldCount - count);
 
         auto object = static_cast<T *>(Zone::ReAlloc(oldObject, count * sizeof(T), &result));
-        if (!construct) return object;
 
         if (result && count > oldCount) Construct<T>(object, oldCount, count - oldCount);
 

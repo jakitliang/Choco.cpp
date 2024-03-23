@@ -5,12 +5,13 @@
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
-#include "vector.h"
+#include "cc/variant.h"
+#include "cc/sequence.h"
 
 namespace CC {
     template<>
-    struct Variant<char []> {
-        using Type = TrivialData<char>;
+    struct Variant<char []> : Sequence<char> {
+        using Type = char *;
 
         Type * object;
 
@@ -28,25 +29,21 @@ namespace CC {
 
         ~Variant();
 
-        char * begin();
-
-        char * end();
-
         Size Length() const;
+
+        Size Count() const override;
 
         char * cString();
 
         const char * cString() const;
-
-        char & operator[](Size index);
-
-        const char & operator[](Size index) const;
 
         bool operator!() const;
 
         // Algorithms
 
         void Insert(Size index, const char * str, Size length);
+
+        void Insert(Size index, const char * str);
 
         void Insert(Size index, const char & t);
 
@@ -60,8 +57,48 @@ namespace CC {
 
         void Delete(Size index);
 
-        template<typename T>
-        friend T & operator<<(T &os, const Variant & str) {
+        char & operator[](Size index) override;
+
+        const char & operator[](Size index) const override;
+
+        // Iterator methods
+
+        struct Iterator {
+            Iterator() = default;
+
+            // Incrementing means going through the list
+            Iterator & operator++();
+
+            Iterator & operator+(Size index);
+
+            // It needs to be able to compare nodes
+            bool operator!=(const Iterator &other) const;
+
+            bool operator==(const Iterator &other) const;
+
+            // Return the data from the node (dereference operator)
+            char & operator*();
+
+            const char & operator*() const;
+
+            template<typename OS>
+            friend OS & operator<<(OS & os, const Iterator & iterator) {
+                return os << *iterator;
+            }
+
+            char * cur;
+        };
+
+        Iterator begin();
+
+        Iterator begin() const;
+
+        Iterator end();
+
+        Iterator end() const;
+
+        template<typename OS>
+        friend OS & operator<<(OS &os, const Variant & str) {
             return os << str.cString();
         }
     };

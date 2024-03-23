@@ -89,7 +89,7 @@ namespace CC {
 
         template<typename E>
         void Insert(Size index, E * elements, Size cnt) {
-            cout << sizeof(E) << endl;
+            int i = 0;
             if (cnt < 1) return;
 
             if (index > count) {
@@ -98,32 +98,42 @@ namespace CC {
 
             if (object == nullptr) {
                 object = Node::Alloc(elements);
-                elements += 1;
                 lastObject = object;
 
-                for (int i = 1; i < cnt; ++i) {
+                for (i = 1; i < cnt; ++i) {
                     lastObject = lastObject->Concat(&elements[i]);
                 }
 
             } else {
                 if (index == count) {
                     // Append to end
-                    for (int i = 0; i < cnt; ++i)
+                    for (i = 0; i < cnt; ++i)
                         lastObject = lastObject->Concat(&elements[i]);
 
                 } else {
                     // Insert to index
                     // Get last
-                    Node * cur = object;
-                    Node * next = nullptr;
-                    for (int i = 0; i < index; ++i) {
-                        cur = cur->next;
+                    Node * prev = nullptr;
+                    Node * next = object;
+
+                    for (i = 0; i < index; ++i) {
+                        prev = next;
+                        next = next->next;
                     }
-                    next = cur->next;
-                    for (int i = 0; i < cnt; ++i) {
-                        cur = cur->Concat(&elements[i]);
+
+                    i = 0;
+
+                    if (prev == nullptr) {
+                        object = Node::Alloc(elements);
+                        prev = object;
+                        i = 1;
                     }
-                    cur->next = next;
+
+                    for (; i < cnt; ++i) {
+                        prev = prev->Concat(&elements[i]);
+                    }
+
+                    prev->next = next;
                 }
             }
 
@@ -233,11 +243,24 @@ namespace CC {
 
             Iterator(Iterator && iterator) noexcept : cur(iterator.cur), prev(iterator.prev) {}
 
-            explicit Iterator(Node * node) : cur(node) {}
+            explicit Iterator(Node * node) : cur(node), prev(nullptr) {}
 
             // Incrementing means going through the list
             Iterator & operator++() {
-                if (cur != nullptr) {
+                if (cur == nullptr) return *this;
+
+                prev = cur;
+                cur = cur->next;
+
+                return *this;
+            }
+
+            Iterator & operator+(Size index) {
+                if (cur == nullptr) return *this;
+
+                for (Size i = 0; i < index; ++i) {
+                    if (cur == nullptr) break;
+
                     prev = cur;
                     cur = cur->next;
                 }
@@ -245,20 +268,13 @@ namespace CC {
                 return *this;
             }
 
-            // Post fixing is bad in general, but it has its usages
-            Iterator operator++(int) {
-                Iterator temp(static_cast<Iterator &&>(*this)); // Make a copy of the iterator
-                ++(*this);                                      // Increment
-                return static_cast<Iterator &&>(temp);          // Return the copy before increment
-            }
-
-            bool operator!=(Iterator &other) {
-                return this->cur != other.cur;
-            }
-
             // It needs to be able to compare nodes
             bool operator!=(const Iterator &other) {
                 return this->cur != other.cur;
+            }
+
+            bool operator==(const Iterator &other) {
+                return this->cur == other.cur;
             }
 
             // Return the data from the node (dereference operator)
@@ -270,8 +286,13 @@ namespace CC {
                 return **this->cur;
             }
 
-            Node * prev = nullptr;
-            Node * cur = nullptr;
+            template<typename OS>
+            friend OS & operator<<(OS & os, const Iterator & iterator) {
+                return os << *iterator;
+            }
+
+            Node * prev;
+            Node * cur;
         };
 
         Iterator begin() {
@@ -284,7 +305,7 @@ namespace CC {
     };
 
     template<typename T>
-    using LinkedList = Var<IList<Linked<T>>>;
+    using LinkedList = List<Linked<T>>;
 }
 
 #endif //CHOCO_CPP_LINKED_LIST_H
