@@ -10,24 +10,24 @@
 
 namespace CC {
     template<>
-    struct Variant<char []> : Sequence<char> {
+    struct Var<char []> : Sequence<char> {
         using Type = char *;
 
         Type * object;
 
-        Variant();
+        Var();
 
-        Variant(const Variant & str);
+        Var(const Var & str);
 
-        Variant(Variant && str) noexcept;
+        Var(Var && str) noexcept;
 
-        Variant(const char * cStr, Size length);
+        Var(const char * cStr, Size length);
 
-        Variant(const char * cStr);
+        Var(const char * cStr);
 
-        Variant(const Byte * bytes, Size length);
+        Var(const Byte * bytes, Size length);
 
-        ~Variant();
+        ~Var();
 
         Size Length() const;
 
@@ -98,12 +98,27 @@ namespace CC {
         Iterator end() const;
 
         template<typename OS>
-        friend OS & operator<<(OS &os, const Variant & str) {
+        friend OS & operator<<(OS &os, const Var & str) {
             return os << str.cString();
         }
     };
 
-    using String = Variant<char []>;
+    template<Size S>
+    struct Var<char [S]> : private Var<char []> {
+        using Type = char;
+
+        Var() = delete;
+
+        Var(const Var & var) : Var<char []>(var) {}
+
+        Var(Var && var) : Var<char []>(static_cast<Var &&>(var)) {}
+
+        Var(const char (&o)[S]) : Var<char []>(&o[0], S) {}
+
+        Var(char (&&o)[S]) : Var<char []>(&o[0], S) {}
+    };
+
+    using String = Var<char []>;
 }
 
 #endif //CC_STRING_H

@@ -31,27 +31,19 @@ struct Test1 : Object {
 
 int main() {
     cout << is_pod<Object>::value << endl;
-    cout << is_pod<Variant<int>>::value << endl;
+    cout << is_pod<Var<int>>::value << endl;
 //    cout << is_pod<Var<int>>::value << endl;
 //    cout << is_pod<Slice<int>>::value << endl;
 //    cout << is_pod<Array<int>>::value << endl;
 //    cout << is_pod<String>::value << endl;
     cout << "===================" << endl;
 
-//    cout << is_standard_layout<Variant<int>>::value << endl;
-//    cout << is_standard_layout<Var<int>>::value << endl;
-//    cout << is_standard_layout<Slice<int>>::value << endl;
-//    cout << is_standard_layout<Array<int>>::value << endl;
-//    cout << is_standard_layout<String>::value << endl;
-//    cout << "===================" << endl;
-
     // Local var test
     {
-//        int i1 = 123;
-//        Var<int> i = i1;
-//        auto j = i;
-//
-//        cout << j.Inspect().size() << endl;
+        int i1 = 123;
+        Var<int> i = i1;
+        auto j = i;
+        auto t = Var(1);
 
         static int count = 1;
 
@@ -67,24 +59,8 @@ int main() {
 //        v.push_back(static_cast<A &&>(a));
 
         Var<A> s = A();
-        cout << s.is<A>() << endl;
         cout << "===================" << endl;
     }
-
-    cout << "===================" << endl;
-
-    // Slice var test
-//    {
-//        Var<int (&)[]> i;
-//        auto j = i;
-//
-//        cout << j.Inspect().size() << endl;
-//    }
-
-//    // Vector var
-//    {
-//        Var<vector<int>> v;
-//    }
 
     return 0;
 }

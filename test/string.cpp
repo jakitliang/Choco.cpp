@@ -2,6 +2,7 @@
 // Created by Jakit on 2024/3/17.
 //
 
+#include "cc/array.h"
 #include "cc/string.h"
 #include <iostream>
 
@@ -14,7 +15,7 @@ int main() {
 //    cout << is_pod<String>::value << endl;
     cout << "===================" << endl;
 
-//    cout << is_standard_layout<Variant<int>>::value << endl;
+//    cout << is_standard_layout<Var<int>>::value << endl;
 //    cout << is_standard_layout<Var<int>>::value << endl;
 //    cout << is_standard_layout<Slice<int>>::value << endl;
 //    cout << is_standard_layout<Array<int>>::value << endl;
@@ -59,6 +60,10 @@ int main() {
         s.Insert(5, " demo");
 
         cout << s << endl;
+    }
+
+    {
+
     }
 
     return 0;

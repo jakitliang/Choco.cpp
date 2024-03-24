@@ -9,22 +9,22 @@
 
 namespace CC {
     template<typename T>
-    struct Variant<T> : Variant<void> {
+    struct Var : Var<void> {
         using Type = T;
 
         Type * object;
 
-        Variant() : object(std::is_abstract<Type>::value ? nullptr : Make<T>()) {}
+        Var() : object(std::is_abstract<Type>::value ? nullptr : Make<T>()) {}
 
-        Variant(const Variant & v) : object(Retain(v.object)) {}
+        Var(const Var & v) : object(Retain(v.object)) {}
 
-        Variant(Variant && v) : object(v.object) { v.object = nullptr; }
+        Var(Var && v) : object(v.object) { v.object = nullptr; }
 
-        Variant(const T & o) : object(Clone(o)) {}
+        Var(const T & o) : object(Clone(o)) {}
 
-        Variant(T && o) : object(Clone(static_cast<T &&>(o))) {}
+        Var(T && o) : object(Clone(static_cast<T &&>(o))) {}
 
-        ~Variant() {
+        ~Var() {
             Destroy(object);
         }
 
@@ -32,7 +32,7 @@ namespace CC {
             return reinterpret_cast<Inspector &>(*object);
         }
 
-        Variant & operator=(const Variant & var) {
+        Var & operator=(const Var & var) {
             if (this == &var) return *this;
 
             Destroy(object);
@@ -41,7 +41,7 @@ namespace CC {
             return *this;
         }
 
-        Variant & operator=(Variant && var) {
+        Var & operator=(Var && var) {
             if (this == &var) return *this;
 
             Destroy(object);
@@ -51,11 +51,11 @@ namespace CC {
             return *this;
         }
 
-        Variant & operator=(const T & o) {
+        Var & operator=(const T & o) {
             Copy(object, 0, &o, 1);
         }
 
-        Variant & operator=(T && o) {
+        Var & operator=(T && o) {
             Move(object, 0, &o, 1);
         }
 
@@ -79,9 +79,6 @@ namespace CC {
             return std::is_base_of<typename Decay<T>::Type, D>::value;
         }
     };
-
-    template<typename T>
-    using Var = Variant<T>;
 }
 
 #endif //CHOCO_CPP_VAR_H

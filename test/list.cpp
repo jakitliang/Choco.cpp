@@ -27,7 +27,7 @@ struct Test1 : Object {
 };
 
 int main() {
-//    cout << is_standard_layout<Variant<int>>::value << endl;
+//    cout << is_standard_layout<Var<int>>::value << endl;
 //    cout << is_standard_layout<Var<int>>::value << endl;
 //    cout << is_standard_layout<Slice<int>>::value << endl;
 //    cout << is_standard_layout<Array<int>>::value << endl;

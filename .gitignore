@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
 
-# Compiled Variant files
+# Compiled Var files
 *.slo
 *.lo
 *.o

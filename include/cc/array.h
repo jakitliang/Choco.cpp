@@ -5,137 +5,135 @@
 #ifndef CC_ARRAY_H
 #define CC_ARRAY_H
 
-#include "cc/var.h"
+#include "cc/variant.h"
+#include "cc/zone.h"
 #include "cc/sequence.h"
 #include <bitset>
 
 namespace CC {
     template<typename T>
-    struct Variant<T []> : Sequence<T *> {
-        using Type = T *;
+    struct Var<T []> : Sequence<T> {
+        using Type = T;
 
         Type * object;
-        Byte * ref;
-        Size * count;
 
-        Variant() : object(Alloc<Type>()), count(Make<Size>()) {
-            *object = Make<T>(0);
-        }
+        Var() : object(nullptr) {}
 
-        Variant(const Variant & var) : object(Retain(var.object)), count(Make<Size>()) {}
+        Var(const Var & var) : object(Retain(var.object)) {}
 
-        Variant(Variant && var) : object(var.object), count(var.count) {
+        Var(Var && var) : object(var.object) {
             var.object = nullptr;
-            var.count = nullptr;
         }
 
-        template<Size S>
-        Variant(const T (&o)[S]) : object(Alloc<Type>()), count(Make<Size>()) {
-            *object = Alloc<T>(S);
-            CopyConstruct(*object, 0, &o[0], S);
-            *count = S;
+        Var(T * && object) : object(object) { object = nullptr; }
+
+        ~Var() {
+            Destroy(object);
         }
 
-        template<Size S>
-        Variant(T (&&o)[S]) : object(Alloc<Type>()), count(Make<Size>()) {
-            *object = Alloc<T>(S);
-            MoveConstruct(*object, 0, &o[0], S);
-            *count = S;
+        T & operator[](Size index) {
+            return object[index];
         }
 
-        Variant & operator=(const Variant & var) {
-            if (this == &var) return *this;
-
-            Destroy(*object);
-            Release(object);
-            Release(count);
-
-            object = Retain(var.object);
-            Retain(*var.object);
-            count = Retain(var.count);
-
-            return *this;
+        const T & operator[](Size index) const {
+            return object[index];
         }
 
-        Variant & operator=(Variant && var) {
-            if (this == &var) return *this;
+        // Iterator methods
 
-            Destroy(*object);
-            Release(object);
-            Release(count);
+        struct Iterator {
+            Iterator() : cur(nullptr) {};
 
-            object = var.object;
-            count = var.count;
-            var.object = nullptr;
-            var.count = nullptr;
+            Iterator(const Iterator & iterator) : cur(iterator.cur) {}
 
-            return *this;
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur) {}
+
+            explicit Iterator(T * object) : cur(object) {}
+
+            // Incrementing means going through the list
+            Iterator & operator++() {
+                if (cur == nullptr) return *this;
+                cur = ++cur;
+                return *this;
+            }
+
+            Iterator & operator+(Size index) {
+                if (cur == nullptr) return *this;
+
+                for (Size i = 0; i < index; ++i) {
+                    cur = ++cur;
+                }
+
+                return *this;
+            }
+
+            // It needs to be able to compare nodes
+            bool operator!=(const Iterator &other) {
+                return this->cur != other.cur;
+            }
+
+            bool operator==(const Iterator &other) {
+                return this->cur == other.cur;
+            }
+
+            // Return the data from the node (dereference operator)
+            T & operator*() {
+                return *this->cur;
+            }
+
+            const T & operator*() const {
+                return *this->cur;
+            }
+
+            template<typename OS>
+            friend OS & operator<<(OS & os, const Iterator & iterator) {
+                return os << *iterator;
+            }
+
+            T * cur;
+        };
+
+        Iterator begin() {
+            return Iterator(object);
         }
 
-        template<Size S>
-        Variant & operator=(const T (&o)[S]) {
-            auto count = Count<T>(*object);
-
-            if (S > count) *object = ReAlloc<T>(S);
-
-            Copy(*object, 0, &o[0], S);
-
-            if (S > count) CopyConstruct(*object, count, &o[count], S - count);
-
-            return *this;
+        Iterator begin() const {
+            return Iterator(object);
         }
 
-        template<Size S>
-        Variant & operator=(T (&&o)[S]) {
-            auto count = Count<T>(*object);
-
-            if (S > Count<T>(*object)) *object = ReAlloc<T>(S);
-
-            Move(*object, 0, &o[0], S);
-
-            if (S > count) MoveConstruct(*object, count, &o[count], S - count);
-
-            return *this;
-        }
-
-        // Algorithms
-
-        void Insert(Size index, const T * str, Size cnt) {
-
-        }
-
-        void Insert(Size index, T * str, Size cnt);
-
-        void Insert(Size index, const T & t);
-
-        void Insert(Size index, T && t);
-
-        void Push(const T * elements, Size length) {
-
-        }
-
-        void Push(T * elements, Size length);
-
-        void Push(const T & element) {
-            Push(element, 1);
-        }
-
-        void Push(T && element) {
-            Push(element, 1);
-        }
-
-        void Delete(Size index, Size cnt);
-
-        void Delete(Size index);
-
-        bool operator!() {
-            return *count == 0;
-        }
-
-        bool Include(Size index) {
-            return
+        Iterator end() const {
+            return Iterator(object + this->Count());
         }
     };
+
+    template<typename T, Size S>
+    struct Var<T [S]> : Var<T []> {
+        using Type = T;
+
+        Var() : Var<T []>(Make<Type>(S)) {}
+
+        Var(const Var & var) : Var<T []>(var) {}
+
+        Var(Var && var) : Var<T[]>(static_cast<Var &&>(var)) {}
+
+        Var(const T (&o)[S]) : Var<T[]>(Clone(o)) {}
+
+        Var(T (&&o)[S]) : Var<T[]>(Clone(static_cast<T(&&)[S]>(o))) {}
+
+        Size Count() const {
+            return S;
+        }
+    };
+
+    template<typename T, Size S>
+    Var<T [S]> Array(const T (&object)[S]) {
+        return {object};
+    }
+
+    template<typename T, Size S>
+    Var<T [S]> Array(T (&&object)[S]) {
+        return {static_cast<T (&&)[S]>(object)};
+    }
 }
 
 #endif //CC_ARRAY_H

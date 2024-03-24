@@ -212,7 +212,7 @@ namespace CC {
 
             Iterator(Iterator && iterator) noexcept : cur(iterator.cur) {}
 
-            explicit Iterator(T * && object) : cur(object) { object = nullptr; }
+            explicit Iterator(T * object) : cur(object) { object = nullptr; }
 
             // Incrementing means going through the list
             Iterator & operator++() {

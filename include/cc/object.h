@@ -10,7 +10,7 @@
 
 namespace CC {
     template<>
-    struct Variant<void> {
+    struct Var<void> {
         struct Inspector {
             Byte * Bytes() {
                 return reinterpret_cast<Byte *>(this);
@@ -90,7 +90,7 @@ namespace CC {
         }
     };
 
-    using Object = Variant<void>;
+    using Object = Var<void>;
 }
 
 #endif //CC_OBJECT_H
