@@ -24,7 +24,7 @@ CC::Data::Data(Size length)
     : Var<Byte []>(Make<Byte>(length)), object(*this->delegate), length(Make<Size>()) {}
 
 CC::Data::~Data() {
-    Destroy(*this->delegate);
+    if (delegate) Destroy(*delegate);
     Destroy(length);
 }
 

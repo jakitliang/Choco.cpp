@@ -14,6 +14,7 @@ CC::String::String(const String & str)
 
 CC::String::String(String && str) noexcept
     : Var<char []>(static_cast<Var &&>(str)), object(*this->delegate), length(str.length) {
+    str.object = nullptr;
     str.length = nullptr;
 }
 
@@ -34,7 +35,7 @@ CC::String::String(const CC::Byte *bytes, CC::Size length)
 }
 
 CC::String::~String() {
-    Destroy(object);
+    if (delegate) Destroy(*delegate);
     Destroy(length);
 }
 
@@ -80,7 +81,7 @@ void CC::String::Insert(Size index, const char * str, Size len) {
     }
 
     if (indexEnd > Count()) {
-        object = ReMake<char>(object, indexEnd);
+        *this->delegate = ReMake<char>(object, indexEnd);
     }
 
     // Move the data [index .. Count()] to the end
@@ -152,6 +153,14 @@ void CC::String::Delete(Size index, Size len) {
 
 void CC::String::Delete(Size index) {
     Delete(index, 1);
+}
+
+CC::Var<char []>::Iterator CC::String::end() {
+    return Iterator(&object[Length()]);
+}
+
+CC::Var<char []>::Iterator CC::String::end() const {
+    return Iterator(&object[Length()]);
 }
 
 char & CC::String::operator[](Size index) {

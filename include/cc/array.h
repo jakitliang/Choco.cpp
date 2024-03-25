@@ -112,9 +112,9 @@ namespace CC {
 
     template<typename T, Size S>
     struct Var<T [S]> : Var<T []> {
-        using Type = T;
+        using Type = T *;
 
-        Type * object;
+        Type & object;
 
         Var() : Var<T []>(Make<T>(S)), object(*this->delegate) {}
 
@@ -127,11 +127,7 @@ namespace CC {
         Var(T (&&o)[S]) : Var<T []>(Clone(static_cast<T (&&)[S]>(o))), object(*this->delegate) {}
 
         ~Var() {
-            Destroy(object);
-        }
-
-        void Resize(Size count) {
-            *this->delegate = ReMake<T>(object, count);
+            if (this->delegate) Destroy(*this->delegate);
         }
 
         Size Count() const {

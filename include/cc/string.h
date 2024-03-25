@@ -10,9 +10,9 @@
 
 namespace CC {
     struct String : Var<char []> {
-        using Type = char;
+        using Type = char *;
 
-        Type * object;
+        Type & object;
         Size * length;
 
         String();
@@ -60,6 +60,10 @@ namespace CC {
         char & operator[](Size index) override;
 
         const char & operator[](Size index) const override;
+
+        Iterator end() override;
+
+        Iterator end() const override;
 
         template<typename OS>
         friend OS & operator<<(OS &os, const String & str) {

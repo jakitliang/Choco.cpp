@@ -33,8 +33,6 @@ int main() {
     {
         Var<int [3]> i;
         int a = 1;
-        i.Resize(5);
-        a = 111;
     }
 
     return 0;
