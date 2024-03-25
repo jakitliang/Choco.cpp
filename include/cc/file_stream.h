@@ -9,12 +9,26 @@
 #include "cc/stream.h"
 
 namespace CC {
-    struct File : IStream {
-        Size onWrite(const void * buffer, Size length);
+    struct FileStream : Stream {
+        struct IO : Stream::IO {
+            Size Write(const void * buffer, Size length) override {
+                return 0;
+            }
 
-        Size onRead(void * buffer, Size length);
+            Size Read(void * buffer, Size length) override {
+                return 0;
+            }
 
-        bool onClose();
+            bool Close() override {
+                return false;
+            }
+        };
+
+        FileStream() : Stream(Make<FileStream::IO>()) {}
+
+        FileStream(const FileStream & fileStream);
+
+        FileStream(FileStream && fileStream);
     };
 }
 

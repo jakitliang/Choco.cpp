@@ -33,9 +33,9 @@ namespace CC {
 
         Size Count() const override;
 
-        char * cString();
+        char * CString();
 
-        const char * cString() const;
+        const char * CString() const;
 
         bool operator!() const;
 
@@ -63,7 +63,7 @@ namespace CC {
 
         template<typename OS>
         friend OS & operator<<(OS &os, const String & str) {
-            return os << str.cString();
+            return os << str.CString();
         }
     };
 }

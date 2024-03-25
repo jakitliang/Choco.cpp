@@ -46,11 +46,11 @@ CC::Size CC::String::Count() const {
     return CC::Count<char>(object);
 }
 
-char * CC::String::cString() {
+char * CC::String::CString() {
     return &object[0];
 }
 
-const char * CC::String::cString() const {
+const char * CC::String::CString() const {
     return &object[0];
 }
 
@@ -139,13 +139,13 @@ void CC::String::Delete(Size index, Size len) {
     // x: place to remove
     // | | | |x|x|
     if (indexEnd >= count) {
-        Destruct(object, index, count - index);
+        Destruct<char>(object, index, count - index);
         *length = index;
         return;
     }
 
     Move(object, index, &object[indexEnd], count - indexEnd);
-    Destruct(object, count - len, len);
+    Destruct<char>(object, count - len, len);
 
     *length -= len;
 }

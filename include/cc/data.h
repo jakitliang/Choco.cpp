@@ -29,31 +29,37 @@ namespace CC {
 
         ~Data();
 
+        void Copy(Size index, const void * buffer, Size length);
+
+        void Move(Size index, void * buffer, Size length);
+
+        void Push(const void * buffer, Size length);
+
+        void Shift(Size length);
+
         Size Count() const override;
 
-        Size Length() const;
+        Size & Length();
 
-        // Algorithms
+        const Size & Length() const;
 
-        void Insert(Size index, const Byte * str, Size length);
+        Byte * CData(Size index = 0);
 
-        void Insert(Size index, const Byte & t);
+        const Byte * CData(Size index = 0) const;
 
-        void Push(const Byte * str, Size length);
-
-        void Push(const Byte & t);
-
-        void Delete(Size index, Size length);
-
-        void Delete(Size index);
+        void Resize(Size size);
 
         Byte & operator[](Size index) override;
 
         const Byte & operator[](Size index) const override;
 
+        Iterator end() override;
+
+        Iterator end() const override;
+
         template<typename OS>
         friend OS & operator<<(OS & os, const Data & data) {
-            char str[4];
+            char str[3];
 
             for (int i = 0; i < data.Count(); ++i) {
                 os << data.ToHex(str, i) << ' ';
@@ -61,7 +67,7 @@ namespace CC {
             return os;
         }
 
-        char * ToHex(char (&str)[4], Size index) const;
+        char * ToHex(char (&str)[3], Size index) const;
     };
 }
 

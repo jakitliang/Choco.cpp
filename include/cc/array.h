@@ -101,11 +101,11 @@ namespace CC {
             return Iterator(*delegate);
         }
 
-        Iterator end() {
+        virtual Iterator end() {
             return Iterator(*delegate + this->Count());
         }
 
-        Iterator end() const {
+        virtual Iterator end() const {
             return Iterator(*delegate + this->Count());
         }
     };

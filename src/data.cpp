@@ -21,109 +21,89 @@ CC::Data::Data(const void * bytes, Size length)
 }
 
 CC::Data::Data(Size length)
-    : Var<Byte []>(Alloc<Byte>(length)), object(*this->delegate), length(Clone(length)) {}
+    : Var<Byte []>(Make<Byte>(length)), object(*this->delegate), length(Make<Size>()) {}
 
 CC::Data::~Data() {
-    Destroy(object);
+    Destroy(*this->delegate);
     Destroy(length);
+}
+
+void CC::Data::Copy(CC::Size index, const void * buffer, CC::Size len) {
+    CC::Copy<Byte>(object, index, static_cast<const Byte *>(buffer), len);
+}
+
+void CC::Data::Move(CC::Size index, void * buffer, CC::Size len) {
+    CC::Move<Byte>(object, index, static_cast<Byte *>(buffer), len);
+}
+
+void CC::Data::Push(const void * buffer, CC::Size len) {
+    auto indexEnd = Length() + len;
+    if (len < 1) return;
+
+    if (indexEnd > Count()) {
+        *this->delegate = ReMake<Byte>(object, indexEnd);
+    }
+
+    CC::Copy<Byte>(object, Length(), static_cast<const Byte *>(buffer), len);
+
+    *length += len;
+}
+
+void CC::Data::Shift(CC::Size len) {
+    auto count = Length();
+    if (len < 1) return;
+
+    // Case 1: Remove all
+    if (len >= count) {
+        *length = 0;
+        return;
+    }
+
+    CC::Copy(object, 0, &object[len], count - len);
+
+    *length -= len;
 }
 
 CC::Size CC::Data::Count() const {
     return CC::Count<Byte>(object);
 }
 
-CC::Size CC::Data::Length() const {
+CC::Size & CC::Data::Length() {
     return *length;
 }
 
-// Algorithms
+const CC::Size & CC::Data::Length() const {
+    return *length;
+}
 
-void CC::Data::Insert(Size index, const Byte * str, Size len) {
-    auto count = Length();
-    if (len < 1) return;
-
-    auto indexEnd = count + len;
-
-    // Case: out of bound
-    // 0 1 2 3 4 5
-    //         |-|
-    // | | | |
-    // | | | |0|-:
-    // --------------------
-    // Aligned to the end
-    // 0 1 2 3 4 5
-    //       |-|
-    // | | | |
-    // | | | |-|
-    if (index > count) {
-        index = count; // Fix insert position
+CC::Byte *CC::Data::CData(CC::Size index) {
+    if (index >= Count()) {
+        std::cerr << "Data::[] out of bounds" << std::endl;
+        abort();
     }
 
-    if (indexEnd > Count()) {
-        *this->delegate = ReMake<Byte>(object, indexEnd);
+    return &object[index];
+}
+
+const CC::Byte *CC::Data::CData(CC::Size index) const {
+    if (index >= Count()) {
+        std::cerr << "Data::[] out of bounds" << std::endl;
+        abort();
     }
 
-    // Move the data [index .. Count()] to the end
-    // New data           elements[0 .. count]
-    // Part 1                                    // Part 3
-    // data[0 .. index]                          data[index .. last]
-    // Part 1             Part 2                 // Part 3
-    // data[0 .. index] + elements[0 .. count] + data[index .. last]
-
-    if (index < count) {
-        // Move part 3 to the end
-        Copy(object, index + len, &object[index], count - index);
-    }
-
-    // Insert part 2 into data
-    Copy(object, index, str, len);
-
-    *length += len;
+    return &object[index];
 }
 
-void CC::Data::Insert(Size index, const Byte & t) {
-    Insert(index, &t, 1);
+void CC::Data::Resize(CC::Size size) {
+    ReMake<Byte>(object, size);
 }
 
-void CC::Data::Push(const Byte * str, Size length) {
-    Insert(Length(), str, length);
+CC::Var<CC::Byte[]>::Iterator CC::Data::end() {
+    return Iterator(&object[Length()]);
 }
 
-void CC::Data::Push(const Byte & t) {
-    Insert(Length(), t);
-}
-
-void CC::Data::Delete(Size index, Size len) {
-    auto count = Length();
-    if (len < 1) return;
-
-    if (index >= count) return;
-
-    // Erase
-    // Part 1             Part 2              // Part 3
-    // data[0 .. index] + erase[0 .. count] + data[index .. last]
-    // Part 1                                 // Part 3
-    // data[0 .. index]         +             data[index .. last]
-
-    auto indexEnd = index + len;
-
-    // Case 1: From index remove to the data.end
-    // x: place to remove
-    // | | | |x|x|
-    if (indexEnd >= count) {
-        Destruct(object, index, count - index);
-        *length = index;
-        return;
-    }
-
-    Move(object, index, &object[indexEnd], count - indexEnd);
-    Destruct(object, count - len, len);
-
-    *length -= len;
-}
-
-void CC::Data::Delete(Size index) {
-    Delete(index, 1);
+CC::Var<CC::Byte[]>::Iterator CC::Data::end() const {
+    return Iterator(&object[Length()]);
 }
 
 CC::Byte & CC::Data::operator[](Size index) {
@@ -144,7 +124,7 @@ const CC::Byte & CC::Data::operator[](Size index) const {
     return object[index];
 }
 
-char * CC::Data::ToHex(char (&str)[4], CC::Size index) const {
-    snprintf(&str[0], 4, "%x", object[index]);
+char * CC::Data::ToHex(char (&str)[3], CC::Size index) const {
+    snprintf(&str[0], 3, "%x", object[index]);
     return str;
 }

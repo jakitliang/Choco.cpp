@@ -23,6 +23,7 @@ int main() {
 
 //    cout << t << endl;
 
+    data.Length() = 5;
     data[0] = 100;
     data[1] = 250;
     data[2] = 100;

@@ -18,3 +18,5 @@ add_executable(TestLinkedList test_linked_list.cpp $<TARGET_OBJECTS:cc-src>)
 add_executable(TestVector test_vector.cpp $<TARGET_OBJECTS:cc-src>)
 
 add_executable(TestByte byte.cpp $<TARGET_OBJECTS:cc-src>)
+
+add_executable(TestFileChannel file_channel.cpp $<TARGET_OBJECTS:cc-src>)
