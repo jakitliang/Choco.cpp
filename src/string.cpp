@@ -80,7 +80,7 @@ void CC::String::Insert(Size index, const char * str, Size len) {
     }
 
     if (indexEnd > Count()) {
-        *this->delegate = ReMake<char>(object, indexEnd);
+        object = ReMake<char>(object, indexEnd);
     }
 
     // Move the data [index .. Count()] to the end

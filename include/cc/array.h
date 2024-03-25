@@ -112,9 +112,9 @@ namespace CC {
 
     template<typename T, Size S>
     struct Var<T [S]> : Var<T []> {
-        using Type = T *;
+        using Type = T;
 
-        Type & object;
+        Type * object;
 
         Var() : Var<T []>(Make<T>(S)), object(*this->delegate) {}
 
