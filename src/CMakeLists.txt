@@ -4,6 +4,7 @@ add_library(
         intptr.cpp
         zone.cpp
         string.cpp
+        data.cpp
 )
 
 target_include_directories(cc-src PUBLIC ../)

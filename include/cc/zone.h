@@ -6,10 +6,10 @@
 #define CC_ZONE_H
 
 #include "types.h"
+#include <type_traits>
 
 #if defined(_WINDOWS)
 #include <vcruntime_new.h>
-#include <type_traits>
 #else
 #include <new>
 #endif

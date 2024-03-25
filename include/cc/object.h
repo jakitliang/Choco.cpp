@@ -53,10 +53,6 @@ namespace CC {
             }
         };
 
-        virtual Inspector & Inspect() {
-            return reinterpret_cast<Inspector &>(*this);
-        }
-
         static void * operator new(Size size) {
             return Zone::Alloc(size);
         }

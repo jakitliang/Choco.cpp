@@ -5,60 +5,64 @@
 #include "cc/string.h"
 #include "cc/zone.h"
 #include <cstring>
+#include <iostream>
 
-CC::Var<char []>::Var() : object(Alloc<Type>()) {
-    *object = Make<char>(0);
+CC::String::String() : Var<char []>(Make<char>(0)), object(*this->delegate), length(Make<Size>()) {}
+
+CC::String::String(const String & str)
+    : Var<char []>(str), object(*this->delegate), length(Retain(str.length)) {}
+
+CC::String::String(String && str) noexcept
+    : Var<char []>(static_cast<Var &&>(str)), object(*this->delegate), length(str.length) {
+    str.length = nullptr;
 }
 
-CC::Var<char []>::Var(const Var & str) : object(Retain(str.object)) {}
-
-CC::Var<char []>::Var(Var && str) noexcept : object(str.object) {
-    str.object = nullptr;
+CC::String::String(const char * str, Size length)
+    : Var<char []>(Alloc<char>(length)), object(*this->delegate), length(Clone(length)) {
+    CopyConstruct<char>(object, 0, str, length);
 }
 
-CC::Var<char []>::Var(const char * str, Size length) : object(Alloc<Type>()) {
-    *object = CopyConstruct<char>(Alloc<char>(length), 0, str, length);
+CC::String::String(const char *str)
+    : Var<char []>(Alloc<char>(strlen(str))), object(*this->delegate), length(Make<Size>()) {
+    *length = strlen(str);
+    CopyConstruct<char>(object, 0, str, *length);
 }
 
-CC::Var<char []>::Var(const char *str) : object(Alloc<Type>()) {
-    auto length = strlen(str);
-    *object = CopyConstruct<char>(Alloc<char>(length), 0, str, length);
+CC::String::String(const CC::Byte *bytes, CC::Size length)
+    : Var<char []>(Alloc<char>(length)), object(*this->delegate), length(Clone(length)) {
+    CopyConstruct<char>(object, 0, (const char *) bytes, length);
 }
 
-CC::Var<char []>::Var(const CC::Byte *bytes, CC::Size length) : object(Alloc<Type>()) {
-    *object = CopyConstruct<char>(Alloc<char>(length), 0, (const char *) bytes, length);
+CC::String::~String() {
+    Destroy(object);
+    Destroy(length);
 }
 
-CC::Var<char []>::~Var() {
-    Release(*object);
-    Release(object);
+CC::Size CC::String::Length() const {
+    return *length;
 }
 
-CC::Size CC::Var<char []>::Length() const {
-    return CC::Count<char>(*object);
+CC::Size CC::String::Count() const {
+    return CC::Count<char>(object);
 }
 
-CC::Size CC::Var<char []>::Count() const {
-    return CC::Count<char>(*object);
+char * CC::String::cString() {
+    return &object[0];
 }
 
-char * CC::Var<char []>::cString() {
-    return &(*object)[0];
+const char * CC::String::cString() const {
+    return &object[0];
 }
 
-const char * CC::Var<char []>::cString() const {
-    return &(*object)[0];
-}
-
-bool CC::Var<char []>::operator!() const {
+bool CC::String::operator!() const {
     return Length() == 0;
 }
 
-void CC::Var<char []>::Insert(Size index, const char * str, Size length) {
+void CC::String::Insert(Size index, const char * str, Size len) {
     auto count = Length();
-    if (length < 1) return;
+    if (len < 1) return;
 
-    auto indexEnd = count + length;
+    auto indexEnd = count + len;
 
     // Case: out of bound
     // 0 1 2 3 4 5
@@ -75,8 +79,8 @@ void CC::Var<char []>::Insert(Size index, const char * str, Size length) {
         index = count; // Fix insert position
     }
 
-    if (indexEnd > count) {
-        *object = ReMake<char>(*object, indexEnd);
+    if (indexEnd > Count()) {
+        *this->delegate = ReMake<char>(object, indexEnd);
     }
 
     // Move the data [index .. Count()] to the end
@@ -88,36 +92,38 @@ void CC::Var<char []>::Insert(Size index, const char * str, Size length) {
 
     if (index < count) {
         // Move part 3 to the end
-        Copy(*object, index + length, &(*object)[index], count - index);
+        Copy(object, index + len, &object[index], count - index);
     }
 
     // Insert part 2 into data
-    Copy(*object, index, str, length);
+    Copy(object, index, str, len);
+
+    *length += len;
 }
 
-void CC::Var<char[]>::Insert(CC::Size index, const char *str) {
+void CC::String::Insert(CC::Size index, const char *str) {
     Insert(index, str, strlen(str));
 }
 
-void CC::Var<char []>::Insert(Size index, const char & t) {
+void CC::String::Insert(Size index, const char & t) {
     Insert(index, &t, 1);
 }
 
-void CC::Var<char []>::Push(const char * str, Size length) {
+void CC::String::Push(const char * str, Size length) {
     Insert(Length(), str, length);
 }
 
-void CC::Var<char []>::Push(const char * str) {
+void CC::String::Push(const char * str) {
     Insert(Length(), str, strlen(str));
 }
 
-void CC::Var<char []>::Push(const char & t) {
+void CC::String::Push(const char & t) {
     Insert(Length(), t);
 }
 
-void CC::Var<char []>::Delete(Size index, Size length) {
+void CC::String::Delete(Size index, Size len) {
     auto count = Length();
-    if (length < 1) return;
+    if (len < 1) return;
 
     if (index >= count) return;
 
@@ -127,77 +133,41 @@ void CC::Var<char []>::Delete(Size index, Size length) {
     // Part 1                                 // Part 3
     // data[0 .. index]         +             data[index .. last]
 
-    auto indexEnd = index + length;
+    auto indexEnd = index + len;
 
     // Case 1: From index remove to the data.end
     // x: place to remove
     // | | | |x|x|
     if (indexEnd >= count) {
-        Destruct(*object, index, count - index);
-        count = index;
+        Destruct(object, index, count - index);
+        *length = index;
         return;
     }
 
-    Move(*object, index, &(*object)[indexEnd], count - indexEnd);
-    Destruct(*object, count - length, length);
+    Move(object, index, &object[indexEnd], count - indexEnd);
+    Destruct(object, count - len, len);
+
+    *length -= len;
 }
 
-void CC::Var<char []>::Delete(Size index) {
+void CC::String::Delete(Size index) {
     Delete(index, 1);
 }
 
-char & CC::Var<char []>::operator[](Size index) {
-    return (*object)[index];
-}
-
-const char & CC::Var<char []>::operator[](Size index) const {
-    return (*object)[index];
-}
-
-CC::Var<char[]>::Iterator & CC::Var<char[]>::Iterator::operator++()  {
-    if (cur == nullptr) return *this;
-    cur = ++cur;
-    return *this;
-}
-
-CC::Var<char[]>::Iterator & CC::Var<char[]>::Iterator::operator+(CC::Size index) {
-    if (cur == nullptr) return *this;
-
-    for (Size i = 0; i < index; ++i) {
-        cur = ++cur;
+char & CC::String::operator[](Size index) {
+    if (index >= Length()) {
+        std::cerr << "String::[] out of bounds" << std::endl;
+        abort();
     }
 
-    return *this;
+    return object[index];
 }
 
-bool CC::Var<char[]>::Iterator::operator!=(const CC::Var<char[]>::Iterator &other) const {
-    return this->cur != other.cur;
-}
+const char & CC::String::operator[](Size index) const {
+    if (index >= Length()) {
+        std::cerr << "String::[] out of bounds" << std::endl;
+        abort();
+    }
 
-bool CC::Var<char[]>::Iterator::operator==(const CC::Var<char[]>::Iterator &other) const {
-    return this->cur == other.cur;
-}
-
-char &CC::Var<char[]>::Iterator::operator*() {
-    return *this->cur;
-}
-
-const char &CC::Var<char[]>::Iterator::operator*() const {
-    return *this->cur;
-}
-
-CC::Var<char[]>::Iterator CC::Var<char []>::begin() {
-    return {*object};
-}
-
-CC::Var<char[]>::Iterator CC::Var<char []>::begin() const {
-    return {*object};
-}
-
-CC::Var<char[]>::Iterator CC::Var<char []>::end() {
-    return {&(*object)[Length()]};
-}
-
-CC::Var<char[]>::Iterator CC::Var<char []>::end() const {
-    return {&(*object)[Length()]};
+    return object[index];
 }

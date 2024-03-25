@@ -13,30 +13,30 @@
 namespace CC {
     template<typename T>
     struct Var<T []> : Sequence<T> {
-        using Type = T;
+        using Type = T *;
 
-        Type * object;
+        Type * delegate;
 
-        Var() : object(nullptr) {}
+        Var() : delegate(Make<Type>()) { *delegate = nullptr; }
 
-        Var(const Var & var) : object(Retain(var.object)) {}
+        Var(const Var & var) : delegate(Retain(var.delegate)) {}
 
-        Var(Var && var) : object(var.object) {
-            var.object = nullptr;
+        Var(Var && var) noexcept : delegate(var.delegate) {
+            var.delegate = nullptr;
         }
 
-        Var(T * && object) : object(object) { object = nullptr; }
+        Var(T * object) : delegate(Make<Type>()) { *delegate = object; }
 
         ~Var() {
-            Destroy(object);
+            Destroy(delegate);
         }
 
-        T & operator[](Size index) {
-            return object[index];
+        T & operator[](Size index) override {
+            return (*delegate)[index];
         }
 
-        const T & operator[](Size index) const {
-            return object[index];
+        const T & operator[](Size index) const override {
+            return (*delegate)[index];
         }
 
         // Iterator methods
@@ -94,31 +94,45 @@ namespace CC {
         };
 
         Iterator begin() {
-            return Iterator(object);
+            return Iterator(*delegate);
         }
 
         Iterator begin() const {
-            return Iterator(object);
+            return Iterator(*delegate);
+        }
+
+        Iterator end() {
+            return Iterator(*delegate + this->Count());
         }
 
         Iterator end() const {
-            return Iterator(object + this->Count());
+            return Iterator(*delegate + this->Count());
         }
     };
 
     template<typename T, Size S>
     struct Var<T [S]> : Var<T []> {
-        using Type = T;
+        using Type = T *;
 
-        Var() : Var<T []>(Make<Type>(S)) {}
+        Type & object;
 
-        Var(const Var & var) : Var<T []>(var) {}
+        Var() : Var<T []>(Make<T>(S)), object(*this->delegate) {}
 
-        Var(Var && var) : Var<T[]>(static_cast<Var &&>(var)) {}
+        Var(const Var & var) : Var<T []>(var), object(*this->delegate) {}
 
-        Var(const T (&o)[S]) : Var<T[]>(Clone(o)) {}
+        Var(Var && var) : Var<T []>(static_cast<Var &&>(var)), object(*this->delegate) {}
 
-        Var(T (&&o)[S]) : Var<T[]>(Clone(static_cast<T(&&)[S]>(o))) {}
+        Var(const T (&o)[S]) : Var<T []>(Clone(o)), object(*this->delegate) {}
+
+        Var(T (&&o)[S]) : Var<T []>(Clone(static_cast<T (&&)[S]>(o))), object(*this->delegate) {}
+
+        ~Var() {
+            Destroy(object);
+        }
+
+        void Resize(Size count) {
+            *this->delegate = ReMake<T>(object, count);
+        }
 
         Size Count() const {
             return S;

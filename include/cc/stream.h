@@ -6,20 +6,43 @@
 #define CC_STREAM_H
 
 #include "types.h"
+#include "cc/data.h"
 
 namespace CC {
-    template<typename T>
     struct IStream {
-        virtual Size Write();
-        virtual Size Read();
+        virtual Size onWrite(const void * buffer, Size length) = 0;
+
+        virtual Size onRead(void * buffer, Size length) = 0;
+
+        virtual bool onClose() = 0;
     };
 
-    template<typename T>
-    struct Stream;
+    struct Stream {
+        using Type = IStream;
 
-    template<typename T, template<typename> class IO>
-    struct Stream<IO<T>> : IStream<T> {
+        Type * delegate;
 
+        Stream() : delegate(nullptr) { }
+
+        Stream(const Stream & var) : delegate(Retain(var.delegate)) {}
+
+        Stream(Stream && var) noexcept : delegate(var.delegate) {
+            var.delegate = nullptr;
+        }
+
+        Stream(Type * object) : delegate(object) {}
+
+        virtual Size Write(const void * buffer, Size length) {
+            return delegate->onWrite(buffer, length);
+        }
+
+        virtual Size Read(void * buffer, Size length) {
+            return delegate->onRead(buffer, length);
+        }
+
+        virtual bool Close() {
+            return delegate->onClose();
+        }
     };
 }
 

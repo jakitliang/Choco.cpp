@@ -60,6 +60,14 @@ int main() {
         s.Insert(5, " demo");
 
         cout << s << endl;
+
+        s.Delete(0);
+
+        cout << s << endl;
+
+        cout << "s.len: " << s.Length() << ", s.count: " << s.Count() << endl;
+
+        cout << s[9] << endl;
     }
 
     {
