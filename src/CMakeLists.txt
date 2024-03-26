@@ -16,6 +16,11 @@ add_library(
         render.cpp
         texture.cpp
         canvas.cpp
+        pixels.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)
+target_include_directories(cc-graphics PUBLIC ../)
+
+#target_link_libraries(cc-graphics)
+

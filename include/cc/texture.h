@@ -5,13 +5,14 @@
 #ifndef CHOCO_CPP_TEXTURE_H
 #define CHOCO_CPP_TEXTURE_H
 
+
 namespace CC {
+    struct TextureHandle {
+        void * texture;
+    };
+
     struct Texture {
         Texture();
-
-        Texture(const Texture & render);
-
-        Texture(Texture && render);
 
         ~Texture();
     };

@@ -20,3 +20,6 @@ add_executable(TestVector test_vector.cpp $<TARGET_OBJECTS:cc-foundation>)
 add_executable(TestByte byte.cpp $<TARGET_OBJECTS:cc-foundation>)
 
 add_executable(TestFileChannel file_channel.cpp $<TARGET_OBJECTS:cc-foundation>)
+
+add_executable(TestGUI gui.cpp $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:cc-graphics>)
+target_link_libraries(TestGUI SDL2::SDL2main SDL2::SDL2 SDL2_ttf::SDL2_ttf-static)
