@@ -27,7 +27,7 @@ namespace CC {
 
         Var(T * object) : delegate(Make<Type>()) { *delegate = object; }
 
-        ~Var() {
+        virtual ~Var() {
             Destroy(delegate);
         }
 

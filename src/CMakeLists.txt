@@ -1,6 +1,6 @@
 
 add_library(
-        cc-src OBJECT
+        cc-foundation OBJECT
         intptr.cpp
         zone.cpp
         string.cpp
@@ -10,4 +10,12 @@ add_library(
         file_channel.cpp
 )
 
-target_include_directories(cc-src PUBLIC ../)
+add_library(
+        cc-graphics OBJECT
+        window.cpp
+        render.cpp
+        texture.cpp
+        canvas.cpp
+)
+
+target_include_directories(cc-foundation PUBLIC ../)

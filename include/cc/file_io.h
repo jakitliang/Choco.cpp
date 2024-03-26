@@ -13,11 +13,9 @@ namespace CC {
 
         FileIO();
 
-        FileIO(const char * fileName, const char * mode, int * error = nullptr);
-
         ~FileIO();
 
-        bool Open(const char * fileName, const char * mode, int * error = nullptr);
+        void Open(const char * fileName, const char * mode, int * error = nullptr);
 
         virtual Size Write(void * buffer, Size length) override;
 

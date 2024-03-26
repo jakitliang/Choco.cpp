@@ -14,7 +14,6 @@ CC::String::String(const String & str)
 
 CC::String::String(String && str) noexcept
     : Var<char []>(static_cast<Var &&>(str)), object(*this->delegate), length(str.length) {
-    str.object = nullptr;
     str.length = nullptr;
 }
 
