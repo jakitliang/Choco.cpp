@@ -3,6 +3,7 @@
 //
 
 #include "cc/window.h"
+#include "cc/screen.h"
 #include "cc/application.h"
 #include <iostream>
 
@@ -11,7 +12,16 @@ using namespace CC;
 
 int main() {
     Application app;
+
+    if (!app.Open()) {
+        cout << "Error!" << endl;
+        return -1;
+    }
+
+    Screen screen;
     Window wnd;
-    wnd.Open("nihao", 0, 0, 100, 100, Window::Flags::Metal);
+    wnd.Open("nihao", screen.width / 2 - 50, screen.height / 2 - 50, 100, 100, 0);
+    app.Run();
+
     return 0;
 }

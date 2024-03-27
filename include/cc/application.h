@@ -9,9 +9,11 @@
 
 namespace CC {
     struct Application {
-        Application();
+        virtual ~Application();
 
-        ~Application();
+        bool Open();
+
+        void Close();
 
         bool Run();
 
