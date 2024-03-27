@@ -7,11 +7,10 @@
 
 #include "cc/types.h"
 #include "cc/variant.h"
+#include "cc/renderer.h"
 
 namespace CC {
-    struct WindowHandle {
-        void * window;
-    };
+    using Window = Var<WindowHandle>;
 
     template<>
     struct Var<WindowHandle> {
@@ -42,7 +41,19 @@ namespace CC {
             static const UInt32 InputGrabbed;
         };
 
+        struct Delegate {
+            virtual void nDraw(Window * wnd) = 0;
+
+            virtual void onUpdate(Int64 dt) = 0;
+
+            virtual void onMouseDown() = 0;
+        };
+
         WindowHandle * handle;
+
+        Renderer * renderer;
+
+        Delegate * Delegate;
 
         Var();
 
@@ -52,12 +63,15 @@ namespace CC {
 
         ~Var();
 
-        bool Open(const char * title, Int32 x, Int32 y, Int32 width, Int32 height, UInt32 flags);
+        bool Open(const char * title,
+                  Int32 x, Int32 y,
+                  Int32 width, Int32 height,
+                  UInt32 flags, UInt32 modes = Renderer::Flags::Hardware);
 
         void Close();
-    };
 
-    using Window = Var<WindowHandle>;
+        void on(UInt32 event);
+    };
 }
 
 #endif //CHOCO_CPP_WINDOW_H

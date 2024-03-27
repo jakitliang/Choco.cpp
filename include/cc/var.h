@@ -28,10 +28,6 @@ namespace CC {
             Destroy(object);
         }
 
-        Inspector & Inspect() override {
-            return reinterpret_cast<Inspector &>(*object);
-        }
-
         Var & operator=(const Var & var) {
             if (this == &var) return *this;
 

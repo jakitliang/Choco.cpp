@@ -12,11 +12,13 @@ add_library(
 
 add_library(
         cc-graphics OBJECT
+        application.cpp
         window.cpp
-        render.cpp
+        renderer.cpp
         texture.cpp
         canvas.cpp
         pixels.cpp
+        internal.h
 )
 
 target_include_directories(cc-foundation PUBLIC ../)
