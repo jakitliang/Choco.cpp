@@ -3,28 +3,10 @@
 //
 
 #include <iostream>
-#include "cc/var_delegate.h"
+#include "cc/linked_list.h"
 
 using namespace std;
 using namespace CC;
-
-struct Test : Object {
-    int i;
-};
-
-struct Test1 : Object {
-    int i;
-
-    Test1() = default;
-
-    void Init() {
-        i = 0;
-    }
-
-    ~Test1() {
-        cout << "Test1::~Test()" << endl;
-    }
-};
 
 int main() {
 //    cout << is_standard_layout<Var<int>>::value << endl;
@@ -35,7 +17,7 @@ int main() {
 //    cout << "===================" << endl;
 
     {
-        List<int> i;
+        LinkedList<int> i;
         i.Push(123);
 //        i.Push(456);
 //        i.Push(789);

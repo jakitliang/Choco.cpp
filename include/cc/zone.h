@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/14.
 //
 
-#ifndef CC_ZONE_H
-#define CC_ZONE_H
+#ifndef CHOCO_CPP_ZONE_H
+#define CHOCO_CPP_ZONE_H
 
 #include "types.h"
 #include <type_traits>
@@ -267,4 +267,4 @@ namespace CC {
     }
 }
 
-#endif //CC_ZONE_H
+#endif //CHOCO_CPP_ZONE_H

@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/5.
 //
 
-#ifndef CC_INTPTR_H
-#define CC_INTPTR_H
+#ifndef CHOCO_CPP_INTPTR_H
+#define CHOCO_CPP_INTPTR_H
 
 #include "cc/defines.h"
 
@@ -61,4 +61,4 @@ namespace CC {
     };
 }
 
-#endif //CC_INTPTR_H
+#endif //CHOCO_CPP_INTPTR_H

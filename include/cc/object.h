@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/10.
 //
 
-#ifndef CC_OBJECT_H
-#define CC_OBJECT_H
+#ifndef CHOCO_CPP_OBJECT_H
+#define CHOCO_CPP_OBJECT_H
 
 #include "zone.h"
 #include "variant.h"
@@ -89,4 +89,4 @@ namespace CC {
     using Object = Var<void>;
 }
 
-#endif //CC_OBJECT_H
+#endif //CHOCO_CPP_OBJECT_H

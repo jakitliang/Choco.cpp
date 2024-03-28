@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/8.
 //
 
-#ifndef CC_STRING_H
-#define CC_STRING_H
+#ifndef CHOCO_CPP_STRING_H
+#define CHOCO_CPP_STRING_H
 
 #include "cc/array.h"
 #include "cc/sequence.h"
@@ -72,4 +72,4 @@ namespace CC {
     };
 }
 
-#endif //CC_STRING_H
+#endif //CHOCO_CPP_STRING_H

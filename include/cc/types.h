@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/5.
 //
 
-#ifndef CC_TYPES_H
-#define CC_TYPES_H
+#ifndef CHOCO_CPP_TYPES_H
+#define CHOCO_CPP_TYPES_H
 
 #include "cc/defines.h"
 
@@ -39,4 +39,4 @@ namespace CC {
     template<class T, int N> struct Decay<T[N]> : Decay<T> {};
 }
 
-#endif //CC_TYPES_H
+#endif //CHOCO_CPP_TYPES_H

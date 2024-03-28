@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/11.
 //
 
-#ifndef CC_FILE_H
-#define CC_FILE_H
+#ifndef CHOCO_CPP_FILE_H
+#define CHOCO_CPP_FILE_H
 
 #include "cc/object.h"
 #include "cc/stream.h"
@@ -32,4 +32,4 @@ namespace CC {
     };
 }
 
-#endif //CC_FILE_H
+#endif //CHOCO_CPP_FILE_H

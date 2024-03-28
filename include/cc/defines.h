@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/5.
 //
 
-#ifndef CC_DEFINES_H
-#define CC_DEFINES_H
+#ifndef CHOCO_CPP_DEFINES_H
+#define CHOCO_CPP_DEFINES_H
 
 #ifdef __cplusplus
 #define CC_EXT     extern "C"
@@ -44,4 +44,4 @@
 #define CC_64
 #endif
 
-#endif //CC_DEFINES_H
+#endif //CHOCO_CPP_DEFINES_H

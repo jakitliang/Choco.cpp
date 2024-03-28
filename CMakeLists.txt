@@ -3,6 +3,8 @@ project(Choco.cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 
+#set(SDL2_DISABLE_INSTALL OFF)
+
 # [Vendor]: SDL2
 set(SDL2_INCLUDE_PATH "lib/SDL/include")
 list(APPEND CMAKE_PREFIX_PATH "lib/SDL")
@@ -13,10 +15,14 @@ set(SDL2_TTF_INCLUDE_PATH "lib/SDL_ttf/include")
 list(APPEND CMAKE_PREFIX_PATH "lib/SDL_ttf")
 find_package(SDL2_ttf REQUIRED)
 
+if (EMSCRIPTEN)
+    message(YES)
+endif ()
+
 include_directories(
         include
-        lib/SDL/include
-        lib/SDL_ttf/include
+        ${SDL2_INCLUDE_PATH}
+        ${SDL2_TTF_INCLUDE_PATH}
 )
 
 add_subdirectory(src)

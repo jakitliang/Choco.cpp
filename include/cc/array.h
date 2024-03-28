@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/8.
 //
 
-#ifndef CC_ARRAY_H
-#define CC_ARRAY_H
+#ifndef CHOCO_CPP_ARRAY_H
+#define CHOCO_CPP_ARRAY_H
 
 #include "cc/variant.h"
 #include "cc/zone.h"
@@ -146,4 +146,4 @@ namespace CC {
     }
 }
 
-#endif //CC_ARRAY_H
+#endif //CHOCO_CPP_ARRAY_H
