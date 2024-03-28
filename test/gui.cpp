@@ -19,8 +19,7 @@ int main() {
     }
 
     Screen screen;
-    Window wnd;
-    wnd.Open("nihao", screen.width / 2 - 50, screen.height / 2 - 50, 100, 100, 0);
+    app.Open("nihao", screen.width / 2 - 50, screen.height / 2 - 50, 200, 200, 0);
     app.Run();
 
     return 0;

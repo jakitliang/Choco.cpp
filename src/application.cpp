@@ -5,22 +5,43 @@
 #include "cc/application.h"
 #include "cc/linked_list.h"
 #include "SDL2/SDL.h"
+#include "cc/window.h"
 
-//CC::LinkedList<Window>
-
-static bool ApplicationStatus = false;
+static int ApplicationStatus = 0;
 
 CC::Application::~Application() {
     Close();
 }
 
 bool CC::Application::Open() {
-    ApplicationStatus = true;
-    return SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0;
+    if (!ApplicationStatus) {
+        ApplicationStatus = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0 ? 1 : 0;
+    }
+
+    return ApplicationStatus;
+}
+
+bool CC::Application::Open(const char *title,
+                      CC::Int32 x, CC::Int32 y,
+                      CC::Int32 width, CC::Int32 height,
+                      CC::UInt32 flags, CC::UInt32 modes) {
+    if (!Open()) {
+        return false;
+
+    } else if (ApplicationStatus == 2) {
+        return true;
+    }
+
+    if (mainWindow.Open(title, x, y, width, height, flags, modes)) ApplicationStatus = 2;
+
+    return ApplicationStatus == 2;
 }
 
 void CC::Application::Close() {
-    ApplicationStatus = false;
+    ApplicationStatus = 0;
+
+    mainWindow.Close();
+
     SDL_Quit();
 }
 
@@ -30,7 +51,8 @@ bool CC::Application::Run() {
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                ApplicationStatus = false;
+                ApplicationStatus = 0;
+                return true;
             }
         }
 

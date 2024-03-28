@@ -6,7 +6,7 @@
 #define CHOCO_CPP_DRAWABLE_H
 
 namespace CC {
-    struct Drawable;
+    struct Drawable {};
 }
 
 #endif //CHOCO_CPP_DRAWABLE_H

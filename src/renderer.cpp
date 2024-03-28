@@ -3,40 +3,28 @@
 //
 
 #include "cc/renderer.h"
-#include "cc/zone.h"
 #include "SDL2/SDL.h"
 
-namespace CC {
-    const UInt32 Renderer::Flags::Software      = SDL_RENDERER_SOFTWARE;
-    const UInt32 Renderer::Flags::Hardware      = SDL_RENDERER_ACCELERATED;
-    const UInt32 Renderer::Flags::PresentVSYNC  = SDL_RENDERER_PRESENTVSYNC;
-    const UInt32 Renderer::Flags::TargetTexture = SDL_RENDERER_TARGETTEXTURE;
-}
-
-CC::Var<CC::RendererHandle>::Var() : handle(Make<RendererHandle>()) {}
-
-CC::Var<CC::RendererHandle>::Var(const Var & renderer) : handle(Retain(renderer.handle)) {}
-
-CC::Var<CC::RendererHandle>::Var(Var && renderer) : handle(renderer.handle) {
-    renderer.handle = nullptr;
-}
-
-CC::Var<CC::RendererHandle>::~Var() {
+CC::Renderer::~Renderer() {
     Close();
 }
 
-bool CC::Var<CC::RendererHandle>::Open(WindowHandle * windowHandle, Int32 index, UInt32 flags) {
-    if (handle->renderer) return true;
+bool CC::Renderer::Open(Handle * windowHandle, Int32 index, UInt32 flags) {
+    auto & renderer = get<SDL_Renderer>();
 
-    handle->renderer = SDL_CreateRenderer(static_cast<SDL_Window *>(windowHandle->window), index, flags);
+    if (renderer) return true;
 
-    return handle->renderer != nullptr;
+    renderer = SDL_CreateRenderer(windowHandle->get<SDL_Window>(), index, flags);
+
+    return renderer != nullptr;
 }
 
-void CC::Var<CC::RendererHandle>::Close() {
-    if (handle->renderer == nullptr) return;
+void CC::Renderer::Close() {
+    auto & renderer = get<SDL_Renderer>();
 
-    SDL_DestroyRenderer(static_cast<SDL_Renderer *>(handle->renderer));
+    if (renderer == nullptr) return;
 
-    handle->renderer = nullptr;
+    SDL_DestroyRenderer(renderer);
+
+    renderer = nullptr;
 }

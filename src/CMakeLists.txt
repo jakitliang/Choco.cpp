@@ -15,11 +15,14 @@ add_library(
         application.cpp
         window.cpp
         renderer.cpp
+        flags.cpp
         texture.cpp
         canvas.cpp
         pixels.cpp
         internal.h
         screen.cpp
+        handle.cpp
+        view.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)
