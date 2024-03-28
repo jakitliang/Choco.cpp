@@ -9,6 +9,8 @@
 
 namespace CC {
     struct Application {
+        WindowHandle * mainWindow;
+
         virtual ~Application();
 
         bool Open();
