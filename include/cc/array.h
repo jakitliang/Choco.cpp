@@ -1,201 +1,149 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/5.
+// Created by Jakit Liang<jakitliang@gmail.com> on 2024/3/8.
 //
 
 #ifndef CC_ARRAY_H
 #define CC_ARRAY_H
 
-#include "var.h"
-#include "slice.h"
+#include "cc/variant.h"
+#include "cc/zone.h"
+#include "cc/sequence.h"
+#include <bitset>
 
 namespace CC {
     template<typename T>
-    struct Variant<T (*)[]> {
-        using Type = T (**)[];
-        using ImmutableType = const T (**)[];
+    struct Var<T []> : Sequence<T> {
+        using Type = T *;
 
-        Type object;
-        Size * count;
+        Type * delegate;
 
-        Variant() : object(Alloc()), count(Var<Size>::Alloc(1)) {
-            *object = Slice<T>::Alloc(0);
-            *count = 0;
+        Var() : delegate(Make<Type>()) { *delegate = nullptr; }
+
+        Var(const Var & var) : delegate(Retain(var.delegate)) {}
+
+        Var(Var && var) noexcept : delegate(var.delegate) {
+            var.delegate = nullptr;
         }
 
-        Variant(const Variant & arr) : object(Retain(arr.object)),
-                                       count(Var<Size>::Retain(arr.count)) {}
+        Var(T * object) : delegate(Make<Type>()) { *delegate = object; }
 
-        Variant(Variant && arr) : object(Retain(arr.object)),
-                                  count(Var<Size>::Retain(arr.count)) {}
-
-        template<Size S>
-        Variant(const T (&arrRef)[S]) : object(Alloc()){
-            *object = Slice<T>::Alloc(S);
-            *count = S;
-
-            for (int i = 0; i < S; ++i) {
-                (**object)[i] = arrRef[i];
-            }
+        virtual ~Var() {
+            Destroy(delegate);
         }
 
-        template<Size S>
-        Variant(T (&&arrRef)[S]) : object(Alloc()){
-            *object = Slice<T>::Alloc(S);
-            *count = S;
-
-            for (int i = 0; i < S; ++i) {
-                (**object)[i] = static_cast<T &&>(arrRef[i]);
-            }
+        T & operator[](Size index) override {
+            return (*delegate)[index];
         }
 
-        ~Variant() {
-            if (object == nullptr) return;
-
-            auto slice = *object;
-            if (Pointer::Release(object)) {
-                Pointer::Release(slice);
-            }
-
-            Pointer::Release(count);
-
-            object = nullptr;
-            count = nullptr;
+        const T & operator[](Size index) const override {
+            return (*delegate)[index];
         }
 
-        T * begin() {
-            return &(**object)[0];
-        }
+        // Iterator methods
 
-        T * end() {
-            return &(**object)[Count()];
-        }
+        struct Iterator {
+            Iterator() : cur(nullptr) {};
 
-        Size Count() {
-            return *count;
-        }
+            Iterator(const Iterator & iterator) : cur(iterator.cur) {}
 
-        Size Capacity() {
-            return Pointer::Count(*object);
-        }
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur) {}
 
-        T & operator[](Size index) {
-            return (**object)[index];
-        }
+            explicit Iterator(T * object) : cur(object) {}
 
-        const T & operator[](Size index) const {
-            return (**object)[index];
-        }
-
-        // Algorithms
-
-        void Insert(Size index, const T * elements, Size cnt) {
-            if (cnt < 1) return;
-
-            auto indexEnd = Count() + cnt;
-
-            // Case: out of bound
-            // 0 1 2 3 4 5
-            //         |-|
-            // | | | |
-            // | | | |0|-:
-            // --------------------
-            // Aligned to the end
-            // 0 1 2 3 4 5
-            //       |-|
-            // | | | |
-            // | | | |-|
-            if (index > Count()) {
-                index = Count(); // Fix insert position
+            // Incrementing means going through the list
+            Iterator & operator++() {
+                if (cur == nullptr) return *this;
+                cur = ++cur;
+                return *this;
             }
 
-            if (indexEnd > Capacity()) {
-                *object = Slice<T>::ReAlloc(*object, indexEnd);
+            Iterator & operator+(Size index) {
+                if (cur == nullptr) return *this;
+
+                for (Size i = 0; i < index; ++i) {
+                    cur = ++cur;
+                }
+
+                return *this;
             }
 
-            // Move the data [index .. Count()] to the end
-            // New data           elements[0 .. count]
-            // Part 1                                    // Part 3
-            // data[0 .. index]                          data[index .. last]
-            // Part 1             Part 2                 // Part 3
-            // data[0 .. index] + elements[0 .. count] + data[index .. last]
-
-            if (index < Count()) {
-                // Move part 3 to the end
-                Pointer::ReplaceElements(*object,
-                                         index + cnt,
-                                         Pointer::Element(*object, index),
-                                         Count() - index);
+            // It needs to be able to compare nodes
+            bool operator!=(const Iterator &other) {
+                return this->cur != other.cur;
             }
 
-            // Insert part 2 into data
-            Pointer::ReplaceElements(*object, index, elements, cnt);
-
-            *count += cnt;
-        }
-
-        void Insert(Size index, const T & t) {
-            Insert(index, &t, 1);
-        }
-
-        void Push(const T * elements, Size cnt) {
-            Insert(Count(), elements, cnt);
-        }
-
-        void Push(const T & t) {
-            Insert(Count(), t);
-        }
-
-        void Delete(Size index, Size cnt) {
-            if (cnt < 1) return;
-
-            if (index >= Count()) return;
-
-            // Erase
-            // Part 1             Part 2              // Part 3
-            // data[0 .. index] + erase[0 .. count] + data[index .. last]
-            // Part 1                                 // Part 3
-            // data[0 .. index]         +             data[index .. last]
-
-            auto indexEnd = index + cnt;
-
-            // Case 1: From index remove to the data.end
-            // x: place to remove
-            // | | | |x|x|
-            if (indexEnd >= Count()) {
-                *count = index;
-                return;
+            bool operator==(const Iterator &other) {
+                return this->cur == other.cur;
             }
 
-            Pointer::ReplaceElements(*object, index, Pointer::Element(*object, indexEnd), Count() - indexEnd);
+            // Return the data from the node (dereference operator)
+            T & operator*() {
+                return *this->cur;
+            }
 
-            *count -= cnt;
+            const T & operator*() const {
+                return *this->cur;
+            }
+
+            template<typename OS>
+            friend OS & operator<<(OS & os, const Iterator & iterator) {
+                return os << *iterator;
+            }
+
+            T * cur;
+        };
+
+        Iterator begin() {
+            return Iterator(*delegate);
         }
 
-        void Delete(Size index) {
-            Delete(index, 1);
+        Iterator begin() const {
+            return Iterator(*delegate);
         }
 
-        // Static methods for lifecycle
-
-        static Type Alloc() {
-            return static_cast<Type>(Pointer::Alloc(sizeof(Type), 1));
+        virtual Iterator end() {
+            return Iterator(*delegate + this->Count());
         }
 
-        static Type Retain(Type object) {
-            return static_cast<Type>(Pointer::Retain(object));
-        }
-
-        static Type ReAlloc(Type object, Size count) {
-            return static_cast<Type>(Pointer::ReAlloc(object, count));
-        }
-
-        static bool Release(Type object) {
-            return Pointer::Release(object);
+        virtual Iterator end() const {
+            return Iterator(*delegate + this->Count());
         }
     };
 
-    template<typename T>
-    using Array = Variant<T (*)[]>;
+    template<typename T, Size S>
+    struct Var<T [S]> : Var<T []> {
+        using Type = T *;
+
+        Type & object;
+
+        Var() : Var<T []>(Make<T>(S)), object(*this->delegate) {}
+
+        Var(const Var & var) : Var<T []>(var), object(*this->delegate) {}
+
+        Var(Var && var) : Var<T []>(static_cast<Var &&>(var)), object(*this->delegate) {}
+
+        Var(const T (&o)[S]) : Var<T []>(Clone(o)), object(*this->delegate) {}
+
+        Var(T (&&o)[S]) : Var<T []>(Clone(static_cast<T (&&)[S]>(o))), object(*this->delegate) {}
+
+        ~Var() {
+            if (this->delegate) Destroy(*this->delegate);
+        }
+
+        Size Count() const {
+            return S;
+        }
+    };
+
+    template<typename T, Size S>
+    Var<T [S]> Array(const T (&object)[S]) {
+        return {object};
+    }
+
+    template<typename T, Size S>
+    Var<T [S]> Array(T (&&object)[S]) {
+        return {static_cast<T (&&)[S]>(object)};
+    }
 }
 
 #endif //CC_ARRAY_H

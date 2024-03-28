@@ -18,13 +18,25 @@ namespace CC {
     using UInt64 = unsigned long long;
     using Byte = UInt8;
 
+#if defined(_WINDOWS)
 #if defined(_WIN64)
-    using Size = unsigned __int64;
+    using Size = unsigned long long;
 #elif defined(_WIN32)
     using Size = unsigned int;
+#endif
 #elif defined(__SIZE_TYPE__)
     using Size = __SIZE_TYPE__;
 #endif
+
+    template<class T> struct Decay { typedef T Type; };
+    template<class T> struct Decay<T*> : Decay<T> {};
+    template<class T> struct Decay<T&> : Decay<T> {};
+    template<class T> struct Decay<T&&> : Decay<T> {};
+    template<class T> struct Decay<T const> : Decay<T> {};
+    template<class T> struct Decay<T volatile> : Decay<T> {};
+    template<class T> struct Decay<T const volatile> : Decay<T> {};
+    template<class T> struct Decay<T[]> : Decay<T> {};
+    template<class T, int N> struct Decay<T[N]> : Decay<T> {};
 }
 
 #endif //CC_TYPES_H

@@ -1,94 +1,75 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/8.
+// Created by Jakit Liang<jakitliang@gmail.com> on 2024/3/8.
 //
 
 #ifndef CC_STRING_H
 #define CC_STRING_H
 
-#include "var.h"
-#include "slice.h"
+#include "cc/array.h"
+#include "cc/sequence.h"
 
 namespace CC {
-    template<>
-    struct Variant<char (*)[]> {
-        using Type = char (**)[];
-        using ImmutableType = const char (**)[];
+    struct String : Var<char []> {
+        using Type = char *;
 
-        Type object;
-        Size * count;
+        Type & object;
+        Size * length;
 
-        Variant();
+        String();
 
-        Variant(const Variant & arr);
+        String(const String & str);
 
-        Variant(Variant && arr) noexcept;
+        String(String && str) noexcept;
 
-        Variant(const char * str, Size length);
+        String(const char * cStr, Size length);
 
-        Variant(const char * str);
+        String(const char * cStr);
 
-        Variant(const Byte * bytes, Size length);
+        String(const Byte * bytes, Size length);
 
-        ~Variant();
-
-        char * begin();
-
-        char * end();
+        ~String();
 
         Size Length() const;
 
-        bool IsEmpty() const;
+        Size Count() const override;
 
-        Size Count();
+        char * CString();
 
-        Size Capacity();
+        const char * CString() const;
 
-        char & operator[](Size index);
-
-        const char & operator[](Size index) const;
+        bool operator!() const;
 
         // Algorithms
 
-        void Insert(Size index, const char * str, Size cnt);
+        void Insert(Size index, const char * str, Size length);
+
+        void Insert(Size index, const char * str);
 
         void Insert(Size index, const char & t);
 
-        void Push(const char * str, Size cnt);
+        void Push(const char * str, Size length);
 
         void Push(const char * str);
 
         void Push(const char & t);
 
-        void Delete(Size index, Size cnt);
+        void Delete(Size index, Size length);
 
         void Delete(Size index);
 
-        static Size Length(char * str);
+        char & operator[](Size index) override;
 
-        char * cString();
+        const char & operator[](Size index) const override;
 
-        const char * cString() const;
+        Iterator end() override;
 
-        // Static methods for lifecycle
+        Iterator end() const override;
 
-        static Type Alloc() {
-            return static_cast<Type>(Pointer::Alloc(sizeof(Type), 1));
-        }
-
-        static Type Retain(Type object) {
-            return static_cast<Type>(Pointer::Retain(object));
-        }
-
-        static Type ReAlloc(Type object, Size count) {
-            return static_cast<Type>(Pointer::ReAlloc(object, count));
-        }
-
-        static bool Release(Type object) {
-            return Pointer::Release(object);
+        template<typename OS>
+        friend OS & operator<<(OS &os, const String & str) {
+            return os << str.CString();
         }
     };
-
-    using String = Variant<char (*)[]>;
 }
 
 #endif //CC_STRING_H

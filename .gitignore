@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
 
-# Compiled Variant files
+# Compiled Var files
 *.slo
 *.lo
 *.o
@@ -33,4 +33,7 @@
 
 # Idea files
 .idea
+
 cmake-*
+.DS_Store
+lib

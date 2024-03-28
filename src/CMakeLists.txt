@@ -1,10 +1,29 @@
 
 add_library(
-        cc-src OBJECT
-        main.cpp
+        cc-foundation OBJECT
         intptr.cpp
-        pointer.cpp
+        zone.cpp
         string.cpp
+        data.cpp
+        file_io.cpp
+        channel.cpp
+        file_channel.cpp
 )
 
-target_include_directories(cc-src PUBLIC ../)
+add_library(
+        cc-graphics OBJECT
+        application.cpp
+        window.cpp
+        renderer.cpp
+        texture.cpp
+        canvas.cpp
+        pixels.cpp
+        internal.h
+        screen.cpp
+)
+
+target_include_directories(cc-foundation PUBLIC ../)
+target_include_directories(cc-graphics PUBLIC ../)
+
+#target_link_libraries(cc-graphics)
+
