@@ -1,5 +1,5 @@
 //
-// Created by Jakit on 2024/3/14.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/14.
 //
 
 #ifndef CC_ZONE_H

@@ -1,5 +1,5 @@
 //
-// Created by Jakit on 2024/3/28.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/28.
 //
 
 #ifndef CHOCO_CPP_SCREEN_H

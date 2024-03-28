@@ -1,20 +1,29 @@
 //
-// Created by liangjie on 2024/3/26.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/26.
 //
 
 #ifndef CHOCO_CPP_TEXTURE_H
 #define CHOCO_CPP_TEXTURE_H
 
+#include "cc/handle.h"
+#include "cc/linked_list.h"
 
 namespace CC {
-    struct TextureHandle {
-        void * texture;
-    };
+    struct Texture : Handle {
+        LinkedList<Texture> subTextures;
 
-    struct Texture {
-        Texture();
+        ~Texture() override;
 
-        ~Texture();
+        bool Open(Handle * rendererHandle,
+                  Int32 width, Int32 height,
+                  UInt32 format,
+                  Int32 access);
+
+        void Close();
+
+        void Push(const Texture & texture);
+
+        void Delete(const Texture & texture);
     };
 }
 

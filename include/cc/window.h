@@ -1,5 +1,5 @@
 //
-// Created by liangjie on 2024/3/26.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/26.
 //
 
 #ifndef CHOCO_CPP_WINDOW_H
@@ -7,6 +7,7 @@
 
 #include "cc/flags.h"
 #include "cc/renderer.h"
+#include "cc/texture.h"
 #include "cc/view.h"
 #include "cc/linked_list.h"
 
@@ -17,6 +18,8 @@ namespace CC {
         };
 
         Renderer renderer;
+
+        Texture texture;
 
         LinkedList<Window> subWindows;
 

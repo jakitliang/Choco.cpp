@@ -1,5 +1,5 @@
 //
-// Created by JakitLiang<jakitliang@gmail.com> on 2024/3/8.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/8.
 //
 
 #include "cc/string.h"

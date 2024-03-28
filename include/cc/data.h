@@ -1,5 +1,5 @@
 //
-// Created by liangjie on 2024/3/25.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/25.
 //
 
 #ifndef CHOCO_CPP_DATA_H

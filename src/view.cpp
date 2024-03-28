@@ -1,5 +1,5 @@
 //
-// Created by liangjie on 2024/3/28.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/28.
 //
 
 #include "cc/view.h"

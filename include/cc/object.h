@@ -1,5 +1,5 @@
 //
-// Created by Jakit on 2024/3/10.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/10.
 //
 
 #ifndef CC_OBJECT_H

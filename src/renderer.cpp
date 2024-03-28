@@ -1,8 +1,9 @@
 //
-// Created by liangjie on 2024/3/26.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/26.
 //
 
 #include "cc/renderer.h"
+#include "cc/window.h"
 #include "SDL2/SDL.h"
 
 CC::Renderer::~Renderer() {
