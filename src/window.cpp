@@ -25,11 +25,14 @@ bool CC::Window::Open(const char * title,
     if (window == nullptr) return false;
 
     if (!renderer.Open(this, -1, modes)) {
-        SDL_DestroyWindow(window);
-        window = nullptr;
+        return false;
     }
 
-    return window != nullptr;
+    if (!layer.Open(&renderer, width, height, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET)) {
+        return false;
+    }
+
+    return true;
 }
 
 void CC::Window::Close() {
@@ -37,8 +40,15 @@ void CC::Window::Close() {
 
     if (window == nullptr) return;
 
+    layer.Close();
     renderer.Close();
     SDL_DestroyWindow(window);
+
+    if (subWindows.Count()) {
+        for (auto & w : subWindows) {
+            w.Close();
+        }
+    }
 
     window = nullptr;
 }

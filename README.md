@@ -7,6 +7,15 @@ Photo of milk chocolate
 
 <img src="./banner.png" width="192" height="192" />
 
+# Support platform
+
+- Windows 7+ (main)
+- macOS 10.10+ (main)
+- Linux Kernel 5.x+
+- Android 5.x+
+- iOS 9+
+- Web - Node.js 12.0+
+
 ## Code guide
 
 In Choco.cpp, we use Data-oriented-design.

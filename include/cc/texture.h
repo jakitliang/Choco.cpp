@@ -10,7 +10,7 @@
 
 namespace CC {
     struct Texture : Handle {
-        LinkedList<Texture> subTextures;
+        LinkedList<Texture> subLayer;
 
         ~Texture() override;
 

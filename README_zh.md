@@ -7,6 +7,15 @@
 
 <img src="./banner.png" width="192" height="192" />
 
+# 支持平台
+
+- Windows 7+ (main)
+- macOS 10.10+ (main)
+- Linux Kernel 5.x+
+- Android 5.x+
+- iOS 9+
+- Web - Node.js 12.0+
+
 ## 代码风格
 
 Choco.cpp 的项目设定是 **【面向数据设计 DOD】**

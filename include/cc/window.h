@@ -19,7 +19,7 @@ namespace CC {
 
         Renderer renderer;
 
-        Texture texture;
+        Texture layer;
 
         LinkedList<Window> subWindows;
 
