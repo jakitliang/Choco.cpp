@@ -30,9 +30,3 @@ void CC::Texture::Close() {
 
     texture = nullptr;
 }
-
-void CC::Texture::Push(const CC::Texture &texture) {
-//    if (std::find(subTextures.begin(), subTextures.end(), texture) != subTextures.end())
-}
-
-void CC::Texture::Delete(const CC::Texture &texture) {}

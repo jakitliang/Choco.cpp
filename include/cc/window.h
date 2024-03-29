@@ -19,7 +19,7 @@ namespace CC {
 
         Renderer renderer;
 
-        Texture layer;
+        LinkedList<Texture> textures;
 
         LinkedList<Window> subWindows;
 
@@ -37,6 +37,8 @@ namespace CC {
         virtual void Update(UInt64 deltaTime);
 
         virtual void Draw();
+
+        void CreateTexture();
     };
 }
 

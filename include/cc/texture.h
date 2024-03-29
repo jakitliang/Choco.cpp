@@ -10,8 +10,6 @@
 
 namespace CC {
     struct Texture : Handle {
-        LinkedList<Texture> subLayer;
-
         ~Texture() override;
 
         bool Open(Handle * rendererHandle,
@@ -20,10 +18,6 @@ namespace CC {
                   Int32 access);
 
         void Close();
-
-        void Push(const Texture & texture);
-
-        void Delete(const Texture & texture);
     };
 }
 
