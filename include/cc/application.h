@@ -27,6 +27,8 @@ namespace CC {
 
         bool Run();
 
+        virtual void OnEvent(UInt32 event);
+
         static Application & Context();
     };
 }

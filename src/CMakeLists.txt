@@ -23,6 +23,7 @@ add_library(
         screen.cpp
         handle.cpp
         view.cpp
+        ui_event.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)

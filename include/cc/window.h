@@ -33,6 +33,10 @@ namespace CC {
         void Close();
 
         void on(UInt32 event);
+
+        virtual void Update(UInt64 deltaTime);
+
+        virtual void Draw();
     };
 }
 

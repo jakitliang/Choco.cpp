@@ -48,3 +48,7 @@ void CC::Window::on(CC::UInt32 event) {
 //        if (Delegate)
     }
 }
+
+void CC::Window::Update(UInt64 deltaTime) {}
+
+void CC::Window::Draw() {}

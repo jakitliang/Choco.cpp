@@ -5,4 +5,10 @@
 #ifndef CHOCO_CPP_EVENTS_H
 #define CHOCO_CPP_EVENTS_H
 
+namespace CC {
+    struct Events {
+
+    };
+}
+
 #endif //CHOCO_CPP_EVENTS_H
