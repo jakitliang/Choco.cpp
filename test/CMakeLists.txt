@@ -28,6 +28,18 @@ else()
 endif()
 
 if(EMSCRIPTEN)
-    add_executable(TestWASM wasm.cpp $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:cc-graphics>)
-    target_link_libraries(TestWASM SDL2::SDL2main SDL2::SDL2-static SDL2_ttf::SDL2_ttf-static)
+    add_executable(TestWASM wasm.cpp $<TARGET_OBJECTS:cc-foundation>)
+    add_compile_definitions("__EMSCRIPTEN__")
+    target_link_options(TestWASM PRIVATE
+            "-sMODULARIZE=1"
+            "-sEXPORT_NAME='Main'"
+            "-sINVOKE_RUN=0"
+            "-sDISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0"
+            "-sEXPORTED_FUNCTIONS=['_main']"
+            "-sEXPORTED_RUNTIME_METHODS=['callMain', 'ccall', 'cwrap']"
+            "-sFORCE_FILESYSTEM=1"
+            "-sUSE_SDL=2"
+            "-sUSE_SDL_TTF=2"
+            "-sALLOW_MEMORY_GROWTH=1"
+            "-sASYNCIFY")
 endif()

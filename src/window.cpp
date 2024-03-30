@@ -61,4 +61,8 @@ void CC::Window::on(CC::UInt32 event) {
 
 void CC::Window::Update(UInt64 deltaTime) {}
 
-void CC::Window::Draw() {}
+void CC::Window::Draw() {
+    SDL_RenderClear(renderer.get<SDL_Renderer>());
+    
+    SDL_RenderPresent(renderer.get<SDL_Renderer>());
+}
