@@ -17,8 +17,6 @@ namespace CC {
 
         Handle(const Handle & handle);
 
-        Handle(Handle && handle);
-
         virtual ~Handle();
 
         template<typename T>

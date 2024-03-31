@@ -6,11 +6,16 @@
 #define CHOCO_CPP_UI_CONTEXT_H
 
 #include "cc/window.h"
-#include <stack>
+#include "cc/texture.h"
+#include <unordered_map>
 
 namespace CC {
+    using WindowMap = unordered_map<UInt32, Window>;
+    using TextureMap = unordered_map<UInt32, Texture>;
+
     struct UIContext {
-        std::stack<Window *> windows;
+        WindowMap Windows;
+        TextureMap Textures;
 
         static UIContext & GetContext();
     };

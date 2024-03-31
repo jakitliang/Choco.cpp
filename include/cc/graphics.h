@@ -9,7 +9,15 @@
 #include "cc/drawable.h"
 
 namespace CC {
-    struct Graphics {
+    namespace Graphics {
+        // @return WindowID
+        UInt32 CreateWindow(const char * title,
+                            Int32 x, Int32 y,
+                            Int32 width, Int32 height,
+                            UInt32 flags, UInt32 modes = Flags::Renderer::Hardware);
+
+        Window * GetWindow(UInt32 windowID);
+
         void Draw(Drawable & drawable,
                   Int32 x,
                   Int32 y,

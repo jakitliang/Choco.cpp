@@ -19,10 +19,6 @@ namespace CC {
 
         Renderer renderer;
 
-        LinkedList<Texture> textures;
-
-        LinkedList<Window> subWindows;
-
         ~Window() override;
 
         bool Open(const char * title,
@@ -32,13 +28,13 @@ namespace CC {
 
         void Close();
 
+        UInt32 GetID();
+
         void on(UInt32 event);
 
         virtual void Update(UInt64 deltaTime);
 
         virtual void Draw();
-
-        void CreateTexture();
     };
 }
 

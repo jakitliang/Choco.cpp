@@ -6,6 +6,7 @@
 #define CHOCO_CPP_RENDERER_H
 
 #include "cc/handle.h"
+#include "cc/texture.h"
 
 namespace CC {
     struct Renderer : Handle {
