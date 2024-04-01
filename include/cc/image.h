@@ -15,7 +15,7 @@ namespace CC {
 
         bool Open(Handle * rendererHandle, const void * buffer, Size size);
 
-        bool Open(Handle * imageData);
+        bool Open(Handle * rendererHandle, Handle * imageData);
 
         void Close();
     };

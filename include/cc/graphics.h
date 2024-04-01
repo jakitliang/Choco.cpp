@@ -11,7 +11,6 @@
 
 namespace CC {
     namespace Graphics {
-        // @return WindowID
         Window CreateWindow(const char * title,
                             Int32 x, Int32 y,
                             Int32 width, Int32 height,
@@ -21,7 +20,7 @@ namespace CC {
 
         Window * GetWindow(UInt32 windowID);
 
-        void Draw(Drawable & drawable,
+        void Draw(Handle * drawable,
                   Int32 x,
                   Int32 y,
                   Int32 radians,

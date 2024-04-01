@@ -55,9 +55,18 @@ namespace CC {
 
 //        void DrawGeometry();
 
-        void Draw(Texture * textur);
+        void Draw(Handle * textureHandle,
+                  Float32 x, Float32 y,
+                  Float32 r = 0,
+                  Float32 scaleX = 1, Float32 scaleY = 1,
+                  Float32 originX = 0, Float32 originY = 0);
 
-//        void Draw(Texture * texture);
+        void Draw(Handle * textureHandle,
+                  Rect quad,
+                  Float32 x, Float32 y,
+                  Float32 r = 0,
+                  Float32 scaleX = 1, Float32 scaleY = 1,
+                  Float32 originX = 0, Float32 originY = 0);
 
         void Clear();
     };

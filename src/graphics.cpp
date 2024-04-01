@@ -10,11 +10,11 @@ CC::UIContext & GetContext() {
     return CC::UIContext::GetContext();
 }
 
-void CC::Graphics::Draw(CC::Drawable &drawable,
+void CC::Graphics::Draw(CC::Handle *drawable,
                         CC::Int32 x, CC::Int32 y,
                         CC::Int32 radians,
                         CC::Int32 scaleX, CC::Int32 scaleY,
                         CC::Int32 offsetX, CC::Int32 offsetY) {
-    auto renderer = UIContext::GetContext().RendererState.top()<SDL_Renderer>();
-//    SDL_RenderCopy(renderer, drawable.)
+    auto & renderer = UIContext::GetContext().RendererState.top();
+//    renderer.Draw()
 }

@@ -147,21 +147,21 @@ void ProcessEvent(const SDL_Event & event) {
 void ApplicationUpdate(CC::Window & wnd, CC::UInt64 timeDiff) {
     wnd.Update(timeDiff);
 
-    if (wnd.subWindows.Count()) {
-        for (auto & w : wnd.subWindows) {
-            w.Update(timeDiff);
-        }
-    }
+//    if (wnd.subWindows.Count()) {
+//        for (auto & w : wnd.subWindows) {
+//            w.Update(timeDiff);
+//        }
+//    }
 }
 
 void ApplicationDraw(CC::Window & wnd) {
     wnd.Draw();
 
-    if (wnd.subWindows.Count()) {
-        for (auto & w : wnd.subWindows) {
-            w.Draw();
-        }
-    }
+//    if (wnd.subWindows.Count()) {
+//        for (auto & w : wnd.subWindows) {
+//            w.Draw();
+//        }
+//    }
 }
 
 bool CC::Application::Run() {
