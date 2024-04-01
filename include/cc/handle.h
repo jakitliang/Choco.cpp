@@ -17,13 +17,19 @@ namespace CC {
 
         Handle(const Handle & handle);
 
+        Handle(Handle && handle) noexcept;
+
         virtual ~Handle();
 
         template<typename T>
-        T * & get() {
+        inline T * & get() {
             using CastType = T *;
             return *reinterpret_cast<CastType *>(object);
         }
+
+        Handle & operator=(const Handle & handle);
+
+        Handle & operator=(Handle && handle) noexcept;
     };
 }
 

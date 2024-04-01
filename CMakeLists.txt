@@ -15,10 +15,16 @@ set(SDL2_TTF_INCLUDE_PATH "lib/SDL_ttf/include")
 list(APPEND CMAKE_PREFIX_PATH "lib/SDL_ttf")
 find_package(SDL2_ttf REQUIRED)
 
+# [Vendor]: SDL2_image
+set(SDL2_IMAGE_INCLUDE_PATH "lib/SDL_image/include")
+list(APPEND CMAKE_PREFIX_PATH "lib/SDL_image")
+find_package(SDL2_image REQUIRED)
+
 include_directories(
         include
         ${SDL2_INCLUDE_PATH}
         ${SDL2_TTF_INCLUDE_PATH}
+        ${SDL2_IMAGE_INCLUDE_PATH}
 )
 
 add_subdirectory(src)

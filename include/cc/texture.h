@@ -17,6 +17,8 @@ namespace CC {
                   UInt32 format,
                   Int32 access);
 
+        bool Open(Handle * rendererHandle, Handle * imageDataHandle);
+
         void Close();
     };
 }

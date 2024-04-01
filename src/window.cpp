@@ -26,12 +26,11 @@ bool CC::Window::Open(const char * title,
     if (window == nullptr) return false;
 
     if (!renderer.Open(this, -1, modes)) {
+        SDL_DestroyWindow(window);
         return false;
     }
 
-//    if (!layer.Open(&renderer, width, height, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET)) {
-//        return false;
-//    }
+    UIContext::GetContext().Windows[GetID()] = *this;
 
     return true;
 }
@@ -42,6 +41,7 @@ void CC::Window::Close() {
     if (window == nullptr) return;
 
 //    layer.Close();
+    UIContext::GetContext().Windows.erase(GetID());
     renderer.Close();
     SDL_DestroyWindow(window);
 

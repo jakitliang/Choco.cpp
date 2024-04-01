@@ -13,11 +13,19 @@ bool CC::Texture::Open(CC::Handle *rendererHandle,
                        CC::Int32 width, Int32 height,
                        CC::UInt32 format, CC::Int32 access) {
     auto & texture = get<SDL_Texture>();
-
     if (texture) return true;
 
     texture = SDL_CreateTexture(rendererHandle->get<SDL_Renderer>(), format, access, width, height);
 
+    return texture != nullptr;
+}
+
+bool CC::Texture::Open(Handle * rendererHandle, CC::Handle *imageDataHandle) {
+    auto & texture = get<SDL_Texture>();
+    if (texture) return true;
+
+    texture = SDL_CreateTextureFromSurface(
+            rendererHandle->get<SDL_Renderer>(), imageDataHandle->get<SDL_Surface>());
     return texture != nullptr;
 }
 

@@ -8,8 +8,6 @@
 #include "cc/list.h"
 #include <iostream>
 
-using namespace std;
-
 namespace CC {
     template<typename T>
     struct Linked : IList<T> {

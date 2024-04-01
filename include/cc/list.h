@@ -10,8 +10,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace CC {
     template<typename T>
     struct IList : Sequence<T> {

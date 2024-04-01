@@ -17,6 +17,8 @@ namespace CC {
     using Int64 = long long;
     using UInt64 = unsigned long long;
     using Byte = UInt8;
+    using Float32 = float;
+    using Float64 = double;
 
 #if defined(_WINDOWS)
 #if defined(_WIN64)
