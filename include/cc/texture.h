@@ -9,7 +9,7 @@
 #include "cc/linked_list.h"
 
 namespace CC {
-    struct Texture : Handle {
+    struct Texture {
         ~Texture() override;
 
         bool Open(Handle * rendererHandle,

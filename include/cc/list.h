@@ -45,7 +45,7 @@ namespace CC {
 
         virtual void Delete(Size index, Size count) = 0;
 
-        void Delete(Size index) {
+        virtual void Delete(Size index) {
             Delete(index, 1);
         }
     };
@@ -90,6 +90,10 @@ namespace CC {
 
         void Delete(Size index, Size count) override {
             object->Delete(index, count);
+        }
+
+        void Delete(Size index) override {
+            object->Delete(index, 1);
         }
 
         Size Count() const override {

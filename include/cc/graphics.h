@@ -6,7 +6,7 @@
 #define CHOCO_CPP_GRAPHICS_H
 
 #include "cc/linked_list.h"
-#include "cc/drawable.h"
+#include "cc/context.h"
 #include "cc/window.h"
 #include "cc/application.h"
 

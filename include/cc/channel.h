@@ -27,9 +27,9 @@ namespace CC {
 
         Channel(const Channel & channel);
 
-        Channel(Channel && channel);
+        Channel(Channel && channel) noexcept;
 
-        Channel(IO * io);
+        explicit Channel(IO * io);
 
         virtual ~Channel();
 
@@ -42,6 +42,10 @@ namespace CC {
         virtual Data & ReadAsync(Size length, Size * size);
 
         virtual bool Close();
+
+        Channel & operator=(const Channel & channel);
+
+        Channel & operator=(Channel && channel) noexcept;
     };
 }
 

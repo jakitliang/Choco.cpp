@@ -9,7 +9,7 @@
 
 namespace CC {
     template<typename T>
-    struct Var : Var<void> {
+    struct Var : Object {
         using Type = T;
 
         Type * object;

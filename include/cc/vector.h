@@ -94,12 +94,6 @@ namespace CC {
         explicit Trivial(Size count) : object(Entity::Make(count)), count(0) {}
 
         ~Trivial() override {
-//            if constexpr (!std::is_trivial<T>::value) {
-//                for (int i = 0; i < count; ++i) {
-//                    (*object)[i].~T();
-//                }
-//            }
-
             if (object == nullptr) return;
             object->Release();
             object = nullptr;

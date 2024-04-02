@@ -5,7 +5,7 @@
 #ifndef CHOCO_CPP_APPLICATION_H
 #define CHOCO_CPP_APPLICATION_H
 
-#include "cc/window.h"
+#include "cc/types.h"
 
 namespace CC {
     struct Application {

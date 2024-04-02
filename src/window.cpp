@@ -3,69 +3,64 @@
 //
 
 #include "cc/window.h"
-#include "cc/renderer.h"
-#include "cc/zone.h"
+#include "window_context.h"
+//#include "cc/renderer.h"
+#include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <thread>
 #include <stack>
+#include <unordered_map>
 
-struct CC::Window::Context {
-    using WindowMap = std::unordered_map<UInt32, CC::Window>;
-    using WindowStack = std::stack<CC::Window *>;
-
-    WindowMap Windows;
-    WindowStack State;
-};
-
-static CC::Window::Context WindowContext = {};
-
-CC::Window::~Window() {
-    Close();
+void Finalizer(void * handle) {
+    SDL_DestroyWindow(static_cast<SDL_Window *>(handle));
 }
 
-bool CC::Window::Open(const char * title,
+CC::Window::Window() : Handle(nullptr) {}
+
+CC::Window::Window(const CC::Window &window) : Handle(RetainHandle(window.Handle)) {}
+
+CC::Window::Window(CC::Window &&window) : Handle(window.Handle) { window.Handle = nullptr; }
+
+CC::Window::~Window() {
+    if (Handle == nullptr) return;
+
+    ReleaseHandle(Handle, Finalizer);
+}
+
+CC::UInt32 CC::Window::Open(const char * title,
                       Int32 x, Int32 y,
                       Int32 width, Int32 height,
                       UInt32 flags, UInt32 modes) {
-    auto & window = get<SDL_Window>();
+    if (Handle) return GetID();
 
-    if (window) return true;
+    Handle = SDL_CreateWindow(title, x, y, width, height, flags);
 
-    window = SDL_CreateWindow(title, x, y, width, height, flags);
+    if (Handle == nullptr) return 0;
 
-    if (window == nullptr) return false;
+//    Renderer renderer;
 
-    Renderer renderer;
+//    if (!renderer.Open(Handle, -1, modes)) {
+//        SDL_DestroyWindow(static_cast<SDL_Window *>(Handle));
+//        return false;
+//    }
 
-    if (!renderer.Open(this, -1, modes)) {
-        SDL_DestroyWindow(window);
-        return false;
-    }
+    RetainHandle(Handle);
+    Context::GetContext().Windows[GetID()] = *this;
 
-    WindowContext.Windows[GetID()] = *this;
-
-    return true;
+    return GetID();
 }
 
 void CC::Window::Close() {
-    auto & window = get<SDL_Window>();
+    if (Handle == nullptr) return;
 
-    if (window == nullptr) return;
-
-    auto id = GetID();
-    auto renderer = WindowContext.Renderers[id];
-
-    renderer.Close();
-    SDL_DestroyWindow(window);
-    window = nullptr;
-
-    WindowContext.Windows.erase(id);
-    WindowContext.Renderers.erase(id);
+    Context::GetContext().Windows.erase(GetID());
+    ReleaseHandle(Handle, Finalizer);
+    Handle = nullptr;
 }
 
 CC::UInt32 CC::Window::GetID() {
-    auto & window = get<SDL_Window>();
-    return SDL_GetWindowID(window);
+    if (Handle == nullptr) return 0;
+    return SDL_GetWindowID(static_cast<SDL_Window *>(Handle));
 }
 
 void CC::Window::on(CC::UInt32 event) {
@@ -77,15 +72,31 @@ void CC::Window::on(CC::UInt32 event) {
 void CC::Window::Update(UInt64 deltaTime) {}
 
 void CC::Window::Draw() {
-    SDL_RenderClear(renderer.get<SDL_Renderer>());
-
-    SDL_RenderPresent(renderer.get<SDL_Renderer>());
+//    SDL_RenderClear(renderer.get<SDL_Renderer>());
+//
+//    SDL_RenderPresent(renderer.get<SDL_Renderer>());
 }
 
-CC::Renderer * CC::Window::GetRenderer() {
-    Renderer::Current();
+//CC::Renderer * CC::Window::GetRenderer() {
+////    Renderer::Current();
+//}
+
+CC::Window &CC::Window::operator=(const CC::Window &window) {
+    if (this == &window) return *this;
+
+    ReleaseHandle(Handle, Finalizer);
+    Handle = RetainHandle(window.Handle);
+    return *this;
+}
+
+CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
+    ReleaseHandle(Handle, Finalizer);
+    Handle = window.Handle;
+    window.Handle = nullptr;
+
+    return *this;
 }
 
 CC::Window * CC::Window::Current() {
-    return WindowContext.State.top();
+    return Context::GetContext().State.top();
 }

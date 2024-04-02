@@ -5,6 +5,7 @@ add_library(
         zone.cpp
         string.cpp
         data.cpp
+        handle.cpp
         file_io.cpp
         channel.cpp
         file_channel.cpp
@@ -12,19 +13,20 @@ add_library(
 
 add_library(
         cc-graphics OBJECT
+        screen.cpp
+        flags.cpp
+        ui_event.cpp
         application.cpp
         window.cpp
-        renderer.cpp
-        flags.cpp
-        texture.cpp
-        canvas.cpp
-        pixels.cpp
-        internal.h
-        screen.cpp
-        handle.cpp
-        view.cpp
-        ui_event.cpp
-        graphics.cpp
+        window_context.h
+        window_context.cpp
+#        renderer.cpp
+#        texture.cpp
+#        canvas.cpp
+#        pixels.cpp
+#        internal.h
+#        view.cpp
+#        graphics.cpp
 #        ui_context.h
 #        ui_context.cpp
 )

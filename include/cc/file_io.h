@@ -13,7 +13,11 @@ namespace CC {
 
         FileIO();
 
-        ~FileIO();
+        FileIO(const FileIO & fileIO);
+
+        FileIO(FileIO && fileIO) noexcept;
+
+        ~FileIO() override;
 
         void Open(const char * fileName, const char * mode, int * error = nullptr);
 
@@ -28,6 +32,10 @@ namespace CC {
         virtual bool Close() override;
 
         virtual bool IsClosed() override;
+
+        FileIO & operator=(const FileIO & fileIO);
+
+        FileIO & operator=(FileIO && fileIO);
     };
 }
 

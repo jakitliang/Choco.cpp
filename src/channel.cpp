@@ -3,23 +3,24 @@
 //
 
 #include "cc/channel.h"
+//#include "cc/zone.h"
 
 const CC::Size BufferSize = 8 * 1024 * 1024;
 
 CC::Channel::Channel()
-    : input(Clone(CC::Data(BufferSize))), output(CC::Make<CC::Data>()) {}
+    : input(Clone(CC::Data(BufferSize))), output(CC::Make<CC::Data>()), io(nullptr) {}
 
 CC::Channel::Channel(const CC::Channel &channel)
-    : input(Retain(channel.input)), output(CC::Make<CC::Data>()) {}
+    : input(Retain(channel.input)), output(CC::Make<CC::Data>()), io(channel.io) {}
 
-CC::Channel::Channel(Channel && channel)
-    : input(channel.input), output(channel.output) {
+CC::Channel::Channel(Channel && channel) noexcept
+    : input(channel.input), output(channel.output), io(channel.io) {
     channel.input = nullptr;
     channel.output = nullptr;
 }
 
 CC::Channel::Channel(CC::IO *io)
-    : io(io), input(Clone(CC::Data(BufferSize))), output(CC::Make<CC::Data>()) {}
+    : input(Clone(CC::Data(BufferSize))), output(CC::Make<CC::Data>()), io(io) {}
 
 CC::Channel::~Channel() {
     Destroy(input);
@@ -80,4 +81,32 @@ CC::Data & CC::Channel::ReadAsync(CC::Size length, CC::Size *size) {
 
 bool CC::Channel::Close() {
     return io->Close();
+}
+
+CC::Channel & CC::Channel::operator=(const CC::Channel & channel) {
+    if (this == &channel) return *this;
+
+    Destroy(channel.input);
+    Destroy(channel.output);
+
+    input = Retain(channel.input);
+    output = Retain(channel.output);
+    io = channel.io;
+
+    return *this;
+}
+
+CC::Channel &CC::Channel::operator=(CC::Channel &&channel) noexcept {
+    Destroy(channel.input);
+    Destroy(channel.output);
+
+    input = channel.input;
+    output = channel.output;
+    io = channel.io;
+
+    channel.input = nullptr;
+    channel.output = nullptr;
+    channel.io = nullptr;
+
+    return *this;
 }

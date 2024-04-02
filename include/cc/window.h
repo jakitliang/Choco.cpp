@@ -6,22 +6,29 @@
 #define CHOCO_CPP_WINDOW_H
 
 #include "cc/flags.h"
-#include "cc/renderer.h"
-#include "cc/texture.h"
-#include "cc/view.h"
 #include "cc/linked_list.h"
+//#include "cc/renderer.h"
+//#include "cc/texture.h"
 
 namespace CC {
-    struct Window : Handle, IView {
+    struct Window {
         struct Context;
 
         struct Delegate {
             virtual void onMouseDown() = 0;
         };
 
-        ~Window() override;
+        void * Handle;
 
-        bool Open(const char * title,
+        Window();
+
+        Window(const Window & window);
+
+        Window(Window && window);
+
+        ~Window();
+
+        UInt32 Open(const char * title,
                   Int32 x, Int32 y,
                   Int32 width, Int32 height,
                   UInt32 flags, UInt32 modes = Flags::Renderer::Hardware);
@@ -36,9 +43,15 @@ namespace CC {
 
         virtual void Draw();
 
-        Renderer * GetRenderer();
+//        Renderer * GetRenderer();
+
+        Window & operator=(const Window & window);
+
+        Window & operator=(Window && window) noexcept;
 
         static Window * Current();
+
+        static const LinkedList<Window *> * GetWindows();
     };
 }
 

@@ -6,11 +6,9 @@
 #define CHOCO_CPP_OBJECT_H
 
 #include "zone.h"
-#include "variant.h"
 
 namespace CC {
-    template<>
-    struct Var<void> {
+    struct Object {
         struct Inspector {
             Byte * Bytes() {
                 return reinterpret_cast<Byte *>(this);
@@ -85,8 +83,6 @@ namespace CC {
             Zone::Release(object);
         }
     };
-
-    using Object = Var<void>;
 }
 
 #endif //CHOCO_CPP_OBJECT_H

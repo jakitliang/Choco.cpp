@@ -5,33 +5,21 @@
 #ifndef CHOCO_CPP_HANDLE_H
 #define CHOCO_CPP_HANDLE_H
 
-#include "cc/types.h"
-
 namespace CC {
     struct Handle {
-        using Type = void *;
         using Finalizer = void (*)(void * handle);
 
-        Type * object;
+        static void * Retain(void * handle);
 
-        Handle();
-
-        Handle(const Handle & handle);
-
-        Handle(Handle && handle) noexcept;
-
-        virtual ~Handle();
-
-        template<typename T>
-        inline T * & get() {
-            using CastType = T *;
-            return *reinterpret_cast<CastType *>(object);
-        }
-
-        Handle & operator=(const Handle & handle);
-
-        Handle & operator=(Handle && handle) noexcept;
+        static bool Release(void * handle, Finalizer finalizer);
     };
+
+    template<typename T>
+    T * RetainHandle(T * handle) {
+        return reinterpret_cast<T *>(Handle::Retain(handle));
+    }
+
+    bool ReleaseHandle(void * handle, Handle::Finalizer finalizer);
 }
 
 #endif //CHOCO_CPP_HANDLE_H

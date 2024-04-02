@@ -3,43 +3,50 @@
 //
 
 #include "cc/handle.h"
-#include "cc/zone.h"
+#include "cc/types.h"
+#include <iostream>
 #include <unordered_map>
 
-static std::unordered_map<void *, CC::Size> HandleRef = {};
+using HandleMapType = std::unordered_map<void *, CC::Size>;
 
-void Retain(CC::Handle & handle) {
-    HandleRef.find
+static HandleMapType HandleMap = {};
+
+void * CC::Handle::Retain(void *handle) {
+    if (handle == nullptr) return handle;
+
+    auto ret = HandleMap.find(handle);
+    if (ret != HandleMap.end()) {
+        ret->second += 1;
+        std::cout << "HRetain:  <" << handle << "> ref [" << ret->second << "]" << std::endl;
+
+    } else {
+        HandleMap[handle] = 1;
+        std::cout << "HRetain:  <" << handle << "> ref [1]" << std::endl;
+    }
+
+    return handle;
 }
 
-void Release() {}
+bool CC::Handle::Release(void *handle, Finalizer finalizer) {
+    if (handle == nullptr) return false;
 
-CC::Handle::Handle() : object(Make<Type>()) { *object = nullptr; }
+    auto ret = HandleMap.find(handle);
+    if (ret == HandleMap.end()) return false;
 
-CC::Handle::Handle(const Handle & handle) : object(Retain(handle.object)) {}
+    ret->second -= 1;
 
-CC::Handle::Handle(Handle && handle) noexcept : object(handle.object) { handle.object = nullptr; }
+    std::cout << "HRelease: <" << handle << "> ref [" << ret->second << "]" << std::endl;
 
-CC::Handle::~Handle() {
-    Release(object);
-    object = nullptr;
+    if (ret->second > 0) {
+        return false;
+    }
+
+    if (finalizer) finalizer(handle);
+    HandleMap.erase(handle);
+
+    return true;
 }
 
-CC::Handle & CC::Handle::operator=(const Handle & handle) {
-    if (this == &handle) return *this;
-
-    Release(object);
-    object = Retain(handle.object);
-
-    return *this;
-}
-
-CC::Handle & CC::Handle::operator=(Handle && handle) noexcept {
-    if (this == &handle) return *this;
-
-    Release(object);
-    object = handle.object;
-    handle.object = nullptr;
-
-    return *this;
+bool CC::ReleaseHandle(void *handle, Handle::Finalizer finalizer) {
+    return Handle::Release(handle, finalizer);
 }

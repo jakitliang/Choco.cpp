@@ -3,28 +3,40 @@
 //
 
 #include "cc/file_io.h"
+#include "cc/handle.h"
 #include <cstdio>
 #include <cerrno>
 
-CC::FileIO::FileIO() : context(nullptr) {}
-
-CC::FileIO::~FileIO() {
+static void Finalizer(void * context) {
     fclose(static_cast<FILE *>(context));
 }
 
+CC::FileIO::FileIO() : context(nullptr) {}
+
+CC::FileIO::FileIO(const CC::FileIO &fileIO) : context(RetainHandle(fileIO.context)) {}
+
+CC::FileIO::FileIO(CC::FileIO &&fileIO) noexcept : context(fileIO.context) { fileIO.context = nullptr; }
+
+CC::FileIO::~FileIO() {
+    ReleaseHandle(context, Finalizer);
+}
+
 void CC::FileIO::Open(const char *fileName, const char *mode, int *error) {
-    auto fp = static_cast<FILE *>(context);
 #ifdef _WINDOWS
-    errno_t err = fopen_s(&fp, fileName, mode);
+    errno_t err = fopen_s(reinterpret_cast<FILE **>(&context), fileName, mode);
 #else
-    fp = fopen(fileName, mode);
+    context = fopen(fileName, mode);
 #endif
 
 #ifdef _WINDOWS
     if (error != nullptr) *error = err;
 #else
-    if (fp == nullptr) *error = errno;
+    if (context == nullptr) *error = errno;
 #endif
+
+    if (context) {
+        RetainHandle(context);
+    }
 }
 
 CC::Size CC::FileIO::Write(void *buffer, CC::Size length) {
@@ -46,7 +58,7 @@ CC::Size CC::FileIO::ReadNonBlock(void *buffer, CC::Size length) {
 bool CC::FileIO::Close() {
     if (context == nullptr) return true;
 
-    fclose(static_cast<FILE *>(context));
+    ReleaseHandle(context, Finalizer);
     context = nullptr;
 
     return true;
@@ -54,4 +66,17 @@ bool CC::FileIO::Close() {
 
 bool CC::FileIO::IsClosed() {
     return context == nullptr;
+}
+
+CC::FileIO &CC::FileIO::operator=(const CC::FileIO &fileIO) {
+    ReleaseHandle(context, Finalizer);
+    context = RetainHandle(fileIO.context);
+    return *this;
+}
+
+CC::FileIO &CC::FileIO::operator=(CC::FileIO &&fileIO) {
+    ReleaseHandle(context, Finalizer);
+    context = fileIO.context;
+    fileIO.context = nullptr;
+    return *this;
 }

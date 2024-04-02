@@ -10,10 +10,13 @@
 #include <stack>
 
 struct CC::Window::Context {
-    using WindowMap = std::unordered_map<UInt32, Window>;
-    using WindowStack = std::stack<Window *>;
+    using WindowMap = std::unordered_map<UInt32, CC::Window>;
+    using WindowStack = std::stack<CC::Window *>;
 
     WindowMap Windows;
+    WindowStack State;
+
+    static Context & GetContext();
 };
 
 #endif //CHOCO_CPP_WINDOW_CONTEXT_H

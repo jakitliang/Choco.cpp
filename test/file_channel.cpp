@@ -10,9 +10,8 @@ using namespace CC;
 
 int main() {
     {
-        Channel ch;
+        FileChannel fileChannel(R"(C:/Users/Jakit/Documents/Temp/test.txt)", "w+");
     }
 
-    int a = 123;
-//    FileChannel(R"(C:/Users/Jakit/Documents/Temp/test.txt)", "w+");
+    int tmp = 123;
 }

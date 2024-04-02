@@ -4,9 +4,10 @@
 
 #include "cc/application.h"
 #include "cc/window.h"
-#include "cc/ui_event.h"
-#include "ui_context.h"
 #include "window_context.h"
+#include "cc/ui_event.h"
+//#include "ui_context.h"
+//#include "window_context.h"
 #include "SDL2/SDL.h"
 #include <unordered_map>
 #include <queue>
@@ -58,9 +59,7 @@ static int ApplicationStatus = 0;
 
 CC::EventMap CC::WindowEvents::events = {};
 
-CC::Application::~Application() {
-    Close();
-}
+CC::Application::~Application() {}
 
 bool CC::Application::Open() {
     if (CurrentApplication) return true;
@@ -132,24 +131,16 @@ void ProcessEvent(const SDL_Event & event) {
     }
 }
 
-void ApplicationUpdate(CC::Window & wnd, CC::UInt64 timeDiff) {
-    wnd.Update(timeDiff);
-
-//    if (wnd.subWindows.Count()) {
-//        for (auto & w : wnd.subWindows) {
-//            w.Update(timeDiff);
-//        }
-//    }
+void ApplicationUpdate(CC::UInt64 timeDiff) {
+    for (auto & wnd : CC::Window::Context::GetContext().Windows) {
+        wnd.second.Update(timeDiff);
+    }
 }
 
-void ApplicationDraw(CC::Window & wnd) {
-    wnd.Draw();
-
-//    if (wnd.subWindows.Count()) {
-//        for (auto & w : wnd.subWindows) {
-//            w.Draw();
-//        }
-//    }
+void ApplicationDraw() {
+    for (auto & wnd : CC::Window::Context::GetContext().Windows) {
+        wnd.second.Draw();
+    }
 }
 
 bool CC::Application::Run() {
@@ -159,16 +150,20 @@ bool CC::Application::Run() {
     UInt64 tickDiff = 0;
     UInt64 tickSecond = tick + 1000;
 
-    while (ApplicationStatus) {
+    while (CurrentApplication) {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
+            // Quit event
+            if (event.type == SDL_QUIT) {
+                CurrentApplication = nullptr;
+                onClose();
+                return true;
+            }
+
             // Application event
-            if (event.type >= SDL_QUIT && event.type <= SDL_APP_DIDENTERFOREGROUND) {
+            if (event.type > SDL_QUIT && event.type <= SDL_APP_DIDENTERFOREGROUND) {
                 onEvent(event.type);
-
-                if (event.type == SDL_QUIT) return true;
-
                 continue;
             }
 
@@ -186,10 +181,10 @@ bool CC::Application::Run() {
         timeOut = tick + tickStep;
 
         // On update
-        ApplicationUpdate(mainWindow, tickDiff);
+        ApplicationUpdate(tickDiff);
 
         // On draw
-        ApplicationDraw(mainWindow);
+        ApplicationDraw();
 
         // Gives us a clear "canvas"
 //        SDL_SetRenderDrawColor(renderer,0,0,0xFF,SDL_ALPHA_OPAQUE);

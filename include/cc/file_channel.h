@@ -15,6 +15,8 @@ namespace CC {
         FileChannel(); // Todo: Random file RW
 
         FileChannel(const char * fileName, const char * mode, int * error = nullptr);
+
+        ~FileChannel() noexcept override;
     };
 }
 
