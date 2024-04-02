@@ -10,6 +10,7 @@
 namespace CC {
     struct Handle {
         using Type = void *;
+        using Finalizer = void (*)(void * handle);
 
         Type * object;
 

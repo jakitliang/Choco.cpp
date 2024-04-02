@@ -3,14 +3,16 @@
 //
 
 #include "cc/application.h"
-#include "cc/linked_list.h"
-#include "cc/ui_event.h"
-#include "SDL2/SDL.h"
 #include "cc/window.h"
+#include "cc/ui_event.h"
+#include "ui_context.h"
+#include "window_context.h"
+#include "SDL2/SDL.h"
 #include <unordered_map>
 #include <queue>
 
 const CC::UIEvent EmptyEvent = {CC::UIEventType::FirstEvent};
+static CC::Application * CurrentApplication = nullptr;
 
 namespace CC {
     using EventMap = std::unordered_map<CC::UInt32, std::queue<CC::UIEvent>>;
@@ -61,35 +63,21 @@ CC::Application::~Application() {
 }
 
 bool CC::Application::Open() {
-    if (!ApplicationStatus) {
-        ApplicationStatus = SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0 ? 1 : 0;
-    }
+    if (CurrentApplication) return true;
 
-    return ApplicationStatus;
-}
-
-bool CC::Application::Open(const char *title,
-                      CC::Int32 x, CC::Int32 y,
-                      CC::Int32 width, CC::Int32 height,
-                      CC::UInt32 flags, CC::UInt32 modes) {
-    if (!Open()) {
-        return false;
-
-    } else if (ApplicationStatus == 2) {
+    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0) {
+        CurrentApplication = this;
+        onOpen();
         return true;
     }
 
-    if (mainWindow.Open(title, x, y, width, height, flags, modes)) ApplicationStatus = 2;
-
-    return ApplicationStatus == 2;
+    return false;
 }
 
 void CC::Application::Close() {
-    ApplicationStatus = 0;
-
-    mainWindow.Close();
-
+    if (CurrentApplication == nullptr) return;
     SDL_Quit();
+    CurrentApplication = nullptr;
 }
 
 void ProcessEvent(const SDL_Event & event) {
@@ -175,14 +163,13 @@ bool CC::Application::Run() {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                ApplicationStatus = 0;
-                return true;
-            }
-
             // Application event
-            if (event.type > SDL_QUIT && event.type <= SDL_APP_DIDENTERFOREGROUND) {
-                OnEvent(event.type);
+            if (event.type >= SDL_QUIT && event.type <= SDL_APP_DIDENTERFOREGROUND) {
+                onEvent(event.type);
+
+                if (event.type == SDL_QUIT) return true;
+
+                continue;
             }
 
             ProcessEvent(event);
@@ -217,4 +204,8 @@ bool CC::Application::Run() {
     return true;
 }
 
-void CC::Application::OnEvent(CC::UInt32 event) {}
+void CC::Application::onOpen() {}
+
+void CC::Application::onClose() {}
+
+void CC::Application::onEvent(CC::UInt32 event) {}

@@ -8,18 +8,10 @@
 #include "cc/linked_list.h"
 #include "cc/drawable.h"
 #include "cc/window.h"
+#include "cc/application.h"
 
 namespace CC {
     namespace Graphics {
-        Window CreateWindow(const char * title,
-                            Int32 x, Int32 y,
-                            Int32 width, Int32 height,
-                            UInt32 flags, UInt32 modes = Flags::Renderer::Hardware);
-
-        void CloseWindow(Window & window);
-
-        Window * GetWindow(UInt32 windowID);
-
         void Draw(Handle * drawable,
                   Int32 x,
                   Int32 y,

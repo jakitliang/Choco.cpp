@@ -13,11 +13,11 @@
 
 namespace CC {
     struct Window : Handle, IView {
+        struct Context;
+
         struct Delegate {
             virtual void onMouseDown() = 0;
         };
-
-        Renderer renderer;
 
         ~Window() override;
 
@@ -35,6 +35,10 @@ namespace CC {
         virtual void Update(UInt64 deltaTime);
 
         virtual void Draw();
+
+        Renderer * GetRenderer();
+
+        static Window * Current();
     };
 }
 

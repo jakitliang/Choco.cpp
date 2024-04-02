@@ -5,9 +5,19 @@
 #include "cc/window.h"
 #include "cc/renderer.h"
 #include "cc/zone.h"
-#include "ui_context.h"
 #include "SDL2/SDL.h"
 #include <thread>
+#include <stack>
+
+struct CC::Window::Context {
+    using WindowMap = std::unordered_map<UInt32, CC::Window>;
+    using WindowStack = std::stack<CC::Window *>;
+
+    WindowMap Windows;
+    WindowStack State;
+};
+
+static CC::Window::Context WindowContext = {};
 
 CC::Window::~Window() {
     Close();
@@ -25,12 +35,14 @@ bool CC::Window::Open(const char * title,
 
     if (window == nullptr) return false;
 
+    Renderer renderer;
+
     if (!renderer.Open(this, -1, modes)) {
         SDL_DestroyWindow(window);
         return false;
     }
 
-    UIContext::GetContext().Windows[GetID()] = *this;
+    WindowContext.Windows[GetID()] = *this;
 
     return true;
 }
@@ -40,18 +52,15 @@ void CC::Window::Close() {
 
     if (window == nullptr) return;
 
-//    layer.Close();
-    UIContext::GetContext().Windows.erase(GetID());
+    auto id = GetID();
+    auto renderer = WindowContext.Renderers[id];
+
     renderer.Close();
     SDL_DestroyWindow(window);
-
-//    if (subWindows.Count()) {
-//        for (auto & w : subWindows) {
-//            w.Close();
-//        }
-//    }
-
     window = nullptr;
+
+    WindowContext.Windows.erase(id);
+    WindowContext.Renderers.erase(id);
 }
 
 CC::UInt32 CC::Window::GetID() {
@@ -71,4 +80,12 @@ void CC::Window::Draw() {
     SDL_RenderClear(renderer.get<SDL_Renderer>());
 
     SDL_RenderPresent(renderer.get<SDL_Renderer>());
+}
+
+CC::Renderer * CC::Window::GetRenderer() {
+    Renderer::Current();
+}
+
+CC::Window * CC::Window::Current() {
+    return WindowContext.State.top();
 }

@@ -25,8 +25,8 @@ add_library(
         view.cpp
         ui_event.cpp
         graphics.cpp
-        ui_context.h
-        ui_context.cpp
+#        ui_context.h
+#        ui_context.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)

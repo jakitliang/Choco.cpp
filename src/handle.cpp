@@ -4,6 +4,15 @@
 
 #include "cc/handle.h"
 #include "cc/zone.h"
+#include <unordered_map>
+
+static std::unordered_map<void *, CC::Size> HandleRef = {};
+
+void Retain(CC::Handle & handle) {
+    HandleRef.find
+}
+
+void Release() {}
 
 CC::Handle::Handle() : object(Make<Type>()) { *object = nullptr; }
 

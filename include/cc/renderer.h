@@ -12,6 +12,8 @@
 
 namespace CC {
     struct Renderer : Handle {
+        struct Context;
+
         ~Renderer() override;
 
         bool Open(Handle * windowHandle, Int32 index, UInt32 flags);
@@ -69,6 +71,8 @@ namespace CC {
                   Float32 originX = 0, Float32 originY = 0);
 
         void Clear();
+
+        Renderer * Current();
     };
 }
 

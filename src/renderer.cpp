@@ -3,9 +3,18 @@
 //
 
 #include "cc/renderer.h"
-#include "cc/window.h"
 #include "SDL2/SDL.h"
 #include <vector>
+#include <unordered_map>
+
+struct CC::Renderer::Context {
+    using RendererMap = std::unordered_map<UInt32, CC::Renderer>;
+    using RendererMap = std::unordered_map<UInt32, CC::Renderer>;
+
+    RendererMap Renderers;
+};
+
+static CC::Renderer::Context RendererContext = {};
 
 static std::vector<SDL_FPoint> Points = {};
 static std::vector<SDL_FRect> Rects = {};
@@ -16,9 +25,14 @@ CC::Renderer::~Renderer() {
 
 bool CC::Renderer::Open(Handle * windowHandle, Int32 index, UInt32 flags) {
     auto & renderer = get<SDL_Renderer>();
+    auto window = windowHandle->get<SDL_Window>();
     if (renderer) return true;
 
-    renderer = SDL_CreateRenderer(windowHandle->get<SDL_Window>(), index, flags);
+    renderer = SDL_CreateRenderer(window, index, flags);
+
+    if (renderer == nullptr) return false;
+
+    RendererContext.Renderers[SDL_GetWindowID(window)] = *this;
 
     return renderer != nullptr;
 }
@@ -156,4 +170,8 @@ void CC::Renderer::Clear() {
     if (renderer == nullptr) return;
 
     SDL_RenderClear(renderer);
+}
+
+CC::Renderer * CC::Renderer::Current() {
+
 }
