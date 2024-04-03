@@ -11,14 +11,27 @@
 #include "cc/rect.h"
 
 namespace CC {
-    struct Renderer : Handle {
+    struct Renderer {
         struct Context;
 
-        ~Renderer() override;
+        void * Handle;
+        UInt32 * windowID;
 
-        bool Open(Handle * windowHandle, Int32 index, UInt32 flags);
+        Renderer();
+
+        Renderer(const Renderer & renderer);
+
+        Renderer(Renderer && renderer);
+
+        ~Renderer();
+
+        UInt32 Open(void * windowHandle, Int32 index, UInt32 flags);
 
         void Close();
+
+        Renderer & operator=(const Renderer & renderer);
+
+        Renderer & operator=(Renderer && renderer);
 
         // Graphic APIs
 

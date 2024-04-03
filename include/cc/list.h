@@ -27,12 +27,32 @@ namespace CC {
             MoveInsert(index, &t, 1);
         }
 
+        template<Size S>
+        void Insert(Size index, const T (&elements)[S]) {
+            CopyInsert(index, &elements[0], S);
+        }
+
+        template<Size S>
+        void Insert(Size index, T (&&elements)[S]) {
+            MoveInsert(index, &elements[0], S);
+        }
+
         void Push(const T * elements, Size cnt) {
             Insert(this->Count(), elements, cnt);
         }
 
         void Push(T * elements, Size cnt) {
             Insert(this->Count(), elements, cnt);
+        }
+
+        template<Size S>
+        void Push(const T (&elements)[S]) {
+            CopyInsert(this->Count(), &elements[0], S);
+        }
+
+        template<Size S>
+        void Push(T (&&elements)[S]) {
+            MoveInsert(this->Count(), &elements[0], S);
         }
 
         void Push(const T & t) {
@@ -44,10 +64,6 @@ namespace CC {
         }
 
         virtual void Delete(Size index, Size count) = 0;
-
-        virtual void Delete(Size index) {
-            Delete(index, 1);
-        }
     };
 
     template<typename T>
@@ -92,7 +108,7 @@ namespace CC {
             object->Delete(index, count);
         }
 
-        void Delete(Size index) override {
+        void Delete(Size index) {
             object->Delete(index, 1);
         }
 

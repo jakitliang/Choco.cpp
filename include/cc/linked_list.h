@@ -155,12 +155,8 @@ namespace CC {
             if (cnt < 1) return;
             if (index >= count) return;
 
-            // Erase
-            // Part 1             Part 2              // Part 3
-            // data[0 .. index] + erase[0 .. count] + data[index .. last]
-            // Part 1                                 // Part 3
-            // data[0 .. index]         +             data[index .. last]
             auto indexEnd = index + cnt;
+            count = indexEnd >= count ? index : count - cnt;
 
             cur = object;
             for (i = 0; i < index; ++i) {
@@ -182,13 +178,11 @@ namespace CC {
                     // |x|x|x|x|x|
                     if (prev == nullptr) {
                         object = lastObject = nullptr;
-                        count = 0;
                         return;
                     }
 
                     lastObject = prev;
                     lastObject->next = nullptr;
-                    count -= i + 1;
                     return;
                 }
 
@@ -201,7 +195,6 @@ namespace CC {
             // |x|x|?|?|?|
             if (prev == nullptr) {
                 object = next;
-                count -= i + 1;
                 return;
             }
 
@@ -209,7 +202,6 @@ namespace CC {
             // x: place to remove
             // | |x|x|x| |
             prev->next = next;
-            count -= i + 1;
         }
 
         Size Count() const override {

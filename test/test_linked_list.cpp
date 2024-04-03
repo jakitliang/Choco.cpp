@@ -3,6 +3,9 @@
 //
 
 #include "cc/linked_list.h"
+#include <iostream>
+
+using namespace std;
 
 int main() {
     {
@@ -38,6 +41,38 @@ int main() {
 
         for (auto i = s.begin(); i != s.end(); ++i) {
             cout << i << endl;
+        }
+    }
+
+    cout << "===============" << endl;
+
+    {
+        CC::LinkedList<int> i;
+        i.Push({1, 2, 3});
+        CC::UInt32 offset = 0;
+        for (auto & item : i) {
+            if (item == 2) {
+                i.Push(item);
+                i.Delete(offset);
+                break;
+            }
+            offset += 1;
+        }
+        for (auto & item : i) {
+            cout << item << endl;
+        }
+    }
+
+    cout << "===============" << endl;
+
+    {
+        CC::LinkedList<int> i;
+        i.Push({1, 2, 3});
+
+        CC::Swap(i[0], i[2]);
+
+        for (auto & item : i) {
+            cout << item << endl;
         }
     }
 }

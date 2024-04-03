@@ -3,38 +3,44 @@
 //
 
 #include "cc/renderer.h"
+#include "renderer_context.h"
+#include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <vector>
 #include <unordered_map>
 
-struct CC::Renderer::Context {
-    using RendererMap = std::unordered_map<UInt32, CC::Renderer>;
-    using RendererMap = std::unordered_map<UInt32, CC::Renderer>;
-
-    RendererMap Renderers;
-};
-
-static CC::Renderer::Context RendererContext = {};
-
 static std::vector<SDL_FPoint> Points = {};
 static std::vector<SDL_FRect> Rects = {};
 
-CC::Renderer::~Renderer() {
-    Close();
+void Finalizer(void * handle) {
+    SDL_DestroyWindow(static_cast<SDL_Window *>(handle));
 }
 
-bool CC::Renderer::Open(Handle * windowHandle, Int32 index, UInt32 flags) {
-    auto & renderer = get<SDL_Renderer>();
-    auto window = windowHandle->get<SDL_Window>();
-    if (renderer) return true;
+CC::Renderer::Renderer() : Handle(nullptr) {}
 
-    renderer = SDL_CreateRenderer(window, index, flags);
+CC::Renderer::Renderer(const CC::Renderer &renderer) : Handle(RetainHandle(renderer.Handle)) {}
 
-    if (renderer == nullptr) return false;
+CC::Renderer::Renderer(CC::Renderer &&renderer) : Handle(renderer.Handle) { renderer.Handle = nullptr; }
 
-    RendererContext.Renderers[SDL_GetWindowID(window)] = *this;
+CC::Renderer::~Renderer() {
+    if (Handle == nullptr) return;
 
-    return renderer != nullptr;
+    ReleaseHandle(Handle, Finalizer);
+}
+
+CC::UInt32 CC::Renderer::Open(void * windowHandle, Int32 index, UInt32 flags) {
+    auto id = SDL_GetWindowID(static_cast<SDL_Window *>(windowHandle));
+
+    if (Handle) return id;
+
+    Handle = SDL_CreateRenderer(static_cast<SDL_Window *>(windowHandle), index, flags);
+
+    if (Handle == nullptr) return 0;
+
+    RetainHandle(Handle);
+    Context::GetContext().Renderers[id] = *this;
+
+    return id;
 }
 
 void CC::Renderer::Close() {
