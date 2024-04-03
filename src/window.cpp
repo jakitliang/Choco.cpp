@@ -4,6 +4,7 @@
 
 #include "cc/window.h"
 #include "window_context.h"
+#include "cc/renderer.h"
 #include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <thread>
@@ -27,13 +28,13 @@ bool CC::Window::Open(const char * title,
     Handle = Context::GetContext().Open(title, x, y, width, height, flags);
     Context::GetContext().Push(this);
 
-//    Renderer renderer;
+    Renderer renderer;
 
-//    if (!renderer.Open(Handle, -1, modes)) {
-//        SDL_DestroyWindow(static_cast<SDL_Window *>(Handle));
-//        return false;
-//    }
-
+    if (!renderer.Open(Handle, -1, modes)) {
+        Context::GetContext().Close(Handle);
+        Context::GetContext().Delete(this);
+        Handle = nullptr;
+    }
 
     return Handle != nullptr;
 }
@@ -46,6 +47,7 @@ bool CC::Window::Open(void * windowHandle) {
 void CC::Window::Close() {
     if (Handle == nullptr) return;
 
+    Renderer::Get(Handle)->Close();
     Context::GetContext().Close(Handle);
     Context::GetContext().Delete(this);
     Handle = nullptr;

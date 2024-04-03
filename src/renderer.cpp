@@ -144,3 +144,7 @@ CC::Renderer * CC::Renderer::GetCurrent() {
     auto window = Window::GetCurrent();
     return window == nullptr ? nullptr : &Context::GetContext().WindowsMap[window->Handle];
 }
+
+CC::Renderer * CC::Renderer::Get(void * windowHandle) {
+    return windowHandle == nullptr ? nullptr : &Context::GetContext().WindowsMap[windowHandle];
+}

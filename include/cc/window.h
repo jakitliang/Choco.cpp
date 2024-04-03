@@ -7,8 +7,6 @@
 
 #include "cc/flags.h"
 #include "cc/linked_list.h"
-//#include "cc/renderer.h"
-//#include "cc/texture.h"
 
 namespace CC {
     struct Window {

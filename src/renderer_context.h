@@ -20,6 +20,10 @@ struct CC::Renderer::Context {
 
     void Close(void * handle);
 
+    void Push();
+
+    void Delete(void * window);
+
     static Context & GetContext();
 };
 

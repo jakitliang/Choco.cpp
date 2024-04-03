@@ -5,7 +5,6 @@
 #ifndef CHOCO_CPP_RENDERER_H
 #define CHOCO_CPP_RENDERER_H
 
-//#include "cc/texture.h"
 #include "cc/vector2.h"
 #include "cc/rect.h"
 
@@ -83,7 +82,9 @@ namespace CC {
 
         void Clear();
 
-        Renderer * GetCurrent();
+        static Renderer * GetCurrent();
+
+        static Renderer * Get(void * windowHandle);
     };
 }
 
