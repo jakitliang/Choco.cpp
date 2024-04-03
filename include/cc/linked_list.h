@@ -146,6 +146,11 @@ namespace CC {
             Insert(index, elements, cnt);
         }
 
+        T & Last() override {
+            if (count == 0) abort();
+            return **lastObject;
+        }
+
         void Delete(Size index, Size cnt) override {
             int i = 0;
             Node * cur = nullptr;

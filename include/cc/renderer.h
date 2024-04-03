@@ -5,8 +5,7 @@
 #ifndef CHOCO_CPP_RENDERER_H
 #define CHOCO_CPP_RENDERER_H
 
-#include "cc/handle.h"
-#include "cc/texture.h"
+//#include "cc/texture.h"
 #include "cc/vector2.h"
 #include "cc/rect.h"
 
@@ -15,23 +14,22 @@ namespace CC {
         struct Context;
 
         void * Handle;
-        UInt32 * windowID;
 
         Renderer();
 
-        Renderer(const Renderer & renderer);
+        Renderer(const Renderer & renderer) = delete;
 
-        Renderer(Renderer && renderer);
+        Renderer(Renderer && renderer) noexcept;
 
         ~Renderer();
 
-        UInt32 Open(void * windowHandle, Int32 index, UInt32 flags);
+        bool Open(void * windowHandle, Int32 index, UInt32 flags);
 
         void Close();
 
-        Renderer & operator=(const Renderer & renderer);
+        Renderer & operator=(const Renderer & renderer) = delete;
 
-        Renderer & operator=(Renderer && renderer);
+        Renderer & operator=(Renderer && renderer) noexcept;
 
         // Graphic APIs
 
@@ -70,13 +68,13 @@ namespace CC {
 
 //        void DrawGeometry();
 
-        void Draw(Handle * textureHandle,
+        void Draw(void * textureHandle,
                   Float32 x, Float32 y,
                   Float32 r = 0,
                   Float32 scaleX = 1, Float32 scaleY = 1,
                   Float32 originX = 0, Float32 originY = 0);
 
-        void Draw(Handle * textureHandle,
+        void Draw(void * textureHandle,
                   Rect quad,
                   Float32 x, Float32 y,
                   Float32 r = 0,
@@ -85,7 +83,7 @@ namespace CC {
 
         void Clear();
 
-        Renderer * Current();
+        Renderer * GetCurrent();
     };
 }
 

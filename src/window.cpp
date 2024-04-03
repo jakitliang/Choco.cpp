@@ -4,38 +4,28 @@
 
 #include "cc/window.h"
 #include "window_context.h"
-//#include "cc/renderer.h"
 #include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <thread>
 #include <stack>
 #include <unordered_map>
 
-void Finalizer(void * handle) {
-    SDL_DestroyWindow(static_cast<SDL_Window *>(handle));
-}
-
 CC::Window::Window() : Handle(nullptr) {}
 
-CC::Window::Window(const CC::Window &window) : Handle(RetainHandle(window.Handle)) {}
-
-CC::Window::Window(CC::Window &&window) : Handle(window.Handle) { window.Handle = nullptr; }
+CC::Window::Window(CC::Window && window) noexcept : Handle(window.Handle) { window.Handle = nullptr; }
 
 CC::Window::~Window() {
-    if (Handle == nullptr) return;
-
-    ReleaseHandle(Handle, Finalizer);
+    Close();
 }
 
-CC::UInt32 CC::Window::Open(const char * title,
+bool CC::Window::Open(const char * title,
                       Int32 x, Int32 y,
                       Int32 width, Int32 height,
                       UInt32 flags, UInt32 modes) {
-    if (Handle) return GetID();
+    if (Handle) return true;
 
-    Handle = SDL_CreateWindow(title, x, y, width, height, flags);
-
-    if (Handle == nullptr) return 0;
+    Handle = Context::GetContext().Open(title, x, y, width, height, flags);
+    Context::GetContext().Push(this);
 
 //    Renderer renderer;
 
@@ -44,17 +34,20 @@ CC::UInt32 CC::Window::Open(const char * title,
 //        return false;
 //    }
 
-    RetainHandle(Handle);
-    Context::GetContext().Windows[GetID()] = *this;
 
-    return GetID();
+    return Handle != nullptr;
+}
+
+bool CC::Window::Open(void * windowHandle) {
+    Handle = Context::GetContext().Open(windowHandle);
+    return Handle != nullptr;
 }
 
 void CC::Window::Close() {
     if (Handle == nullptr) return;
 
-    Context::GetContext().Windows.erase(GetID());
-    ReleaseHandle(Handle, Finalizer);
+    Context::GetContext().Close(Handle);
+    Context::GetContext().Delete(this);
     Handle = nullptr;
 }
 
@@ -81,22 +74,28 @@ void CC::Window::Draw() {
 ////    Renderer::Current();
 //}
 
-CC::Window &CC::Window::operator=(const CC::Window &window) {
+CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
     if (this == &window) return *this;
 
-    ReleaseHandle(Handle, Finalizer);
-    Handle = RetainHandle(window.Handle);
-    return *this;
-}
-
-CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
-    ReleaseHandle(Handle, Finalizer);
+    Close();
     Handle = window.Handle;
     window.Handle = nullptr;
 
     return *this;
 }
 
-CC::Window * CC::Window::Current() {
-    return Context::GetContext().State.top();
+CC::Window * CC::Window::GetCurrent() {
+    auto & windowStack = Context::GetContext().WindowStack;
+    if (windowStack.Count() == 0) return nullptr;
+    return windowStack.Last();
+}
+
+void CC::Window::SetCurrent(CC::Window * window) {
+    auto & windowStack = Context::GetContext().WindowStack;
+    for (auto & wnd : windowStack) {
+        if (wnd->Handle == window->Handle) {
+            Swap(wnd, windowStack.Last());
+            break;
+        }
+    }
 }

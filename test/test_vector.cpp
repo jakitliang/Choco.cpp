@@ -3,8 +3,9 @@
 //
 
 #include "cc/vector.h"
+#include <iostream>
 
-#include "cc/list.h"
+using namespace std;
 
 template<typename T>
 struct A {};
@@ -32,6 +33,14 @@ int main() {
         for (auto i = s.begin(); i != s.end(); ++i) {
             cout << i << endl;
         }
+    }
+
+    cout << "===============" << endl;
+
+    {
+        CC::Vector<int> s;
+        s.Push({1, 2, 3});
+        cout << s.Last() << endl;
     }
 
     int a = 1;

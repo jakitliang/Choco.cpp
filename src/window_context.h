@@ -6,22 +6,30 @@
 #define CHOCO_CPP_WINDOW_CONTEXT_H
 
 #include "cc/window.h"
+#include "cc/linked_list.h"
 #include <unordered_map>
-#include <stack>
 
 struct CC::Window::Context {
-    using WindowMapType = std::unordered_map<UInt32, CC::Window>;
-    using WindowHandleMapType = std::unordered_map<void *, UInt32>;
-    using WindowStackType = std::stack<CC::Window *>;
+    using WindowMapType = std::unordered_map<void *, UInt32>;
+    using WindowStackType = LinkedList<CC::Window *>;
 
     WindowMapType WindowsMap;
-    WindowStackType WindowState;
+    WindowStackType WindowStack;
+
+    void * Open(const char * title,
+                Int32 x, Int32 y,
+                Int32 width, Int32 height,
+                UInt32 flags);
+
+    void * Open(void * handle);
+
+    void Close(void * handle);
+
+    void Push(Window * window);
+
+    void Delete(Window * window);
 
     static Context & GetContext();
-
-    static Window OpenWindow();
-
-    static void CloseWindow();
 };
 
 #endif //CHOCO_CPP_WINDOW_CONTEXT_H

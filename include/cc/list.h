@@ -19,6 +19,8 @@ namespace CC {
 
         virtual void MoveInsert(Size index, T * elements, Size count) = 0;
 
+        virtual T & Last() = 0;
+
         void Insert(Size index, const T & t) {
             CopyInsert(index, &t, 1);
         }
@@ -102,6 +104,10 @@ namespace CC {
 
         void MoveInsert(Size index, T * elements, Size count) override {
             object->MoveInsert(index, elements, count);
+        }
+
+        T & Last() override {
+            return object->Last();
         }
 
         void Delete(Size index, Size count) override {

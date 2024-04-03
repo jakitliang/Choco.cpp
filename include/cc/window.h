@@ -22,16 +22,18 @@ namespace CC {
 
         Window();
 
-        Window(const Window & window);
+        Window(const Window & window) = delete;
 
-        Window(Window && window);
+        Window(Window && window) noexcept;
 
         ~Window();
 
-        UInt32 Open(const char * title,
+        bool Open(const char * title,
                   Int32 x, Int32 y,
                   Int32 width, Int32 height,
                   UInt32 flags, UInt32 modes = Flags::Renderer::Hardware);
+
+        bool Open(void * windowHandle);
 
         void Close();
 
@@ -43,15 +45,13 @@ namespace CC {
 
         virtual void Draw();
 
-//        Renderer * GetRenderer();
-
-        Window & operator=(const Window & window);
+        Window & operator=(const Window & window) = delete;
 
         Window & operator=(Window && window) noexcept;
 
-        static Window * Current();
+        static Window * GetCurrent();
 
-        static const LinkedList<Window *> * GetWindows();
+        static void SetCurrent(Window * window);
     };
 }
 

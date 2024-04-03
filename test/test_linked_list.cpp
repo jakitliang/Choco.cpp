@@ -69,10 +69,12 @@ int main() {
         CC::LinkedList<int> i;
         i.Push({1, 2, 3});
 
-        CC::Swap(i[0], i[2]);
+        CC::Swap(i[0], i.Last());
 
         for (auto & item : i) {
             cout << item << endl;
         }
+
+        cout << "last: " << i.Last() << endl;
     }
 }

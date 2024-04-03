@@ -155,6 +155,11 @@ namespace CC {
             Insert(index, elements, cnt);
         }
 
+        T & Last() override {
+            if (count == 0) abort();
+            return (*object)[count - 1];
+        }
+
         void Delete(Size index, Size cnt) override {
             if (cnt < 1) return;
 

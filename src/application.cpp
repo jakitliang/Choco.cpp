@@ -132,14 +132,14 @@ void ProcessEvent(const SDL_Event & event) {
 }
 
 void ApplicationUpdate(CC::UInt64 timeDiff) {
-    for (auto & wnd : CC::Window::Context::GetContext().Windows) {
-        wnd.second.Update(timeDiff);
+    for (auto & wnd : CC::Window::Context::GetContext().WindowStack) {
+        wnd->Update(timeDiff);
     }
 }
 
 void ApplicationDraw() {
-    for (auto & wnd : CC::Window::Context::GetContext().Windows) {
-        wnd.second.Draw();
+    for (auto & wnd : CC::Window::Context::GetContext().WindowStack) {
+        wnd->Draw();
     }
 }
 

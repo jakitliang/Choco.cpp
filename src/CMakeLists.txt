@@ -20,7 +20,9 @@ add_library(
         window.cpp
         window_context.h
         window_context.cpp
-#        renderer.cpp
+        renderer.cpp
+        renderer_context.h
+        renderer_context.cpp
 #        texture.cpp
 #        canvas.cpp
 #        pixels.cpp

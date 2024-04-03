@@ -10,11 +10,15 @@
 #include <stack>
 
 struct CC::Renderer::Context {
-    using RendererMapType = std::unordered_map<UInt32, CC::Renderer>;
-    using RendererStackType = std::stack<CC::Renderer *>;
+    using RendererMapType = std::unordered_map<void *, void *>; // [Renderer] -> Window
+    using WindowMapType = std::unordered_map<void *, Renderer>; // [Window] -> Renderer
 
-    RendererMapType Renderers;
-    RendererStackType State;
+    RendererMapType RendererMap;
+    WindowMapType WindowsMap;
+
+    void * Open(Renderer & renderer, void * windowHandle, Int32 index, UInt32 flags);
+
+    void Close(void * handle);
 
     static Context & GetContext();
 };
