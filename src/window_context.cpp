@@ -8,7 +8,7 @@
 
 static CC::Window::Context WindowContext = {};
 
-void Finalizer(void * handle) {
+void WindowHandleFinalizer(void * handle) {
     SDL_DestroyWindow(static_cast<SDL_Window *>(handle));
 }
 
@@ -39,7 +39,7 @@ void CC::Window::Context::Close(void * handle) {
 
     if (WindowsMap.find(handle) == WindowsMap.end()) return;
 
-    if (ReleaseHandle(handle, Finalizer)) WindowsMap.erase(handle);
+    if (ReleaseHandle(handle, WindowHandleFinalizer)) WindowsMap.erase(handle);
 }
 
 void CC::Window::Context::Push(CC::Window * window) {

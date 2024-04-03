@@ -8,7 +8,7 @@
 
 static CC::Renderer::Context RendererContext = {};
 
-void Finalizer(void * handle) {
+void RendererHandleFinalizer(void * handle) {
     SDL_DestroyRenderer(static_cast<SDL_Renderer *>(handle));
 }
 
@@ -31,7 +31,7 @@ void CC::Renderer::Context::Close(void *handle) {
 
     if (RendererMap.find(handle) == RendererMap.end()) return;
 
-    if (ReleaseHandle(handle, Finalizer)) {
+    if (ReleaseHandle(handle, RendererHandleFinalizer)) {
         WindowsMap.erase(RendererMap[handle]);
         RendererMap.erase(handle);
     }
