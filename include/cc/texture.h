@@ -5,21 +5,36 @@
 #ifndef CHOCO_CPP_TEXTURE_H
 #define CHOCO_CPP_TEXTURE_H
 
-#include "cc/handle.h"
-#include "cc/linked_list.h"
+#include "cc/flags.h"
+#include "cc/drawable.h"
 
 namespace CC {
-    struct Texture {
-        ~Texture() override;
+    struct Renderer;
+    struct ImageData;
 
-        bool Open(Handle * rendererHandle,
+    struct Texture : Drawable {
+        void * Handle;
+
+        Texture();
+
+        Texture(const Texture & texture);
+
+        Texture(Texture && texture) noexcept;
+
+        ~Texture();
+
+        bool Open(Renderer * renderer,
                   Int32 width, Int32 height,
                   UInt32 format,
                   Int32 access);
 
-        bool Open(Handle * rendererHandle, Handle * imageDataHandle);
+        bool Open(Renderer * renderer, ImageData * imageDataHandle);
 
         void Close();
+
+        Texture & operator=(const Texture & texture);
+
+        Texture & operator=(Texture && texture) noexcept;
     };
 }
 

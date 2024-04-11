@@ -6,7 +6,7 @@
 #include "cc/handle.h"
 #include "SDL2/SDL.h"
 
-static CC::Window::Context WindowContext = {};
+static CC::Window::Context WindowContext = {{}, {}};
 
 void WindowHandleFinalizer(void * handle) {
     SDL_DestroyWindow(static_cast<SDL_Window *>(handle));
@@ -60,6 +60,15 @@ void CC::Window::Context::Delete(CC::Window * window) {
 
         index += 1;
     }
+}
+
+CC::Window::Context::WindowStateType CC::Window::Context::begin() {
+    WindowState = WindowStack.begin();
+    return WindowState;
+}
+
+CC::Window::Context::WindowStateType CC::Window::Context::end() {
+    return WindowStack.end();
 }
 
 CC::Window::Context &CC::Window::Context::GetContext() {

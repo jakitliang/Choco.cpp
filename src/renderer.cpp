@@ -5,7 +5,6 @@
 #include "cc/renderer.h"
 #include "cc/window.h"
 #include "renderer_context.h"
-#include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <vector>
 #include <unordered_map>
@@ -22,9 +21,8 @@ CC::Renderer::~Renderer() {
     Close();
 }
 
-bool CC::Renderer::Open(void * windowHandle, Int32 index, UInt32 flags) {
-    Handle = Context::GetContext().Open(*this, windowHandle, index, flags);
-    return Handle != nullptr;
+CC::Renderer * CC::Renderer::Open(void * windowHandle, Int32 index, UInt32 flags) {
+    return Context::GetContext().Open(windowHandle, index, flags);
 }
 
 void CC::Renderer::Close() {
@@ -114,7 +112,13 @@ void CC::Renderer::Draw(void * textureHandle,
     SDL_FPoint origin{originX + dst.w / 2,
                       originY + dst.h / 2};
 
-    SDL_RenderCopyExF(static_cast<SDL_Renderer *>(Handle), static_cast<SDL_Texture *>(textureHandle), nullptr, &dst, r, &origin, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(static_cast<SDL_Renderer *>(Handle),
+                      static_cast<SDL_Texture *>(textureHandle),
+                      nullptr,
+                      &dst,
+                      r,
+                      &origin,
+                      SDL_FLIP_NONE);
 }
 
 void CC::Renderer::Draw(void * textureHandle,
@@ -136,15 +140,23 @@ void CC::Renderer::Draw(void * textureHandle,
     SDL_RenderCopyExF(static_cast<SDL_Renderer *>(Handle), static_cast<SDL_Texture *>(textureHandle), &src, &dst, r, &origin, SDL_FLIP_NONE);
 }
 
+void CC::Renderer::SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha) {
+    SDL_SetRenderDrawColor(static_cast<SDL_Renderer *>(Handle), red, green, blue, alpha);
+}
+
 void CC::Renderer::Clear() {
     SDL_RenderClear(static_cast<SDL_Renderer *>(Handle));
 }
 
+void CC::Renderer::Present() {
+    SDL_RenderPresent(static_cast<SDL_Renderer *>(Handle));
+}
+
 CC::Renderer * CC::Renderer::GetCurrent() {
-    auto window = Window::GetCurrent();
+    auto window = Window::Current();
     return window == nullptr ? nullptr : &Context::GetContext().WindowsMap[window->Handle];
 }
 
-CC::Renderer * CC::Renderer::Get(void * windowHandle) {
+CC::Renderer * CC::Renderer::GetCurrentWithWindowHandle(void * windowHandle) {
     return windowHandle == nullptr ? nullptr : &Context::GetContext().WindowsMap[windowHandle];
 }

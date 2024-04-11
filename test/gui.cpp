@@ -5,6 +5,7 @@
 #include "cc/window.h"
 #include "cc/screen.h"
 #include "cc/application.h"
+#include "cc/graphics.h"
 #include <iostream>
 
 using namespace std;
@@ -16,7 +17,9 @@ struct MyWindow : Window {
     }
 
     void Draw() override {
-        Window::Draw();
+        CC::Graphics::SetColor(255, 0, 0, 255);
+        CC::Graphics::Line(0, 0, 50, 50);
+
     }
 };
 

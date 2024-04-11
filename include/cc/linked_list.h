@@ -236,9 +236,32 @@ namespace CC {
 
             Iterator(const Iterator & iterator) : cur(iterator.cur), prev(iterator.prev) {}
 
-            Iterator(Iterator && iterator) noexcept : cur(iterator.cur), prev(iterator.prev) {}
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur), prev(iterator.prev) {
+                iterator.cur = nullptr;
+                iterator.prev = nullptr;
+            }
 
             explicit Iterator(Node * node) : cur(node), prev(nullptr) {}
+
+            Iterator & operator=(const Iterator & iterator) {
+                if (this == &iterator) return *this;
+
+                cur = iterator.cur;
+                prev = iterator.prev;
+                return *this;
+            }
+
+            Iterator & operator=(Iterator && iterator) noexcept {
+                if (this == &iterator) return *this;
+
+                cur = iterator.cur;
+                prev = iterator.prev;
+
+                iterator.cur = nullptr;
+                iterator.prev = nullptr;
+
+                return *this;
+            }
 
             // Incrementing means going through the list
             Iterator & operator++() {

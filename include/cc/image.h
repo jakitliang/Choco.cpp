@@ -6,9 +6,10 @@
 #define CHOCO_CPP_IMAGE_H
 
 #include "cc/handle.h"
+#include "cc/types.h"
 
 namespace CC {
-    struct Image : Handle {
+    struct Image {
         ~Image();
 
         bool Open(Handle * rendererHandle, const char * fileName);

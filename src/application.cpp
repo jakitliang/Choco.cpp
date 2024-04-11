@@ -6,6 +6,7 @@
 #include "cc/window.h"
 #include "window_context.h"
 #include "cc/ui_event.h"
+#include "cc/graphics.h"
 //#include "ui_context.h"
 //#include "window_context.h"
 #include "SDL2/SDL.h"
@@ -132,14 +133,16 @@ void ProcessEvent(const SDL_Event & event) {
 }
 
 void ApplicationUpdate(CC::UInt64 timeDiff) {
-    for (auto & wnd : CC::Window::Context::GetContext().WindowStack) {
+    for (auto & wnd : CC::Window::Context::GetContext()) {
         wnd->Update(timeDiff);
     }
 }
 
 void ApplicationDraw() {
-    for (auto & wnd : CC::Window::Context::GetContext().WindowStack) {
+    for (auto & wnd : CC::Window::Context::GetContext()) {
+        CC::Graphics::Clear();
         wnd->Draw();
+        CC::Graphics::Present();
     }
 }
 

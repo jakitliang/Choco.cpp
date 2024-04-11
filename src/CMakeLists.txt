@@ -23,14 +23,13 @@ add_library(
         renderer.cpp
         renderer_context.h
         renderer_context.cpp
-#        texture.cpp
+        texture.cpp
+        image_data.cpp
 #        canvas.cpp
 #        pixels.cpp
 #        internal.h
 #        view.cpp
-#        graphics.cpp
-#        ui_context.h
-#        ui_context.cpp
+        graphics.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)

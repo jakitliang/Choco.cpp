@@ -24,7 +24,11 @@ add_executable(TestGUI gui.cpp $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:
 if(EMSCRIPTEN)
     target_link_libraries(TestGUI SDL2::SDL2main SDL2::SDL2-static SDL2_ttf::SDL2_ttf-static)
 else()
-    target_link_libraries(TestGUI SDL2::SDL2main SDL2::SDL2 SDL2_ttf::SDL2_ttf-static)
+    target_link_libraries(TestGUI
+            SDL2::SDL2main
+            SDL2::SDL2
+            SDL2_ttf::SDL2_ttf-static
+            SDL2_image::SDL2_image-static)
 endif()
 
 if(EMSCRIPTEN)

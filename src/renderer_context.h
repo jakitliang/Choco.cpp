@@ -6,23 +6,20 @@
 #define CHOCO_CPP_RENDERER_CONTEXT_H
 
 #include "cc/renderer.h"
+#include "cc/linked_list.h"
 #include <unordered_map>
 #include <stack>
 
 struct CC::Renderer::Context {
     using RendererMapType = std::unordered_map<void *, void *>; // [Renderer] -> Window
-    using WindowMapType = std::unordered_map<void *, Renderer>; // [Window] -> Renderer
+    using WindowMapType = std::unordered_map<void *, CC::Renderer>; // [Window] -> Renderer
 
     RendererMapType RendererMap;
     WindowMapType WindowsMap;
 
-    void * Open(Renderer & renderer, void * windowHandle, Int32 index, UInt32 flags);
+    CC::Renderer * Open(void * windowHandle, Int32 index, UInt32 flags);
 
     void Close(void * handle);
-
-    void Push();
-
-    void Delete(void * window);
 
     static Context & GetContext();
 };

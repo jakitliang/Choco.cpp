@@ -5,7 +5,6 @@
 #include "cc/window.h"
 #include "window_context.h"
 #include "cc/renderer.h"
-#include "cc/handle.h"
 #include "SDL2/SDL.h"
 #include <thread>
 #include <stack>
@@ -28,9 +27,7 @@ bool CC::Window::Open(const char * title,
     Handle = Context::GetContext().Open(title, x, y, width, height, flags);
     Context::GetContext().Push(this);
 
-    Renderer renderer;
-
-    if (!renderer.Open(Handle, -1, modes)) {
+    if (!Renderer::Open(Handle, -1, modes)) {
         Context::GetContext().Close(Handle);
         Context::GetContext().Delete(this);
         Handle = nullptr;
@@ -47,7 +44,7 @@ bool CC::Window::Open(void * windowHandle) {
 void CC::Window::Close() {
     if (Handle == nullptr) return;
 
-    Renderer::Get(Handle)->Close();
+    Renderer::GetCurrentWithWindowHandle(Handle)->Close();
     Context::GetContext().Close(Handle);
     Context::GetContext().Delete(this);
     Handle = nullptr;
@@ -72,10 +69,6 @@ void CC::Window::Draw() {
 //    SDL_RenderPresent(renderer.get<SDL_Renderer>());
 }
 
-//CC::Renderer * CC::Window::GetRenderer() {
-////    Renderer::Current();
-//}
-
 CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
     if (this == &window) return *this;
 
@@ -86,18 +79,6 @@ CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
     return *this;
 }
 
-CC::Window * CC::Window::GetCurrent() {
-    auto & windowStack = Context::GetContext().WindowStack;
-    if (windowStack.Count() == 0) return nullptr;
-    return windowStack.Last();
-}
-
-void CC::Window::SetCurrent(CC::Window * window) {
-    auto & windowStack = Context::GetContext().WindowStack;
-    for (auto & wnd : windowStack) {
-        if (wnd->Handle == window->Handle) {
-            Swap(wnd, windowStack.Last());
-            break;
-        }
-    }
+CC::Window * CC::Window::Current() {
+    return *Context::GetContext().WindowState;
 }

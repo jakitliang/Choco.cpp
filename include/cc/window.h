@@ -6,7 +6,6 @@
 #define CHOCO_CPP_WINDOW_H
 
 #include "cc/flags.h"
-#include "cc/linked_list.h"
 
 namespace CC {
     struct Window {
@@ -47,9 +46,7 @@ namespace CC {
 
         Window & operator=(Window && window) noexcept;
 
-        static Window * GetCurrent();
-
-        static void SetCurrent(Window * window);
+        static Window * Current();
     };
 }
 

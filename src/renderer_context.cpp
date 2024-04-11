@@ -12,18 +12,20 @@ void RendererHandleFinalizer(void * handle) {
     SDL_DestroyRenderer(static_cast<SDL_Renderer *>(handle));
 }
 
-void *CC::Renderer::Context::Open(CC::Renderer & renderer, void *windowHandle, CC::Int32 index, CC::UInt32 flags) {
-    if (WindowsMap.find(windowHandle) != WindowsMap.end()) return nullptr;
+CC::Renderer * CC::Renderer::Context::Open(void * windowHandle, CC::Int32 index, CC::UInt32 flags) {
+    auto found = WindowsMap.find(windowHandle);
+    if (found != WindowsMap.end()) return &found->second;
 
-    auto handle = SDL_CreateRenderer(static_cast<SDL_Window *>(windowHandle), index, flags);
+    Renderer renderer;
+    renderer.Handle = SDL_CreateRenderer(static_cast<SDL_Window *>(windowHandle), index, flags);
 
-    if (handle != nullptr) {
-        RetainHandle(handle);
-        RendererMap[handle] = windowHandle;
-        WindowsMap[windowHandle] = std::move(renderer);
-    }
+    if (renderer.Handle == nullptr) return nullptr;
 
-    return handle;
+    RetainHandle(renderer.Handle);
+    RendererMap[renderer.Handle] = windowHandle;
+    WindowsMap[windowHandle] = std::move(renderer);
+
+    return &WindowsMap[windowHandle];
 }
 
 void CC::Renderer::Context::Close(void *handle) {

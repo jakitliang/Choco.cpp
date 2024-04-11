@@ -22,8 +22,6 @@ namespace CC {
 
         ~Renderer();
 
-        bool Open(void * windowHandle, Int32 index, UInt32 flags);
-
         void Close();
 
         Renderer & operator=(const Renderer & renderer) = delete;
@@ -80,11 +78,17 @@ namespace CC {
                   Float32 scaleX = 1, Float32 scaleY = 1,
                   Float32 originX = 0, Float32 originY = 0);
 
+        void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
+
         void Clear();
+
+        void Present();
+
+        static Renderer * Open(void * windowHandle, Int32 index, UInt32 flags);
 
         static Renderer * GetCurrent();
 
-        static Renderer * Get(void * windowHandle);
+        static Renderer * GetCurrentWithWindowHandle(void * windowHandle);
     };
 }
 

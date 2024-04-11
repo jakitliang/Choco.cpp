@@ -12,9 +12,11 @@
 struct CC::Window::Context {
     using WindowMapType = std::unordered_map<void *, UInt32>;
     using WindowStackType = LinkedList<CC::Window *>;
+    using WindowStateType = WindowStackType::Type::Iterator;
 
     WindowMapType WindowsMap;
     WindowStackType WindowStack;
+    WindowStateType WindowState;
 
     void * Open(const char * title,
                 Int32 x, Int32 y,
@@ -28,6 +30,10 @@ struct CC::Window::Context {
     void Push(Window * window);
 
     void Delete(Window * window);
+
+    WindowStateType begin();
+
+    WindowStateType end();
 
     static Context & GetContext();
 };
