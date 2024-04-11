@@ -4,6 +4,7 @@
 
 #include "cc/window.h"
 #include "cc/renderer.h"
+#include "cc/texture.h"
 #include "renderer_context.h"
 #include "SDL2/SDL.h"
 #include <vector>
@@ -142,6 +143,16 @@ void CC::Renderer::Draw(void * textureHandle,
 
 void CC::Renderer::SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha) {
     SDL_SetRenderDrawColor(static_cast<SDL_Renderer *>(Handle), red, green, blue, alpha);
+}
+
+void CC::Renderer::SetTarget(CC::Texture *texture) {
+    if (texture == nullptr) {
+        SDL_SetRenderTarget(static_cast<SDL_Renderer *>(Handle), nullptr);
+        return;
+    }
+
+    SDL_SetRenderTarget(static_cast<SDL_Renderer *>(Handle),
+                        static_cast<SDL_Texture *>(texture->GetHandle()));
 }
 
 void CC::Renderer::Clear() {

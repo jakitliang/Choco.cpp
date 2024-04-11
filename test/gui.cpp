@@ -8,12 +8,15 @@
 #include "cc/application.h"
 #include "cc/graphics.h"
 #include "cc/image.h"
+#include "cc/canvas.h"
+#include "cc/pixels.h"
 #include <iostream>
 
 using namespace std;
 using namespace CC;
 
 CC::Image img;
+CC::Canvas canvas;
 
 struct MyWindow : Window {
     void Update(UInt64 deltaTime) override {
@@ -44,7 +47,11 @@ struct MyApp : Application {
                         screen.width / 2 - width / 2,
                         screen.height / 2 - height / 2,
                         width, height, 0);
-        if (img.Open(Renderer::GetWithWindow(&mainWindow), "hamster.png")) cout << "OK" << endl;
+
+        // Initialize resources
+        if (img.Open(Renderer::GetWithWindow(&mainWindow), "hamster.png")) cout << "Image load OK" << endl;
+
+        if (canvas.Open(Renderer::GetWithWindow(&mainWindow), 640, 480)) cout << "Canvas load OK" << endl;
     }
 
     void onClose() override {

@@ -10,6 +10,7 @@
 
 namespace CC {
     struct Window;
+    struct Texture;
 
     struct Renderer {
         struct Context;
@@ -81,6 +82,12 @@ namespace CC {
                   Float32 originX = 0, Float32 originY = 0);
 
         void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
+
+        /**
+         * Set Rendering target texture
+         * @param texture Texture or passing nullptr will render to window context.
+         */
+        void SetTarget(Texture * texture);
 
         void Clear();
 

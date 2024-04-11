@@ -29,7 +29,7 @@ add_library(
         vector2.cpp
         vector4.cpp
         canvas.cpp
-#        pixels.cpp
+        pixels.cpp
 #        internal.h
 #        view.cpp
         graphics.cpp

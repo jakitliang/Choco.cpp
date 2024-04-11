@@ -23,8 +23,8 @@ CC::Canvas::~Canvas() {
     Close();
 }
 
-bool CC::Canvas::Open(CC::Renderer *renderer, CC::Int32 width, CC::Int32 height, CC::UInt32 format, CC::Int32 access) {
-    Handle = SDL_CreateTexture(static_cast<SDL_Renderer *>(renderer->Handle), format, access, width, height);
+bool CC::Canvas::Open(CC::Renderer *renderer, CC::Int32 width, CC::Int32 height, CC::UInt32 format) {
+    Handle = SDL_CreateTexture(static_cast<SDL_Renderer *>(renderer->Handle), format, SDL_TEXTUREACCESS_STREAMING, width, height);
     Handle = RetainHandle(Handle);
     return Handle != nullptr;
 }
@@ -35,6 +35,10 @@ void CC::Canvas::Close() {
     ReleaseHandle(Handle, CanvasHandleFinalize);
 
     Handle = nullptr;
+}
+
+void *CC::Canvas::GetHandle() {
+    return Handle;
 }
 
 CC::Canvas &CC::Canvas::operator=(const CC::Canvas &canvas) {

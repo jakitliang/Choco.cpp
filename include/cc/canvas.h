@@ -6,6 +6,7 @@
 #define CHOCO_CPP_CANVAS_H
 
 #include "cc/texture.h"
+#include "cc/pixels.h"
 
 namespace CC {
     struct Renderer;
@@ -23,10 +24,11 @@ namespace CC {
 
         bool Open(Renderer * renderer,
                   Int32 width, Int32 height,
-                  UInt32 format,
-                  Int32 access);
+                  UInt32 format = Pixel::Format::RGBA8888);
 
         void Close();
+
+        void * GetHandle() override;
 
         Canvas & operator=(const Canvas & canvas);
 

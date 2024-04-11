@@ -10,23 +10,7 @@
 
 namespace CC {
     struct Texture {
-//        void * Handle;
-
-//        Texture();
-//
-//        Texture(const Texture & texture);
-//
-//        Texture(Texture && texture) noexcept;
-
         virtual ~Texture() = default;
-
-        // Canvas
-//        bool Open(Renderer * renderer,
-//                  Int32 width, Int32 height,
-//                  UInt32 format,
-//                  Int32 access);
-
-//        void Close();
 
         Float32 GetWidth();
 
@@ -35,10 +19,6 @@ namespace CC {
         Vector2 GetSize();
 
         virtual void * GetHandle() = 0;
-
-//        Texture & operator=(const Texture & texture);
-//
-//        Texture & operator=(Texture && texture) noexcept;
     };
 }
 
