@@ -24,8 +24,11 @@ add_library(
         renderer_context.h
         renderer_context.cpp
         texture.cpp
+        image.cpp
         image_data.cpp
-#        canvas.cpp
+        vector2.cpp
+        vector4.cpp
+        canvas.cpp
 #        pixels.cpp
 #        internal.h
 #        view.cpp

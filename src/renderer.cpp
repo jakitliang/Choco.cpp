@@ -2,8 +2,8 @@
 // Created by Jakit Liang <jakitliang@gmail.com> on 2024/3/26.
 //
 
-#include "cc/renderer.h"
 #include "cc/window.h"
+#include "cc/renderer.h"
 #include "renderer_context.h"
 #include "SDL2/SDL.h"
 #include <vector>
@@ -157,6 +157,6 @@ CC::Renderer * CC::Renderer::GetCurrent() {
     return window == nullptr ? nullptr : &Context::GetContext().WindowsMap[window->Handle];
 }
 
-CC::Renderer * CC::Renderer::GetCurrentWithWindowHandle(void * windowHandle) {
-    return windowHandle == nullptr ? nullptr : &Context::GetContext().WindowsMap[windowHandle];
+CC::Renderer * CC::Renderer::GetWithWindow(CC::Window * window) {
+    return window == nullptr ? nullptr : &Context::GetContext().WindowsMap[window->Handle];
 }

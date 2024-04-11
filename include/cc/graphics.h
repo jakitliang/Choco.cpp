@@ -5,19 +5,16 @@
 #ifndef CHOCO_CPP_GRAPHICS_H
 #define CHOCO_CPP_GRAPHICS_H
 
-#include "cc/image.h"
+#include "cc/texture.h"
 #include "cc/vector2.h"
 
 namespace CC {
     namespace Graphics {
-        void Draw(Image * drawable,
-                  Int32 x,
-                  Int32 y,
-                  Int32 radians,
-                  Int32 scaleX,
-                  Int32 scaleY,
-                  Int32 offsetX,
-                  Int32 offsetY);
+        void Draw(Texture * drawable,
+                  Float32 x, Float32 y,
+                  Float32 r = 0,
+                  Float32 scaleX = 1, Float32 scaleY = 1,
+                  Float32 originX = 0, Float32 originY = 0);
 
         void Line(Float32 startX, Float32 startY, Float32 endX, Float32 endY);
 

@@ -5,9 +5,13 @@
 #ifndef CHOCO_CPP_CANVAS_H
 #define CHOCO_CPP_CANVAS_H
 
+#include "cc/texture.h"
+
 namespace CC {
-    struct Canvas {
-        void * handle;
+    struct Renderer;
+
+    struct Canvas : Texture {
+        void * Handle;
 
         Canvas();
 
@@ -15,7 +19,18 @@ namespace CC {
 
         Canvas(Canvas && render);
 
-        ~Canvas();
+        ~Canvas() override;
+
+        bool Open(Renderer * renderer,
+                  Int32 width, Int32 height,
+                  UInt32 format,
+                  Int32 access);
+
+        void Close();
+
+        Canvas & operator=(const Canvas & canvas);
+
+        Canvas & operator=(Canvas && canvas);
     };
 }
 

@@ -44,7 +44,7 @@ bool CC::Window::Open(void * windowHandle) {
 void CC::Window::Close() {
     if (Handle == nullptr) return;
 
-    Renderer::GetCurrentWithWindowHandle(Handle)->Close();
+    Renderer::GetWithWindow(this)->Close();
     Context::GetContext().Close(Handle);
     Context::GetContext().Delete(this);
     Handle = nullptr;

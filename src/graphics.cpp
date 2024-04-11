@@ -7,14 +7,15 @@
 #include "cc/renderer.h"
 #include "SDL2/SDL.h"
 
-void CC::Graphics::Draw(Image * drawable,
-                        CC::Int32 x, CC::Int32 y,
-                        CC::Int32 radians,
-                        CC::Int32 scaleX, CC::Int32 scaleY,
-                        CC::Int32 offsetX, CC::Int32 offsetY) {
-//    auto & renderer = UIContext::GetContext().RendererState.top();
-//    renderer.Draw()
-//    Renderer::GetCurrent()->Draw()
+void CC::Graphics::Draw(CC::Texture * drawable,
+                        CC::Float32 x, CC::Float32 y,
+                        CC::Float32 r,
+                        CC::Float32 scaleX, CC::Float32 scaleY,
+                        CC::Float32 originX, CC::Float32 originY) {
+    Renderer::GetCurrent()->Draw(drawable->GetHandle(),
+                                 x, y, r,
+                                 scaleX, scaleY,
+                                 originX, originY);
 }
 
 void CC::Graphics::Line(CC::Float32 startX, CC::Float32 startY, CC::Float32 endX, CC::Float32 endY) {

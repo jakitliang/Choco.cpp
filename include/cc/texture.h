@@ -6,35 +6,39 @@
 #define CHOCO_CPP_TEXTURE_H
 
 #include "cc/flags.h"
-#include "cc/drawable.h"
+#include "cc/vector2.h"
 
 namespace CC {
-    struct Renderer;
-    struct ImageData;
+    struct Texture {
+//        void * Handle;
 
-    struct Texture : Drawable {
-        void * Handle;
+//        Texture();
+//
+//        Texture(const Texture & texture);
+//
+//        Texture(Texture && texture) noexcept;
 
-        Texture();
+        virtual ~Texture() = default;
 
-        Texture(const Texture & texture);
+        // Canvas
+//        bool Open(Renderer * renderer,
+//                  Int32 width, Int32 height,
+//                  UInt32 format,
+//                  Int32 access);
 
-        Texture(Texture && texture) noexcept;
+//        void Close();
 
-        ~Texture();
+        Float32 GetWidth();
 
-        bool Open(Renderer * renderer,
-                  Int32 width, Int32 height,
-                  UInt32 format,
-                  Int32 access);
+        Float32 GetHeight();
 
-        bool Open(Renderer * renderer, ImageData * imageDataHandle);
+        Vector2 GetSize();
 
-        void Close();
+        virtual void * GetHandle() = 0;
 
-        Texture & operator=(const Texture & texture);
-
-        Texture & operator=(Texture && texture) noexcept;
+//        Texture & operator=(const Texture & texture);
+//
+//        Texture & operator=(Texture && texture) noexcept;
     };
 }
 

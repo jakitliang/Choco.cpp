@@ -9,6 +9,8 @@
 #include "cc/rect.h"
 
 namespace CC {
+    struct Window;
+
     struct Renderer {
         struct Context;
 
@@ -88,7 +90,7 @@ namespace CC {
 
         static Renderer * GetCurrent();
 
-        static Renderer * GetCurrentWithWindowHandle(void * windowHandle);
+        static Renderer * GetWithWindow(Window * window);
     };
 }
 

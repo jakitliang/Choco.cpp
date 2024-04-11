@@ -5,20 +5,36 @@
 #ifndef CHOCO_CPP_IMAGE_H
 #define CHOCO_CPP_IMAGE_H
 
-#include "cc/handle.h"
-#include "cc/types.h"
+#include "cc/texture.h"
 
 namespace CC {
-    struct Image {
-        ~Image();
+    struct ImageData;
+    struct Renderer;
 
-        bool Open(Handle * rendererHandle, const char * fileName);
+    struct Image : Texture {
+        void * Handle;
 
-        bool Open(Handle * rendererHandle, const void * buffer, Size size);
+        Image();
 
-        bool Open(Handle * rendererHandle, Handle * imageData);
+        Image(const Image & image);
+
+        Image(Image && image);
+
+        ~Image() override;
+
+        bool Open(Renderer * renderer, const char * fileName);
+
+        bool Open(Renderer * renderer, const void * buffer, Size size);
+
+        bool Open(Renderer * renderer, ImageData * imageData);
 
         void Close();
+
+        void * GetHandle() override;
+
+        Image & operator=(const Image & image);
+
+        Image & operator=(Image && image);
     };
 }
 
