@@ -26,6 +26,10 @@ void CC::Graphics::Line(const CC::Vector2 &start, const CC::Vector2 &end) {
     Renderer::GetCurrent()->DrawLine(start, end);
 }
 
+void CC::Graphics::Line(const CC::Vector2 *lines, CC::UInt32 count) {
+    Renderer::GetCurrent()->DrawLines(lines, count);
+}
+
 void CC::Graphics::SetColor(CC::UInt8 red, CC::UInt8 green, CC::UInt8 blue, CC::UInt8 alpha) {
     Renderer::GetCurrent()->SetColor(red, green, blue, alpha);
 }

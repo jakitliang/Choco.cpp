@@ -20,6 +20,13 @@ namespace CC {
 
         void Line(const Vector2 & start, const Vector2 & end);
 
+        void Line(const CC::Vector2 *lines, CC::UInt32 count);
+
+        template<Size S>
+        void Line(const CC::Vector2 (&lines)[S]) {
+            Line(&lines[0], S);
+        }
+
         void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
 
         void Clear();

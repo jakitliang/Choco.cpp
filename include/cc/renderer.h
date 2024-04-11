@@ -36,11 +36,11 @@ namespace CC {
 
         void DrawLine(const Vector2 & start, const Vector2 & end);
 
-        void DrawLines(const Vector2 (*lines)[], UInt32 count);
+        void DrawLines(const Vector2 *lines, UInt32 count);
 
         template<Size S>
         void DrawLines(const Vector2 (&lines)[S]) {
-            DrawLines(&lines, S);
+            DrawLines(&lines[0], S);
         }
 
         void DrawPoint(Float32 positionX, Float32 positionY);

@@ -50,11 +50,11 @@ void CC::Renderer::DrawLine(const CC::Vector2 &start, const CC::Vector2 &end) {
     DrawLine(start.X, start.Y, end.X, end.Y);
 }
 
-void CC::Renderer::DrawLines(const CC::Vector2 (*lines)[], CC::UInt32 count) {
+void CC::Renderer::DrawLines(const CC::Vector2 *lines, CC::UInt32 count) {
     Points.clear();
 
     for (int i = 0; i < count; ++i) {
-        Points.emplace_back(SDL_FPoint{(*lines)[i].X, (*lines)[i].Y});
+        Points.emplace_back(SDL_FPoint{lines[i].X, lines[i].Y});
     }
 
     SDL_RenderDrawLinesF(static_cast<SDL_Renderer *>(Handle), &Points[0], (int) count);

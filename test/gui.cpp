@@ -23,8 +23,12 @@ struct MyWindow : Window {
     void Draw() override {
         static CC::Float32 r = 0;
         CC::Graphics::SetColor(255, 0, 0, 255);
-        CC::Graphics::Line(0, 0, 50, 50);
-        CC::Graphics::Draw(&img, 0, 0, r);
+
+//        CC::Graphics::Line(0, 0, 50, 50);  // Draw one line
+
+        CC::Graphics::Line({{0, 0}, {50, 50}, {100, 0}}); // Draw many lines
+
+        CC::Graphics::Draw(&img, 0, 0, r); // Draw image with rotation
         r = r > 358 ? 0.0 : r + 1.0f;
     }
 };
@@ -41,7 +45,6 @@ struct MyApp : Application {
                         screen.height / 2 - height / 2,
                         width, height, 0);
         if (img.Open(Renderer::GetWithWindow(&mainWindow), "hamster.png")) cout << "OK" << endl;
-
     }
 
     void onClose() override {
@@ -53,14 +56,13 @@ struct MyApp : Application {
 int main() {
     MyApp app;
 
-//    if (!app.Open()) {
-//        cout << "Error!" << endl;
-//        return -1;
-//    }
+    if (!app.Open()) {
+        cout << "Error!" << endl;
+        return -1;
+    }
 
 //    app.Open("nihao", screen.width / 2 - 50, screen.height / 2 - 50, 200, 200, 0);
 
-    app.Open();
     app.Run();
 
     return 0;
