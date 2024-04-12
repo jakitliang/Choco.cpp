@@ -7,6 +7,10 @@
 
 using namespace std;
 
+struct A {
+    int n;
+};
+
 int main() {
     {
         CC::List<CC::Linked<int>> s;
@@ -76,5 +80,17 @@ int main() {
         }
 
         cout << "last: " << i.Last() << endl;
+    }
+
+    {
+        A a;
+        CC::LinkedList<A *> i;
+        i.Push(&a);
+
+        for (auto & item : i) {
+            cout << item->n << endl;
+        }
+
+        find(i.begin(), i.end(), &a);
     }
 }

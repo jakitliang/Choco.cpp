@@ -41,6 +41,12 @@ int main() {
         CC::Vector<int> s;
         s.Push({1, 2, 3});
         cout << s.Last() << endl;
+
+        auto ret = std::find(s.begin(), s.end(), 1);
+
+        if (ret != s.end()) {
+            cout << ret << endl;
+        }
     }
 
     int a = 1;

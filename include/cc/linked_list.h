@@ -6,7 +6,7 @@
 #define CHOCO_CPP_LINKED_LIST_H
 
 #include "cc/list.h"
-#include <iostream>
+#include <iterator>
 
 namespace CC {
     template<typename T>
@@ -232,6 +232,12 @@ namespace CC {
         }
 
         struct Iterator {
+            using difference_type = T;
+            using value_type = T;
+            using pointer = T *;
+            using reference = T &;
+            using iterator_category = std::forward_iterator_tag;
+
             Iterator() : cur(nullptr), prev(nullptr) {};
 
             Iterator(const Iterator & iterator) : cur(iterator.cur), prev(iterator.prev) {}

@@ -6,6 +6,7 @@
 #define CHOCO_CPP_VECTOR_H
 
 #include "cc/list.h"
+#include <iterator>
 
 namespace CC {
     template<typename T>
@@ -205,13 +206,36 @@ namespace CC {
         // Iterator methods
 
         struct Iterator {
+            using difference_type = T;
+            using value_type = T;
+            using pointer = T *;
+            using reference = T &;
+            using iterator_category = std::forward_iterator_tag;
+
             Iterator() : cur(nullptr) {};
 
             Iterator(const Iterator & iterator) : cur(iterator.cur) {}
 
-            Iterator(Iterator && iterator) noexcept : cur(iterator.cur) {}
+            Iterator(Iterator && iterator) noexcept : cur(iterator.cur) { iterator.cur = nullptr; }
 
             explicit Iterator(T * object) : cur(object) { object = nullptr; }
+
+            Iterator & operator=(const Iterator & iterator) {
+                if (this == &iterator) return *this;
+
+                cur = iterator.cur;
+                return *this;
+            }
+
+            Iterator & operator=(Iterator && iterator) noexcept {
+                if (this == &iterator) return *this;
+
+                cur = iterator.cur;
+
+                iterator.cur = nullptr;
+
+                return *this;
+            }
 
             // Incrementing means going through the list
             Iterator & operator++() {

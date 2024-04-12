@@ -12,7 +12,7 @@
 struct CC::Window::Context {
     using WindowMapType = std::unordered_map<void *, UInt32>;
     using WindowStackType = LinkedList<CC::Window *>;
-    using WindowStateType = WindowStackType::Type::Iterator;
+    using WindowStateType = Linked<CC::Window *>::Iterator;
 
     WindowMapType WindowsMap;
     WindowStackType WindowStack;
@@ -31,9 +31,9 @@ struct CC::Window::Context {
 
     void Delete(Window * window);
 
-    WindowStateType begin();
+    Linked<CC::Window *>::Iterator begin();
 
-    WindowStateType end();
+    Linked<CC::Window *>::Iterator end();
 
     static Context & GetContext();
 };
