@@ -30,6 +30,22 @@ void CC::Graphics::Line(const CC::Vector2 *lines, CC::UInt32 count) {
     Renderer::GetCurrent()->DrawLines(lines, count);
 }
 
+void CC::Graphics::Geometry2D(CC::Texture *drawable,
+                              const CC::Vertex *vertexes, CC::UInt32 count,
+                              const CC::UInt32 *indices, CC::UInt32 indicesCount) {
+    Renderer::GetCurrent()->DrawGeometry2D(drawable,
+                                           vertexes, count,
+                                           indices, indicesCount);
+}
+
+void CC::Graphics::Geometry(CC::Texture *drawable,
+                            const CC::Vertex *vertexes, CC::UInt32 count,
+                            const CC::UInt32 *indices, CC::UInt32 indicesCount) {
+    Renderer::GetCurrent()->DrawGeometry3D(drawable,
+                                           vertexes, count,
+                                           indices, indicesCount);
+}
+
 void CC::Graphics::SetColor(CC::UInt8 red, CC::UInt8 green, CC::UInt8 blue, CC::UInt8 alpha) {
     Renderer::GetCurrent()->SetColor(red, green, blue, alpha);
 }

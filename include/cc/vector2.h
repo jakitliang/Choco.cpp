@@ -1,5 +1,5 @@
 //
-// Created by liangjie on 2024/4/1.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/4/1.
 //
 
 #ifndef CHOCO_CPP_VECTOR2_H
@@ -12,13 +12,19 @@ namespace CC {
         Float32 X;
         Float32 Y;
 
-        Vector2();
+        Vector2 & operator+(const Vector2 & another);
 
-        Vector2(const Vector2 & vector2) = default;
+        Vector2 & operator-(const Vector2 & another);
 
-        Vector2(Float32 x, Float32 y);
+        Vector2 & operator*(Float32 num);
 
-        Vector2(Float32 (&array)[2]);
+        Vector2 & operator/(Float32 num);
+
+        bool operator==(const Vector2 & another) const;
+
+        bool operator!=(const Vector2 & another) const;
+
+        static Vector2 Zero();
     };
 }
 

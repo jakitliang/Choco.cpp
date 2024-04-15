@@ -12,6 +12,7 @@
 
 static std::vector<SDL_FPoint> Points = {};
 static std::vector<SDL_FRect> Rects = {};
+static std::vector<SDL_Vertex> Vertexes = {};
 
 CC::Renderer::Renderer() : Handle(nullptr) {}
 
@@ -139,6 +140,46 @@ void CC::Renderer::Draw(void * textureHandle,
                       originY + dst.h / 2};
 
     SDL_RenderCopyExF(static_cast<SDL_Renderer *>(Handle), static_cast<SDL_Texture *>(textureHandle), &src, &dst, r, &origin, SDL_FLIP_NONE);
+}
+
+void CC::Renderer::DrawGeometry2D(Texture * texture,
+                                  const Vertex * vertexes, UInt32 count,
+                                  const UInt32 * indices, UInt32 indicesCount) {
+    Vertexes.clear();
+
+    for (int i = 0; i < count; ++i) {
+        Vertexes.push_back(SDL_Vertex{
+            SDL_FPoint{vertexes[i].Position.X, vertexes[i].Position.Y},
+            SDL_Color{vertexes[i].Color.Red,
+                      vertexes[i].Color.Green,
+                      vertexes[i].Color.Blue,
+                      vertexes[i].Color.Alpha}});
+    }
+
+    SDL_RenderGeometry(static_cast<SDL_Renderer *>(Handle),
+                       texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
+                       &Vertexes[0], static_cast<int>(count),
+                       (const Int32 *) indices, static_cast<int>(indicesCount));
+}
+
+void CC::Renderer::DrawGeometry3D(Texture * texture,
+                                  const Vertex * vertexes, UInt32 count,
+                                  const UInt32 * indices, UInt32 indicesCount) {
+//    SDL_RenderGeometryRaw(static_cast<SDL_Renderer *>(Handle),
+//                          texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
+//                          &vertexes->Position.X, sizeof(Vertex),
+//                          reinterpret_cast<const SDL_Color *>(&vertexes->Color), sizeof(Vertex),
+//                          &vertexes->UV.X, sizeof(Vertex),
+//                          static_cast<int>(count),
+//                          indices, static_cast<int>(indicesCount), sizeof(UInt32));
+
+    SDL_RenderGeometryRaw(static_cast<SDL_Renderer *>(Handle),
+                          texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
+                          &vertexes->Position.X, sizeof(Vertex),
+                          reinterpret_cast<const SDL_Color *>(&vertexes->Color), sizeof(Vertex),
+                          &vertexes->UV.X, sizeof(Vertex),
+                          static_cast<int>(count),
+                          indices, static_cast<int>(indicesCount), sizeof(UInt32));
 }
 
 void CC::Renderer::SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha) {

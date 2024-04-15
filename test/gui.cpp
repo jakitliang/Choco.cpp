@@ -25,6 +25,7 @@ struct MyWindow : Window {
 
     void Draw() override {
         static CC::Float32 r = 0;
+        static CC::Float32 tWidth = 0;
         CC::Graphics::SetColor(255, 0, 0, 255);
 
 //        CC::Graphics::Line(0, 0, 50, 50);  // Draw one line
@@ -33,6 +34,16 @@ struct MyWindow : Window {
 
         CC::Graphics::Draw(&img, 0, 0, r); // Draw image with rotation
         r = r > 358 ? 0.0 : r + 1.0f;
+        tWidth = tWidth > 200 ? 0.0 : tWidth + 1.0f;
+
+        Vertex vertex[] = {
+                {{100, 150, r}, Colors::Red},
+                {{tWidth, 100, 0}, Colors::Green},
+                {{100, 100, 0}, Colors::Blue}
+        };
+
+//        CC::Graphics::Geometry2D(nullptr, &vertex[0], 3, nullptr, 0);
+        CC::Graphics::Geometry(nullptr, &vertex[0], 3, nullptr, 0);
     }
 };
 

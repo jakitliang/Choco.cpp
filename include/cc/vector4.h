@@ -1,5 +1,5 @@
 //
-// Created by liangjie on 2024/4/1.
+// Created by Jakit Liang <jakitliang@gmail.com> on 2024/4/1.
 //
 
 #ifndef CHOCO_CPP_VECTOR4_H
@@ -14,13 +14,19 @@ namespace CC {
         Float32 Z;
         Float32 W;
 
-        Vector4();
+        Vector4 & operator+(const Vector4 & another);
 
-        Vector4(const Vector4 & vector4) = default;
+        Vector4 & operator-(const Vector4 & another);
 
-        Vector4(Float32 x, Float32 y, Float32 z, Float32 w);
+        Vector4 & operator*(Float32 num);
 
-        Vector4(Float32 (&array)[4]);
+        Vector4 & operator/(Float32 num);
+
+        bool operator==(const Vector4 & another) const;
+
+        bool operator!=(const Vector4 & another) const;
+
+        static Vector4 Zero();
     };
 }
 

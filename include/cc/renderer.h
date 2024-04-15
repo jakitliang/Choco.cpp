@@ -7,6 +7,7 @@
 
 #include "cc/vector2.h"
 #include "cc/rect.h"
+#include "cc/vertex.h"
 
 namespace CC {
     struct Window;
@@ -80,6 +81,14 @@ namespace CC {
                   Float32 r = 0,
                   Float32 scaleX = 1, Float32 scaleY = 1,
                   Float32 originX = 0, Float32 originY = 0);
+
+        void DrawGeometry2D(Texture * texture,
+                            const Vertex * vertexes, UInt32 count,
+                            const UInt32 * indices, UInt32 indicesCount);
+
+        void DrawGeometry3D(Texture * texture,
+                            const Vertex * vertexes, UInt32 count,
+                            const UInt32 * indices, UInt32 indicesCount);
 
         void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
 

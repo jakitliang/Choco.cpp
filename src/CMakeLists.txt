@@ -27,9 +27,12 @@ add_library(
         image.cpp
         image_data.cpp
         vector2.cpp
+        vector3.cpp
         vector4.cpp
         canvas.cpp
         pixels.cpp
+        color.cpp
+        vertex.cpp
 #        internal.h
 #        view.cpp
         graphics.cpp

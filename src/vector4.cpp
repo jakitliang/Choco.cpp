@@ -3,11 +3,62 @@
 //
 
 #include "cc/vector4.h"
+#include <cmath>
 
-CC::Vector4::Vector4() : X(0), Y(0), Z(0), W(0) {}
+const CC::Float32 Epsilon = 0.01f;
 
-CC::Vector4::Vector4(CC::Float32 x, CC::Float32 y, CC::Float32 z, CC::Float32 w)
-    : X(x), Y(y), Z(z), W(w) {}
+CC::Vector4 &CC::Vector4::operator+(const CC::Vector4 &another) {
+    X += another.X;
+    Y += another.Y;
+    Z += another.Z;
+    W += another.W;
 
-CC::Vector4::Vector4(CC::Float32 (&array)[4])
-    : X(array[0]), Y(array[1]), Z(array[2]), W(3) {}
+    return *this;
+}
+
+CC::Vector4 &CC::Vector4::operator-(const CC::Vector4 &another) {
+    X -= another.X;
+    Y -= another.Y;
+    Z -= another.Z;
+    W -= another.W;
+
+    return *this;
+}
+
+CC::Vector4 &CC::Vector4::operator*(CC::Float32 num) {
+    X *= num;
+    Y *= num;
+    Z *= num;
+    W *= num;
+
+    return *this;
+}
+
+CC::Vector4 &CC::Vector4::operator/(CC::Float32 num) {
+    X /= num;
+    Y /= num;
+    Z /= num;
+    W /= num;
+
+    return *this;
+}
+
+bool CC::Vector4::operator!=(const CC::Vector4 &another) const {
+    if (fabs(X - another.X) < Epsilon) return false;
+
+    if (fabs(Y - another.Y) < Epsilon) return false;
+
+    if (fabs(Z - another.Z) < Epsilon) return false;
+
+    if (fabs(W - another.W) < Epsilon) return false;
+
+    return true;
+}
+
+bool CC::Vector4::operator==(const CC::Vector4 &another) const {
+    return !operator!=(another);
+}
+
+CC::Vector4 CC::Vector4::Zero() {
+    return {0, 0, 0, 0};
+}
