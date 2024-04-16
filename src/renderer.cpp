@@ -165,14 +165,6 @@ void CC::Renderer::DrawGeometry2D(Texture * texture,
 void CC::Renderer::DrawGeometry3D(Texture * texture,
                                   const Vertex * vertexes, UInt32 count,
                                   const UInt32 * indices, UInt32 indicesCount) {
-//    SDL_RenderGeometryRaw(static_cast<SDL_Renderer *>(Handle),
-//                          texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
-//                          &vertexes->Position.X, sizeof(Vertex),
-//                          reinterpret_cast<const SDL_Color *>(&vertexes->Color), sizeof(Vertex),
-//                          &vertexes->UV.X, sizeof(Vertex),
-//                          static_cast<int>(count),
-//                          indices, static_cast<int>(indicesCount), sizeof(UInt32));
-
     SDL_RenderGeometryRaw(static_cast<SDL_Renderer *>(Handle),
                           texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
                           &vertexes->Position.X, sizeof(Vertex),
