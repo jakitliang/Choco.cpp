@@ -15,6 +15,7 @@ add_library(
         cc-graphics OBJECT
         screen.cpp
         flags.cpp
+        font.cpp
         ui_event.cpp
         application.cpp
         window.cpp

@@ -5,14 +5,17 @@
 #include "cc/window.h"
 #include "cc/renderer.h"
 #include "cc/texture.h"
+#include "cc/font.h"
 #include "renderer_context.h"
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include <vector>
 #include <unordered_map>
 
 static std::vector<SDL_FPoint> Points = {};
 static std::vector<SDL_FRect> Rects = {};
 static std::vector<SDL_Vertex> Vertexes = {};
+static CC::Font DefaultFont = {};
 
 CC::Renderer::Renderer() : Handle(nullptr) {}
 
@@ -172,6 +175,37 @@ void CC::Renderer::DrawGeometry3D(Texture * texture,
                           &vertexes->UV.X, sizeof(Vertex),
                           static_cast<int>(count),
                           indices, static_cast<int>(indicesCount), sizeof(UInt32));
+}
+
+void CC::Renderer::DrawText(const char * text,
+                            CC::Font * font,
+                            CC::Float32 x, CC::Float32 y,
+                            CC::Float32 r,
+                            CC::Float32 scaleX, CC::Float32 scaleY,
+                            CC::Float32 originX, CC::Float32 originY) {
+    UInt8 red, green, blue, alpha;
+    Uint32 format;
+    Int32 access, width, height;
+    SDL_GetRenderDrawColor(static_cast<SDL_Renderer *>(Handle), &red, &green, &blue, &alpha);
+    auto surface = TTF_RenderUTF8_Solid(static_cast<TTF_Font *>(font->Handle), text, {red, green, blue, alpha});
+    width = surface->w;
+    height = surface->h;
+
+    SDL_FRect dst{x, y, (Float32) width * scaleX, (Float32) height * scaleY};
+    SDL_FPoint origin{originX + dst.w / 2,
+                      originY + dst.h / 2};
+
+    auto textureHandle = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer *>(Handle), surface);
+
+    SDL_RenderCopyExF(static_cast<SDL_Renderer *>(Handle),
+                      static_cast<SDL_Texture *>(textureHandle),
+                      nullptr,
+                      &dst,
+                      r,
+                      &origin,
+                      SDL_FLIP_NONE);
+    SDL_DestroyTexture(textureHandle);
+    SDL_FreeSurface(surface);
 }
 
 void CC::Renderer::SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha) {

@@ -66,4 +66,24 @@ namespace CC {
     const UInt32 UIEventType::PollSentinel = SDL_POLLSENTINEL;
     const UInt32 UIEventType::UserEvent = SDL_USEREVENT;
     const UInt32 UIEventType::LastEvent = SDL_LASTEVENT;
+
+    const UInt8 UIWindowEvent::EventType::None = SDL_WINDOWEVENT_NONE;
+    const UInt8 UIWindowEvent::EventType::Shown = SDL_WINDOWEVENT_SHOWN;
+    const UInt8 UIWindowEvent::EventType::Hidden = SDL_WINDOWEVENT_HIDDEN;
+    const UInt8 UIWindowEvent::EventType::Exposed = SDL_WINDOWEVENT_EXPOSED;
+    const UInt8 UIWindowEvent::EventType::Moved = SDL_WINDOWEVENT_MOVED;
+    const UInt8 UIWindowEvent::EventType::Resized = SDL_WINDOWEVENT_RESIZED;
+    const UInt8 UIWindowEvent::EventType::SizeChanged = SDL_WINDOWEVENT_SIZE_CHANGED;
+    const UInt8 UIWindowEvent::EventType::Minimized = SDL_WINDOWEVENT_MINIMIZED;
+    const UInt8 UIWindowEvent::EventType::Maximized = SDL_WINDOWEVENT_MAXIMIZED;
+    const UInt8 UIWindowEvent::EventType::Restored = SDL_WINDOWEVENT_RESTORED;
+    const UInt8 UIWindowEvent::EventType::Enter = SDL_WINDOWEVENT_ENTER;
+    const UInt8 UIWindowEvent::EventType::Leave = SDL_WINDOWEVENT_LEAVE;
+    const UInt8 UIWindowEvent::EventType::FocusGained = SDL_WINDOWEVENT_FOCUS_GAINED;
+    const UInt8 UIWindowEvent::EventType::FocusLost = SDL_WINDOWEVENT_FOCUS_LOST;
+    const UInt8 UIWindowEvent::EventType::Close = SDL_WINDOWEVENT_CLOSE;
+    const UInt8 UIWindowEvent::EventType::TakeFocus = SDL_WINDOWEVENT_TAKE_FOCUS;
+    const UInt8 UIWindowEvent::EventType::HitTest = SDL_WINDOWEVENT_HIT_TEST;
+    const UInt8 UIWindowEvent::EventType::ICCProfChanged = SDL_WINDOWEVENT_ICCPROF_CHANGED;
+    const UInt8 UIWindowEvent::EventType::DisplayChanged = SDL_WINDOWEVENT_DISPLAY_CHANGED;
 }

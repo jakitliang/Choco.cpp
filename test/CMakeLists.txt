@@ -19,7 +19,7 @@ add_executable(TestByte byte.cpp $<TARGET_OBJECTS:cc-foundation>)
 
 add_executable(TestFileChannel file_channel.cpp $<TARGET_OBJECTS:cc-foundation>)
 
-add_executable(TestGUI gui.cpp $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:cc-graphics>)
+add_executable(TestGUI gui.cpp hkyt.cpp $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:cc-graphics>)
 
 if(EMSCRIPTEN)
     target_link_libraries(TestGUI SDL2::SDL2main SDL2::SDL2-static SDL2_ttf::SDL2_ttf-static)

@@ -84,7 +84,15 @@ void ProcessEvent(const SDL_Event & event) {
     auto uiEvent = CC::UIEvent{event.type};
     auto uiEventType = uiEvent.Type;
 
-    if (uiEventType >= SDL_KEYDOWN && uiEventType < SDL_MOUSEMOTION) {
+    if (uiEventType == SDL_WINDOWEVENT) {
+        // Window 200+
+        uiEvent.window = {event.window.timestamp,
+                          event.window.windowID,
+                          event.window.event};
+        CC::WindowEvents::Enqueue(event.window.windowID, uiEvent);
+
+    } else if (uiEventType < SDL_MOUSEMOTION) {
+        // Keyboard 300+
         if (uiEventType == SDL_KEYDOWN || uiEventType == SDL_KEYUP) {
             uiEvent.key = {event.key.timestamp,
                            event.key.windowID,
@@ -93,7 +101,8 @@ void ProcessEvent(const SDL_Event & event) {
             CC::WindowEvents::Enqueue(event.key.windowID, uiEvent);
         }
 
-    } else if (uiEventType >= SDL_MOUSEMOTION && uiEventType < SDL_JOYAXISMOTION) {
+    } else if (uiEventType < SDL_JOYAXISMOTION) {
+        // Mouse
         if (uiEventType == SDL_MOUSEMOTION) {
             uiEvent.motion = {event.motion.timestamp,
                               event.motion.windowID,
@@ -134,6 +143,12 @@ void ProcessEvent(const SDL_Event & event) {
 
 void ApplicationUpdate(CC::UInt64 timeDiff) {
     for (auto & wnd : CC::Window::Context::GetContext()) {
+        auto wndID = wnd->GetID();
+        while (CC::WindowEvents::Poll(wndID)) {
+            auto event = CC::WindowEvents::Dequeue(wndID);
+            wnd->onEvent(event);
+        }
+
         wnd->Update(timeDiff);
     }
 }

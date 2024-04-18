@@ -5,6 +5,7 @@
 #include "cc/graphics.h"
 #include "cc/window.h"
 #include "cc/renderer.h"
+#include "cc/font.h"
 #include "SDL2/SDL.h"
 
 void CC::Graphics::Draw(CC::Texture * drawable,
@@ -44,6 +45,16 @@ void CC::Graphics::Geometry(CC::Texture *drawable,
     Renderer::GetCurrent()->DrawGeometry3D(drawable,
                                            vertexes, count,
                                            indices, indicesCount);
+}
+
+void CC::Graphics::Print(const char * text,
+                         CC::Font * font,
+                         CC::Float32 x, CC::Float32 y,
+                         CC::Float32 r,
+                         CC::Float32 scaleX, CC::Float32 scaleY,
+                         CC::Float32 originX, CC::Float32 originY) {
+    Renderer::GetCurrent()->DrawText(text, font, x, y, r,
+                                     scaleX, scaleY, originX, originY);
 }
 
 void CC::Graphics::SetColor(CC::UInt8 red, CC::UInt8 green, CC::UInt8 blue, CC::UInt8 alpha) {

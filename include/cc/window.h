@@ -6,6 +6,7 @@
 #define CHOCO_CPP_WINDOW_H
 
 #include "cc/flags.h"
+#include "cc/ui_event.h"
 
 namespace CC {
     struct Window {
@@ -36,7 +37,17 @@ namespace CC {
 
         UInt32 GetID();
 
-        void on(UInt32 event);
+        void onEvent(UIEvent & event);
+
+        virtual void onStateChanged(UIWindowEvent & event);
+
+        virtual void onKey(UIKeyboardEvent & event);
+
+        virtual void onMouseMotion(UIMouseMotionEvent & event);
+
+        virtual void onMouseButton(UIMouseButtonEvent & event);
+
+        virtual void onMouseWheel(UIMouseWheelEvent & event);
 
         virtual void Update(UInt64 deltaTime);
 

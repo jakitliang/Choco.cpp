@@ -10,15 +10,26 @@
 #include "cc/image.h"
 #include "cc/canvas.h"
 #include "cc/pixels.h"
+#include "cc/font.h"
 #include <iostream>
 
 using namespace std;
 using namespace CC;
 
-CC::Image img;
-CC::Canvas canvas;
+static CC::Image img;
+static CC::Canvas canvas;
+static CC::Font font;
+
+extern unsigned char hkyt_ttf[];
+extern unsigned int hkyt_ttf_len;
 
 struct MyWindow : Window {
+    void onStateChanged(UIWindowEvent &event) override {
+        Window::onStateChanged(event);
+
+        cout << "onStateChanged: " << (int) event.Event << endl;
+    }
+
     void Update(UInt64 deltaTime) override {
         Window::Update(deltaTime);
     }
@@ -44,6 +55,8 @@ struct MyWindow : Window {
 
 //        CC::Graphics::Geometry2D(nullptr, &vertex[0], 3, nullptr, 0);
         CC::Graphics::Geometry(nullptr, &vertex[0], 3, nullptr, 0);
+
+        CC::Graphics::Print("那你很棒棒哦!", &font, 200, 200);
     }
 };
 
@@ -63,6 +76,9 @@ struct MyApp : Application {
         if (img.Open(Renderer::GetWithWindow(&mainWindow), "hamster.png")) cout << "Image load OK" << endl;
 
         if (canvas.Open(Renderer::GetWithWindow(&mainWindow), 640, 480)) cout << "Canvas load OK" << endl;
+
+        if (font.Open(hkyt_ttf, hkyt_ttf_len, 15)) cout << "Font load OK" << endl;
+//        if (font.Open("/System/Library/Fonts/PingFang.ttc", 15)) cout << "Font load OK" << endl;
     }
 
     void onClose() override {
@@ -73,6 +89,8 @@ struct MyApp : Application {
 
 int main() {
     MyApp app;
+
+    printf("ERROR --- %d%d%d\n", hkyt_ttf[10], hkyt_ttf[20], hkyt_ttf[30]);
 
     if (!app.Open()) {
         cout << "Error!" << endl;

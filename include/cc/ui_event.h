@@ -112,6 +112,33 @@ namespace CC {
         Int32 MouseY;      /**< Y coordinate, relative to window (added in 2.26.0) */
     };
 
+    struct UIWindowEvent {
+        struct EventType {
+            static const UInt8 None;
+            static const UInt8 Shown;
+            static const UInt8 Hidden;
+            static const UInt8 Exposed;
+            static const UInt8 Moved;
+            static const UInt8 Resized;
+            static const UInt8 SizeChanged;
+            static const UInt8 Minimized;
+            static const UInt8 Maximized;
+            static const UInt8 Restored;
+            static const UInt8 Enter;
+            static const UInt8 Leave;
+            static const UInt8 FocusGained;
+            static const UInt8 FocusLost;
+            static const UInt8 Close;
+            static const UInt8 TakeFocus;
+            static const UInt8 HitTest;
+            static const UInt8 ICCProfChanged;
+            static const UInt8 DisplayChanged;
+        };
+        UInt32 Timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+        UInt32 WindowID;    /**< The associated window */
+        UInt8 Event;        /**< ::EventType */
+    };
+
     struct UIEvent {
         enum ButtonState {
             UIEventButtonReleased = 0,
@@ -125,6 +152,7 @@ namespace CC {
             UIMouseMotionEvent motion;
             UIMouseButtonEvent button;
             UIMouseWheelEvent  wheel;
+            UIWindowEvent      window;
         };
     };
 }

@@ -12,6 +12,7 @@
 namespace CC {
     struct Window;
     struct Texture;
+    struct Font;
 
     struct Renderer {
         struct Context;
@@ -89,6 +90,13 @@ namespace CC {
         void DrawGeometry3D(Texture * texture,
                             const Vertex * vertexes, UInt32 count,
                             const UInt32 * indices, UInt32 indicesCount);
+
+        void DrawText(const char * text,
+                      Font * font,
+                      Float32  x, Float32 y,
+                      Float32 r = 0,
+                      Float32 scaleX = 1, Float32 scaleY = 1,
+                      Float32 originX = 0, Float32 originY = 0);
 
         void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
 

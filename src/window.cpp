@@ -55,11 +55,37 @@ CC::UInt32 CC::Window::GetID() {
     return SDL_GetWindowID(static_cast<SDL_Window *>(Handle));
 }
 
-void CC::Window::on(CC::UInt32 event) {
-    if (event == SDL_MOUSEBUTTONDOWN) {
-//        if (Delegate)
+void CC::Window::onEvent(CC::UIEvent & event) {
+    if (event.Type == SDL_WINDOWEVENT) {
+        onStateChanged(event.window);
+
+    } else if (event.Type < SDL_MOUSEMOTION) {
+        if (event.Type == SDL_KEYDOWN || event.Type == SDL_KEYUP) {
+            onKey(event.key);
+        }
+
+    } else if (event.Type < SDL_JOYAXISMOTION) {
+        if (event.Type == SDL_MOUSEMOTION) {
+            onMouseMotion(event.motion);
+
+        } else if (event.Type == SDL_MOUSEBUTTONUP || event.Type == SDL_MOUSEBUTTONDOWN) {
+            onMouseButton(event.button);
+
+        } else if (event.Type == SDL_MOUSEWHEEL) {
+            onMouseWheel(event.wheel);
+        }
     }
 }
+
+void CC::Window::onStateChanged(CC::UIWindowEvent &event) {}
+
+void CC::Window::onKey(CC::UIKeyboardEvent &event) {}
+
+void CC::Window::onMouseMotion(CC::UIMouseMotionEvent &event) {}
+
+void CC::Window::onMouseButton(CC::UIMouseButtonEvent &event) {}
+
+void CC::Window::onMouseWheel(CC::UIMouseWheelEvent &event) {}
 
 void CC::Window::Update(UInt64 deltaTime) {}
 
