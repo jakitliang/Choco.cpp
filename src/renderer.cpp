@@ -148,21 +148,13 @@ void CC::Renderer::Draw(void * textureHandle,
 void CC::Renderer::DrawGeometry2D(Texture * texture,
                                   const Vertex * vertexes, UInt32 count,
                                   const UInt32 * indices, UInt32 indicesCount) {
-    Vertexes.clear();
-
-    for (int i = 0; i < count; ++i) {
-        Vertexes.push_back(SDL_Vertex{
-            SDL_FPoint{vertexes[i].Position.X, vertexes[i].Position.Y},
-            SDL_Color{vertexes[i].Color.Red,
-                      vertexes[i].Color.Green,
-                      vertexes[i].Color.Blue,
-                      vertexes[i].Color.Alpha}});
-    }
-
-    SDL_RenderGeometry(static_cast<SDL_Renderer *>(Handle),
-                       texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
-                       &Vertexes[0], static_cast<int>(count),
-                       (const Int32 *) indices, static_cast<int>(indicesCount));
+    SDL_RenderGeometryRaw(static_cast<SDL_Renderer *>(Handle),
+                          texture == nullptr ? nullptr : static_cast<SDL_Texture *>(texture->GetHandle()),
+                          &vertexes->Position.X, sizeof(Vertex),
+                          reinterpret_cast<const SDL_Color *>(&vertexes->Color), sizeof(Vertex),
+                          &vertexes->UV.X, sizeof(Vertex),
+                          static_cast<int>(count),
+                          indices, static_cast<int>(indicesCount), sizeof(UInt32));
 }
 
 void CC::Renderer::DrawGeometry3D(Texture * texture,
@@ -187,7 +179,8 @@ void CC::Renderer::DrawText(const char * text,
     Uint32 format;
     Int32 access, width, height;
     SDL_GetRenderDrawColor(static_cast<SDL_Renderer *>(Handle), &red, &green, &blue, &alpha);
-    auto surface = TTF_RenderUTF8_Solid(static_cast<TTF_Font *>(font->Handle), text, {red, green, blue, alpha});
+//    auto surface = TTF_RenderUTF8_Solid(static_cast<TTF_Font *>(font->Handle), text, {red, green, blue, alpha});
+    auto surface = TTF_RenderUTF8_Blended(static_cast<TTF_Font *>(font->Handle), text, {red, green, blue, alpha});
     width = surface->w;
     height = surface->h;
 

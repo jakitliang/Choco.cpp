@@ -12,10 +12,6 @@ namespace CC {
     struct Window {
         struct Context;
 
-        struct Delegate {
-            virtual void onMouseDown() = 0;
-        };
-
         void * Handle;
 
         Window();
@@ -49,9 +45,15 @@ namespace CC {
 
         virtual void onMouseWheel(UIMouseWheelEvent & event);
 
+        virtual void onOpen();
+
+        virtual void onClose();
+
         virtual void Update(UInt64 deltaTime);
 
         virtual void Draw();
+
+        void SetTransparent(Byte opacity);
 
         Window & operator=(const Window & window) = delete;
 

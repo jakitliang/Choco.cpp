@@ -33,6 +33,8 @@ bool CC::Window::Open(const char * title,
         Handle = nullptr;
     }
 
+    if (Handle != nullptr) onOpen();
+
     return Handle != nullptr;
 }
 
@@ -44,9 +46,12 @@ bool CC::Window::Open(void * windowHandle) {
 void CC::Window::Close() {
     if (Handle == nullptr) return;
 
+    onClose();
+
     Renderer::GetWithWindow(this)->Close();
     Context::GetContext().Close(Handle);
     Context::GetContext().Delete(this);
+
     Handle = nullptr;
 }
 
@@ -87,12 +92,32 @@ void CC::Window::onMouseButton(CC::UIMouseButtonEvent &event) {}
 
 void CC::Window::onMouseWheel(CC::UIMouseWheelEvent &event) {}
 
+void CC::Window::onOpen() {}
+
+void CC::Window::onClose() {}
+
 void CC::Window::Update(UInt64 deltaTime) {}
 
 void CC::Window::Draw() {
 //    SDL_RenderClear(renderer.get<SDL_Renderer>());
 //
 //    SDL_RenderPresent(renderer.get<SDL_Renderer>());
+}
+
+void CC::Window::SetTransparent(Byte opacity) {
+#ifdef _WINDOWS
+    // Makes a window transparent by setting a transparency color.
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
+    SDL_GetWindowWMInfo(window, &wmInfo);
+    HWND hWnd = wmInfo.info.win.window;
+
+    // Change window type to layered
+    SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
+
+    // Set transparency color
+    SetLayeredWindowAttributes(hWnd, 0, opacity, LWA_ALPHA);
+#endif
 }
 
 CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {

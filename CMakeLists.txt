@@ -31,6 +31,6 @@ add_subdirectory(src)
 
 #add_executable(cc $<TARGET_OBJECTS:cc-src>)
 
-add_library(cc $<TARGET_OBJECTS:cc-foundation>)
+add_library(cc $<TARGET_OBJECTS:cc-foundation> $<TARGET_OBJECTS:cc-graphics>)
 
 add_subdirectory(test)
