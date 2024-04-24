@@ -207,6 +207,16 @@ void CC::Renderer::SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha) {
     SDL_SetRenderDrawColor(static_cast<SDL_Renderer *>(Handle), red, green, blue, alpha);
 }
 
+CC::Color CC::Renderer::GetColor() {
+    CC::Color color{0, 0, 0, 0};
+    SDL_GetRenderDrawColor(static_cast<SDL_Renderer *>(Handle),
+                           &color.Red,
+                           &color.Green,
+                           &color.Blue,
+                           &color.Alpha);
+    return color;
+}
+
 void CC::Renderer::SetTarget(CC::Texture *texture) {
     if (texture == nullptr) {
         SDL_SetRenderTarget(static_cast<SDL_Renderer *>(Handle), nullptr);

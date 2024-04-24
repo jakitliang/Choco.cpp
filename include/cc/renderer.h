@@ -100,6 +100,8 @@ namespace CC {
 
         void SetColor(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
 
+        CC::Color GetColor();
+
         /**
          * Set Rendering target texture
          * @param texture Texture or passing nullptr will render to window context.

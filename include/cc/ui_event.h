@@ -141,8 +141,8 @@ namespace CC {
 
     struct UIEvent {
         enum ButtonState {
-            UIEventButtonReleased = 0,
-            UIEventButtonPressed  = 1
+            ButtonStateReleased = 0,
+            ButtonStatePressed  = 1
         };
 
         UInt32 Type;

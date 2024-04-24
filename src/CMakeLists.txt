@@ -37,6 +37,7 @@ add_library(
 #        internal.h
 #        view.cpp
         graphics.cpp
+        rect.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)

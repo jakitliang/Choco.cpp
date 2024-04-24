@@ -43,6 +43,8 @@ namespace CC::Graphics {
         Rects(&rects, S, filled);
     }
 
+    void Circle(Float32 offsetX, Float32 offsetY, Float32 radius, int density);
+
     void Geometry2D(Texture * drawable,
                     const Vertex * vertexes, UInt32 count,
                     const UInt32 * indices, UInt32 indicesCount);
@@ -64,6 +66,8 @@ namespace CC::Graphics {
                     const UInt32 (&indices)[S2]) {
         Geometry(drawable, &vertexes[0], S1, &indices[0], S2);
     }
+
+    bool IsInRect(const CC::Vector2 & point, const CC::Rect & rect);
 
     void Print(const char * text,
                Font * font,
