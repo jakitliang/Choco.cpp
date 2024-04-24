@@ -31,6 +31,18 @@ void CC::Graphics::Line(const CC::Vector2 *lines, CC::UInt32 count) {
     Renderer::GetCurrent()->DrawLines(lines, count);
 }
 
+void CC::Graphics::Rectangle(Float32 x, Float32 y, Float32 width, Float32 height, bool filled) {
+    Renderer::GetCurrent()->DrawRect(x, y, width, height, filled);
+}
+
+void CC::Graphics::Rectangle(const CC::Rect & rect, bool filled) {
+    Renderer::GetCurrent()->DrawRect(rect, filled);
+}
+
+void CC::Graphics::Rectangles(const CC::Rect (*rects)[], UInt32 count, bool filled) {
+    Renderer::GetCurrent()->DrawRects(rects, count, filled);
+}
+
 void CC::Graphics::Geometry2D(CC::Texture *drawable,
                               const CC::Vertex *vertexes, CC::UInt32 count,
                               const CC::UInt32 *indices, CC::UInt32 indicesCount) {

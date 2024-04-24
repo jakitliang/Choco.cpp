@@ -8,6 +8,7 @@
 #include "cc/texture.h"
 #include "cc/vector2.h"
 #include "cc/vertex.h"
+#include "cc/rect.h"
 
 namespace CC {
     struct Font;
@@ -29,6 +30,17 @@ namespace CC::Graphics {
     template<Size S>
     void Line(const CC::Vector2 (&lines)[S]) {
         Line(&lines[0], S);
+    }
+
+    void Rectangle(Float32 x, Float32 y, Float32 width, Float32 height, bool filled = false);
+
+    void Rectangle(const CC::Rect & rect, bool filled = false);
+
+    void Rectangles(const CC::Rect (*rects)[], UInt32 count, bool filled = false);
+
+    template<Size S>
+    void Rectangles(const CC::Rect (&rects)[S], bool filled = false) {
+        Rects(&rects, S, filled);
     }
 
     void Geometry2D(Texture * drawable,

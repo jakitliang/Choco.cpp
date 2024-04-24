@@ -83,17 +83,18 @@ void CC::Renderer::DrawPoints(const CC::Vector2 (*positions)[], CC::UInt32 count
     SDL_RenderDrawLinesF(static_cast<SDL_Renderer *>(Handle), &Points[0], (int) count);
 }
 
-void CC::Renderer::DrawRect(CC::Float32 x, CC::Float32 y, CC::Float32 width, CC::Float32 height) {
+void CC::Renderer::DrawRect(CC::Float32 x, CC::Float32 y, CC::Float32 width, CC::Float32 height, bool filled) {
     SDL_FRect rect{x, y, width, height};
 
-    SDL_RenderDrawRectF(static_cast<SDL_Renderer *>(Handle), &rect);
+    if (filled) SDL_RenderFillRectF(static_cast<SDL_Renderer *>(Handle), &rect);
+    else SDL_RenderDrawRectF(static_cast<SDL_Renderer *>(Handle), &rect);
 }
 
-void CC::Renderer::DrawRect(const CC::Rect &rect) {
-    DrawRect(rect.X, rect.Y, rect.Width, rect.Height);
+void CC::Renderer::DrawRect(const CC::Rect &rect, bool filled) {
+    DrawRect(rect.X, rect.Y, rect.Width, rect.Height, filled);
 }
 
-void CC::Renderer::DrawRects(const CC::Rect (*rects)[], CC::UInt32 count) {
+void CC::Renderer::DrawRects(const CC::Rect (*rects)[], CC::UInt32 count, bool filled) {
     Rects.clear();
 
     for (int i = 0; i < count; ++i) {
@@ -101,7 +102,8 @@ void CC::Renderer::DrawRects(const CC::Rect (*rects)[], CC::UInt32 count) {
                                      (*rects)[i].Width, (*rects)[i].Height});
     }
 
-    SDL_RenderDrawRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
+    if (filled) SDL_RenderFillRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
+    else SDL_RenderDrawRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
 }
 
 void CC::Renderer::Draw(void * textureHandle,

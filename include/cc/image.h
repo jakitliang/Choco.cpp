@@ -22,6 +22,12 @@ namespace CC {
 
         ~Image() override;
 
+        bool Open(const char * fileName);
+
+        bool Open(const void * buffer, Size size);
+
+        bool Open(ImageData * imageData);
+
         bool Open(Renderer * renderer, const char * fileName);
 
         bool Open(Renderer * renderer, const void * buffer, Size size);

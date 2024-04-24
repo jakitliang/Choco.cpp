@@ -57,15 +57,15 @@ namespace CC {
             DrawPoints(&positions, S);
         }
 
-        void DrawRect(Float32 x, Float32 y, Float32 width, Float32 height);
+        void DrawRect(Float32 x, Float32 y, Float32 width, Float32 height, bool filled = false);
 
-        void DrawRect(const Rect & rect);
+        void DrawRect(const Rect & rect, bool filled = false);
 
-        void DrawRects(const Rect (*rects)[], UInt32 count);
+        void DrawRects(const Rect (*rects)[], UInt32 count, bool filled = false);
 
         template<Size S>
-        void DrawRects(const Rect (&rects)[S]) {
-            DrawRects(&rects, S);
+        void DrawRects(const Rect (&rects)[S], bool filled = false) {
+            DrawRects(&rects, S, filled);
         }
 
 //        void DrawGeometry();

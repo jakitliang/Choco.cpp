@@ -24,6 +24,47 @@ CC::Image::~Image() {
     Close();
 }
 
+bool CC::Image::Open(const char *fileName) {
+    if (Handle != nullptr) return true;
+
+    auto surface = IMG_Load(fileName);
+
+    if (surface == nullptr) return false;
+
+    Handle = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle), surface);
+    Handle = RetainHandle(Handle);
+
+    SDL_FreeSurface(surface);
+
+    return Handle != nullptr;
+}
+
+bool CC::Image::Open(const void * buffer, CC::Size size) {
+    if (Handle != nullptr) return true;
+
+    auto surface = IMG_Load_RW(SDL_RWFromConstMem(buffer, size), 1);
+
+    if (surface == nullptr) return false;
+
+    Handle = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle), surface);
+    Handle = RetainHandle(Handle);
+
+    SDL_FreeSurface(surface);
+
+    return Handle != nullptr;
+}
+
+bool CC::Image::Open(CC::ImageData * imageData) {
+    if (Handle != nullptr) return true;
+
+    Handle = SDL_CreateTextureFromSurface(
+            static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle),
+            static_cast<SDL_Surface *>(imageData->Handle));
+    Handle = RetainHandle(Handle);
+
+    return Handle != nullptr;
+}
+
 bool CC::Image::Open(CC::Renderer * renderer, const char *fileName) {
     if (Handle != nullptr) return true;
 
