@@ -22,6 +22,10 @@ namespace CC {
 
         Rect(Float32 (&array)[4]);
 
+        bool Includes(const Vector2 & position) const;
+
+        bool Includes(const Rect & rect) const;
+
         Vector2 Position();
 
         Vector2 Size();

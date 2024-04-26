@@ -4,6 +4,7 @@
 
 #include "cc/ui_event.h"
 #include "SDL2/SDL.h"
+#include "cc/graphics.h"
 
 namespace CC {
     // UIEvents

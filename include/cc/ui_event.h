@@ -6,6 +6,7 @@
 #define CHOCO_CPP_UI_EVENT_H
 
 #include "cc/types.h"
+#include "cc/rect.h"
 
 namespace CC {
     struct UIEventType {
@@ -140,7 +141,7 @@ namespace CC {
     };
 
     struct UIEvent {
-        enum ButtonState {
+        typedef CC_ENUM(int, ButtonState) {
             ButtonStateReleased = 0,
             ButtonStatePressed  = 1
         };

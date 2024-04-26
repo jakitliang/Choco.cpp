@@ -38,6 +38,7 @@ add_library(
 #        view.cpp
         graphics.cpp
         rect.cpp
+        ui_element.cpp
 )
 
 target_include_directories(cc-foundation PUBLIC ../)
