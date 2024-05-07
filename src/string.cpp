@@ -162,6 +162,37 @@ CC::Var<char []>::Iterator CC::String::end() const {
     return Iterator(&object[Length()]);
 }
 
+//CC::String::String(const String & str)
+//    : Var<char []>(str), object(*this->delegate), length(Retain(str.length)) {}
+//
+//CC::String::String(String && str) noexcept
+//    : Var<char []>(static_cast<Var &&>(str)), object(*this->delegate), length(str.length) {
+//    str.length = nullptr;
+//}
+
+CC::String &CC::String::operator=(const CC::String &string) {
+    Var<char []>::operator=(string);
+
+    if (this == &string) return *this;
+
+    Destroy(length);
+    length = Retain(string.length);
+
+    return *this;
+}
+
+CC::String &CC::String::operator=(CC::String &&string) noexcept {
+    Var<char []>::operator=(static_cast<String &&>(string));
+
+    if (this == &string) return *this;
+
+    Destroy(length);
+    length = string.length;
+    string.length = nullptr;
+
+    return *this;
+}
+
 char & CC::String::operator[](Size index) {
     if (index >= Length()) {
         std::cerr << "String::[] out of bounds" << std::endl;

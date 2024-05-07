@@ -6,6 +6,7 @@
 #define CHOCO_CPP_RENDERER_H
 
 #include "cc/vector2.h"
+#include "cc/vector4.h"
 #include "cc/rect.h"
 #include "cc/vertex.h"
 
@@ -61,7 +62,7 @@ namespace CC {
 
         void DrawRect(const Rect & rect, bool filled = false);
 
-        void DrawRects(const Rect (*rects)[], UInt32 count, bool filled = false);
+        void DrawRects(const Rect *rects, UInt32 count, bool filled = false);
 
         template<Size S>
         void DrawRects(const Rect (&rects)[S], bool filled = false) {
@@ -77,7 +78,7 @@ namespace CC {
                   Float32 originX = 0, Float32 originY = 0);
 
         void Draw(void * textureHandle,
-                  Rect quad,
+                  Vector4 quad,
                   Float32 x, Float32 y,
                   Float32 r = 0,
                   Float32 scaleX = 1, Float32 scaleY = 1,
@@ -92,7 +93,7 @@ namespace CC {
                             const UInt32 * indices, UInt32 indicesCount);
 
         void DrawText(const char * text,
-                      Font * font,
+                      const Font * font,
                       Float32  x, Float32 y,
                       Float32 r = 0,
                       Float32 scaleX = 1, Float32 scaleY = 1,

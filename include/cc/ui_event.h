@@ -6,7 +6,7 @@
 #define CHOCO_CPP_UI_EVENT_H
 
 #include "cc/types.h"
-#include "cc/rect.h"
+#include "cc/bounds.h"
 
 namespace CC {
     struct UIEventType {

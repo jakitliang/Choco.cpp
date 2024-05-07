@@ -1,34 +1,25 @@
 //
-// Created by liangjie on 2024/4/1.
+// Created by liangjie on 2024/4/29.
 //
 
 #ifndef CHOCO_CPP_RECT_H
 #define CHOCO_CPP_RECT_H
 
-#include "cc/vector2.h"
+#include "cc/vertex.h"
 
 namespace CC {
     struct Rect {
-        Float32 X;
-        Float32 Y;
-        Float32 Width;
-        Float32 Height;
+        Vertex Vertices[4];
+        UInt32 Indices[6];
 
-        Rect();
+        void SetColor(Color color);
 
-        Rect(const Rect & rect) = default;
+        void SetColor(Color topRight,
+                      Color bottomRight,
+                      Color bottomLeft,
+                      Color topLeft);
 
-        Rect(Float32 x, Float32 y, Float32 width, Float32 height);
-
-        Rect(Float32 (&array)[4]);
-
-        bool Includes(const Vector2 & position) const;
-
-        bool Includes(const Rect & rect) const;
-
-        Vector2 Position();
-
-        Vector2 Size();
+        static Rect Make(Float32 x, Float32 y, Float32 width, Float32 height);
     };
 }
 

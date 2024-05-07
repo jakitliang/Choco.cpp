@@ -36,7 +36,7 @@ namespace CC::Graphics {
 
     void Rectangle(const CC::Rect & rect, bool filled = false);
 
-    void Rectangles(const CC::Rect (*rects)[], UInt32 count, bool filled = false);
+    void Rectangles(const CC::Rect *rects, UInt32 count, bool filled = false);
 
     template<Size S>
     void Rectangles(const CC::Rect (&rects)[S], bool filled = false) {
@@ -67,10 +67,8 @@ namespace CC::Graphics {
         Geometry(drawable, &vertexes[0], S1, &indices[0], S2);
     }
 
-    bool IsInRect(const CC::Vector2 & point, const CC::Rect & rect);
-
     void Print(const char * text,
-               Font * font,
+               const Font * font,
                Float32  x, Float32 y,
                Float32 r = 0,
                Float32 scaleX = 1, Float32 scaleY = 1,

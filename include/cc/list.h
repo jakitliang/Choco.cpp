@@ -40,11 +40,11 @@ namespace CC {
         }
 
         void Push(const T * elements, Size cnt) {
-            Insert(this->Count(), elements, cnt);
+            CopyInsert(this->Count(), elements, cnt);
         }
 
         void Push(T * elements, Size cnt) {
-            Insert(this->Count(), elements, cnt);
+            MoveInsert(this->Count(), elements, cnt);
         }
 
         template<Size S>

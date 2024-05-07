@@ -25,10 +25,29 @@ namespace CC {
             var.delegate = nullptr;
         }
 
-        Var(T * object) : delegate(Make<Type>()) { *delegate = object; }
+        explicit Var(T * object) : delegate(Make<Type>()) { *delegate = object; }
 
         virtual ~Var() {
             Destroy(delegate);
+        }
+
+        Var & operator=(const Var & var) {
+            if (this == &var) return *this;
+
+            Destroy(delegate);
+            delegate = Retain(var.delegate);
+
+            return *this;
+        }
+
+        Var & operator=(Var && var) noexcept {
+            if (this == &var) return *this;
+
+            Destroy(delegate);
+            delegate = var.delegate;
+            var.delegate = nullptr;
+
+            return *this;
         }
 
         T & operator[](Size index) override {

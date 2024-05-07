@@ -7,6 +7,10 @@
 
 const CC::Float32 Epsilon = 0.01f;
 
+CC::Float32 CC::Vector2::Distance(const CC::Vector2 &from) const {
+    return sqrt(powf(X - from.X, 2) + powf(Y - from.Y, 2));
+}
+
 CC::Vector2 &CC::Vector2::operator+(const CC::Vector2 &another) {
     X += another.X;
     Y += another.Y;

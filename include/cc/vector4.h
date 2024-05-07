@@ -9,10 +9,10 @@
 
 namespace CC {
     struct Vector4 {
-        Float32 X;
-        Float32 Y;
-        Float32 Z;
-        Float32 W;
+        union {Float32 X; Float32 R;};
+        union {Float32 Y; Float32 G;};
+        union {Float32 Z; Float32 B; Float32 Width;};
+        union {Float32 W; Float32 A; Float32 Height;};
 
         Vector4 & operator+(const Vector4 & another);
 

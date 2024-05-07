@@ -5,31 +5,41 @@
 #ifndef JM_DEPLOYER_UI_ELEMENT_H
 #define JM_DEPLOYER_UI_ELEMENT_H
 
-#include "cc/rect.h"
+#include "cc/bounds.h"
+#include "cc/linked_list.h"
+#include "cc/vector4.h"
+#include <iostream>
 
 namespace CC::UI {
     struct Element {
-        virtual Rect Bounds() const;
-
-        virtual Float32 GetZ() const;
+        Bounds Frame;
+        Bounds Bounds;
     };
 
-    static int Select(const Vector2 & position,
-                      Element * elements, int count,
-                      Element * chosen);
+    bool PointInQuad(const Vector3 & point, const Vector4 & quad);
 
-    static int Select(const Vector2 & position,
-                      const Element * elements, int count,
-                      const Element * chosen);
+    bool QuadInQuad(const Vector4 & quad1, const Vector4 & quad2, CC::Vector4 * intersect);
 
     template<Size S>
-    static int Select(const CC::Vector2 & position, const Element * chosen, const Element (&elements)[S]) {
-        return Select(position, &elements[0], S, chosen);
-    }
+    const Element * Select(const Vector3 &position, const Element * const (&elements)[S]) {
+        const Element * ret = nullptr;
+        CC::Float32 max = 0;
 
-    template<Size S>
-    static int Select(const CC::Vector2 & position, Element * chosen, Element (&elements)[S]) {
-        return Select(position, &elements[0], S, chosen);
+        for (int i = 0; i < S; ++i) {
+            auto & element = elements[i];
+            auto & elementPosition = element->Frame.Position;
+
+            if (PointInQuad(position, {elementPosition.X, elementPosition.Y,
+                                       element->Bounds.Size.X, element->Bounds.Size.Y})) {
+                if (elementPosition.Z >= max) {
+                    max = elementPosition.Z;
+                    ret = element;
+                    break;
+                }
+            }
+        }
+
+        return ret;
     }
 }
 

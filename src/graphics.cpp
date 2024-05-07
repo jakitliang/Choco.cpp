@@ -40,7 +40,7 @@ void CC::Graphics::Rectangle(const CC::Rect & rect, bool filled) {
     Renderer::GetCurrent()->DrawRect(rect, filled);
 }
 
-void CC::Graphics::Rectangles(const CC::Rect (*rects)[], UInt32 count, bool filled) {
+void CC::Graphics::Rectangles(const CC::Rect *rects, UInt32 count, bool filled) {
     Renderer::GetCurrent()->DrawRects(rects, count, filled);
 }
 
@@ -89,14 +89,8 @@ void CC::Graphics::Geometry(CC::Texture *drawable,
                                            indices, indicesCount);
 }
 
-bool CC::Graphics::IsInRect(const CC::Vector2 & point, const CC::Rect & rect) {
-    SDL_FPoint p{point.X, point.Y};
-    SDL_FRect r{rect.X, rect.Y, rect.Width, rect.Height};
-    return SDL_PointInFRect(&p, &r) == SDL_TRUE;
-}
-
 void CC::Graphics::Print(const char * text,
-                         CC::Font * font,
+                         const CC::Font * font,
                          CC::Float32 x, CC::Float32 y,
                          CC::Float32 r,
                          CC::Float32 scaleX, CC::Float32 scaleY,

@@ -29,10 +29,10 @@ void *CC::Zone::Alloc(CC::Size size) {
 
     MemoryMap[object] = {end, 1};
 
-    cout << "Alloc   <" << object << "> "
-         << "ref[" << 1 << "] "
-         << "size[" << size << "]"
-         << endl;
+//    cout << "Alloc   <" << object << "> "
+//         << "ref[" << 1 << "] "
+//         << "size[" << size << "]"
+//         << endl;
 
     return object;
 }
@@ -51,11 +51,11 @@ void *CC::Zone::ReAlloc(void *oldObject, CC::Size size, bool * result) {
     Byte * end = (Byte *) object + size;
     *end = 0;
 
-    cout << "ReAlloc <" << oldObject << "> "
-         << "-> <" << object << "> "
-         << "ref[" << ret->second.Ref << "] "
-         << "size[" << (UInt64) end - (UInt64) object << "]"
-         << endl;
+//    cout << "ReAlloc <" << oldObject << "> "
+//         << "-> <" << object << "> "
+//         << "ref[" << ret->second.Ref << "] "
+//         << "size[" << (UInt64) end - (UInt64) object << "]"
+//         << endl;
 
     MemoryMap[object] = {end, ret->second.Ref};
     if (object == oldObject) return object; // Same address
@@ -72,10 +72,10 @@ void *CC::Zone::Retain(void *object) {
 
     ret->second.Ref += 1;
 
-    cout << "Retain  <" << object << "> "
-         << "ref[" << ret->second.Ref << "] "
-         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
-         << endl;
+//    cout << "Retain  <" << object << "> "
+//         << "ref[" << ret->second.Ref << "] "
+//         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
+//         << endl;
 
     return object;
 }
@@ -88,10 +88,10 @@ bool CC::Zone::Release(void *object) {
 
     ret->second.Ref -= 1;
 
-    cout << "Release <" << object << "> "
-         << "ref[" << ret->second.Ref << "] "
-         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
-         << (ret->second.Ref == 0 ? " freed!" : "") << endl;
+//    cout << "Release <" << object << "> "
+//         << "ref[" << ret->second.Ref << "] "
+//         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
+//         << (ret->second.Ref == 0 ? " freed!" : "") << endl;
 
     if (ret->second.Ref > 0) return false;
     MemoryMap.erase(object);
@@ -108,10 +108,10 @@ bool CC::Zone::Release(void * object, Finalizer finalizer) {
 
     ret->second.Ref -= 1;
 
-    cout << "Release <" << object << "> "
-         << "ref[" << ret->second.Ref << "] "
-         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
-         << (ret->second.Ref == 0 ? " freed!" : "") << endl;
+//    cout << "Release <" << object << "> "
+//         << "ref[" << ret->second.Ref << "] "
+//         << "size[" << (UInt64) ret->second.End - (UInt64) object << "]"
+//         << (ret->second.Ref == 0 ? " freed!" : "") << endl;
 
     if (ret->second.Ref > 0) return false;
     (*finalizer)(object, 0, (Size) ret->second.End - (Size) object);

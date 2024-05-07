@@ -91,19 +91,24 @@ void CC::Renderer::DrawRect(CC::Float32 x, CC::Float32 y, CC::Float32 width, CC:
 }
 
 void CC::Renderer::DrawRect(const CC::Rect &rect, bool filled) {
-    DrawRect(rect.X, rect.Y, rect.Width, rect.Height, filled);
+//    DrawRect(rect.Vertices[0]., rect.Y, rect.Width, rect.Height, filled);
+    DrawGeometry3D(nullptr, rect.Vertices, 4, rect.Indices, 6);
 }
 
-void CC::Renderer::DrawRects(const CC::Rect (*rects)[], CC::UInt32 count, bool filled) {
+void CC::Renderer::DrawRects(const CC::Rect *rects, CC::UInt32 count, bool filled) {
     Rects.clear();
 
-    for (int i = 0; i < count; ++i) {
-        Rects.emplace_back(SDL_FRect{(*rects)[i].X, (*rects)[i].Y,
-                                     (*rects)[i].Width, (*rects)[i].Height});
-    }
+//    for (int i = 0; i < count; ++i) {
+//        Rects.emplace_back(SDL_FRect{(*rects)[i].X, (*rects)[i].Y,
+//                                     (*rects)[i].Width, (*rects)[i].Height});
+//    }
+//
+//    if (filled) SDL_RenderFillRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
+//    else SDL_RenderDrawRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
 
-    if (filled) SDL_RenderFillRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
-    else SDL_RenderDrawRectsF(static_cast<SDL_Renderer *>(Handle), &Rects[0], (int) count);
+    for (int i = 0; i < count; ++i) {
+        DrawGeometry3D(nullptr, rects[i].Vertices, 4, rects[i].Indices, 6);
+    }
 }
 
 void CC::Renderer::Draw(void * textureHandle,
@@ -129,7 +134,7 @@ void CC::Renderer::Draw(void * textureHandle,
 }
 
 void CC::Renderer::Draw(void * textureHandle,
-                        CC::Rect quad,
+                        CC::Vector4 quad,
                         CC::Float32 x, CC::Float32 y,
                         CC::Float32 r,
                         CC::Float32 scaleX, CC::Float32 scaleY,
@@ -172,7 +177,7 @@ void CC::Renderer::DrawGeometry3D(Texture * texture,
 }
 
 void CC::Renderer::DrawText(const char * text,
-                            CC::Font * font,
+                            const CC::Font * font,
                             CC::Float32 x, CC::Float32 y,
                             CC::Float32 r,
                             CC::Float32 scaleX, CC::Float32 scaleY,

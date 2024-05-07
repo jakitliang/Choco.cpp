@@ -57,6 +57,10 @@ namespace CC {
 
         void Delete(Size index);
 
+        String & operator=(const String & string);
+
+        String & operator=(String && string) noexcept;
+
         char & operator[](Size index) override;
 
         const char & operator[](Size index) const override;

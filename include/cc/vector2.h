@@ -12,6 +12,8 @@ namespace CC {
         Float32 X;
         Float32 Y;
 
+        Float32 Distance(const Vector2 & from) const;
+
         Vector2 & operator+(const Vector2 & another);
 
         Vector2 & operator-(const Vector2 & another);

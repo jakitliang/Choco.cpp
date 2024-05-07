@@ -8,6 +8,14 @@
 using namespace std;
 using namespace CC;
 
+void TestArgs(const LinkedList<int> & numbers) {
+    for (auto item : numbers) {
+        cout << item << ", ";
+    }
+
+    cout << endl;
+}
+
 int main() {
 //    cout << is_standard_layout<Var<int>>::value << endl;
 //    cout << is_standard_layout<Var<int>>::value << endl;
@@ -31,6 +39,20 @@ int main() {
             cout << item << endl;
         }
     }
+
+    cout << "===================" << endl;
+
+    {
+        LinkedList<int> i = {{1, 2, 3}};
+    }
+
+    cout << "===================" << endl;
+
+    {
+        TestArgs({{1, 2, 3}});
+    }
+
+    cout << "===================" << endl;
 
     return 0;
 }
