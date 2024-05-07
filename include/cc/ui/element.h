@@ -21,8 +21,8 @@ namespace CC::UI {
     bool QuadInQuad(const Vector4 & quad1, const Vector4 & quad2, CC::Vector4 * intersect);
 
     template<Size S>
-    const Element * Select(const Vector3 &position, const Element * const (&elements)[S]) {
-        const Element * ret = nullptr;
+    Element * Select(const Vector3 &position, Element * (&elements)[S]) {
+        Element * ret = nullptr;
         CC::Float32 max = 0;
 
         for (int i = 0; i < S; ++i) {

@@ -9,6 +9,10 @@
 #include <thread>
 #include <stack>
 #include <unordered_map>
+#ifdef _WIN32
+#include "SDL2/SDL_syswm.h"
+#include <Windows.h>
+#endif
 
 CC::Window::Window() : Handle(nullptr) {}
 
@@ -109,7 +113,7 @@ void CC::Window::SetTransparent(Byte opacity) {
     // Makes a window transparent by setting a transparency color.
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
-    SDL_GetWindowWMInfo(window, &wmInfo);
+    SDL_GetWindowWMInfo(static_cast<SDL_Window *>(Handle), &wmInfo);
     HWND hWnd = wmInfo.info.win.window;
 
     // Change window type to layered
