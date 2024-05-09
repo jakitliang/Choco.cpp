@@ -133,7 +133,7 @@ void CC::ImageBatch::NextFrame() {
     if (context->Frame >= anime->count) context->Frame = 0;
 }
 
-void CC::ImageBatch::Render(Int32 x, Int32 y) {
+void CC::ImageBatch::Render(CC::Int32 x, CC::Int32 y) {
     if (context->animeHandle == nullptr) return;
 
     auto anime = static_cast<IMG_Animation *>(context->animeHandle);
