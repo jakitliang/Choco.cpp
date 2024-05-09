@@ -128,19 +128,27 @@ void CC::ImageBatch::NextFrame() {
     if (context->animeHandle == nullptr) return;
 
     auto anime = static_cast<IMG_Animation *>(context->animeHandle);
+    context->Frame++;
+
+    if (context->Frame >= anime->count) context->Frame = 0;
+}
+
+void CC::ImageBatch::Render() {
+    if (context->animeHandle == nullptr) return;
+
+    auto anime = static_cast<IMG_Animation *>(context->animeHandle);
     auto renderer = static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle);
 
     auto texture = SDL_CreateTextureFromSurface(
         renderer,
-        anime->frames[context->Frame++]);
+        anime->frames[context->Frame]);
 
+    // Backup
     auto target = SDL_GetRenderTarget(renderer);
-    if (context->Frame > anime->count) context->Frame = 0;
-
-    SDL_SetRenderTarget(renderer, static_cast<SDL_Texture *>(Handle));
-
     UInt8 rgba[4];
     SDL_GetRenderDrawColor(renderer, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
+
+    SDL_SetRenderTarget(renderer, static_cast<SDL_Texture *>(Handle));
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
@@ -148,6 +156,7 @@ void CC::ImageBatch::NextFrame() {
 
     SDL_RenderCopy(renderer, texture, &ab, &ab);
 
+    // Reset
     SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
     SDL_SetRenderTarget(renderer, target);
 }

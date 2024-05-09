@@ -41,9 +41,11 @@ namespace CC {
 
         bool Open(Renderer * renderer, ImageData * imageData);
 
+        void Close();
+
         void NextFrame();
 
-        void Close();
+        void Render();
 
         void * GetHandle() override;
 
