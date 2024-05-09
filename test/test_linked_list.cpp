@@ -11,6 +11,8 @@ struct A {
     int n;
 };
 
+static CC::LinkedList<int *> data = {};
+
 int main() {
     {
         CC::List<CC::Linked<int>> s;
@@ -92,5 +94,9 @@ int main() {
         }
 
         find(i.begin(), i.end(), &a);
+    }
+
+    {
+
     }
 }
