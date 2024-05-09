@@ -133,7 +133,7 @@ void CC::ImageBatch::NextFrame() {
     if (context->Frame >= anime->count) context->Frame = 0;
 }
 
-void CC::ImageBatch::Render() {
+void CC::ImageBatch::Render(Int32 x, Int32 y) {
     if (context->animeHandle == nullptr) return;
 
     auto anime = static_cast<IMG_Animation *>(context->animeHandle);
@@ -152,7 +152,7 @@ void CC::ImageBatch::Render() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    SDL_Rect ab = {0, 0, anime->w, anime->h};
+    SDL_Rect ab = {x, y, anime->w, anime->h};
 
     SDL_RenderCopy(renderer, texture, &ab, &ab);
 

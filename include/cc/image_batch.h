@@ -45,7 +45,7 @@ namespace CC {
 
         void NextFrame();
 
-        void Render();
+        void Render(Int32 x, Int32 y);
 
         void * GetHandle() override;
 
