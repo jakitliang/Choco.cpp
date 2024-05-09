@@ -92,14 +92,15 @@ bool CC::ImageBatch::Open(CC::Renderer * renderer, const char *fileName) {
 bool CC::ImageBatch::Open(CC::Renderer * renderer, const void * buffer, CC::Size size) {
     if (Handle != nullptr) return true;
 
-    auto surface = IMG_Load_RW(SDL_RWFromConstMem(buffer, size), 1);
+    IMG_Animation * anime = IMG_LoadAnimation_RW(SDL_RWFromConstMem(buffer, size), 1);
 
-    if (surface == nullptr) return false;
+    if (anime == nullptr) return false;
 
-    Handle = SDL_CreateTextureFromSurface(static_cast<SDL_Renderer *>(renderer->Handle), surface);
+    Handle = SDL_CreateTextureFromSurface(
+        static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle), anime->frames[0]);
     Handle = RetainHandle(Handle);
-
-    SDL_FreeSurface(surface);
+    context->animeHandle = RetainHandle(anime);
+    context->Frame = 0;
 
     return Handle != nullptr;
 }
@@ -124,6 +125,8 @@ void CC::ImageBatch::Close() {
 }
 
 void CC::ImageBatch::NextFrame() {
+    if (context->animeHandle == nullptr) return;
+
     auto anime = static_cast<IMG_Animation *>(context->animeHandle);
     auto renderer = static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle);
 
@@ -157,7 +160,9 @@ CC::ImageBatch &CC::ImageBatch::operator=(const CC::ImageBatch &image) {
     if (this == &image) return *this;
 
     Close();
+    Destroy(context);
     Handle = RetainHandle(image.Handle);
+    context = Retain(image.context);
 
     return *this;
 }
@@ -166,8 +171,11 @@ CC::ImageBatch &CC::ImageBatch::operator=(CC::ImageBatch &&image) {
     if (this == &image) return *this;
 
     Close();
+    Destroy(context);
     Handle = image.Handle;
+    context = image.context;
     image.Handle = nullptr;
+    image.context = nullptr;
 
     return *this;
 }
