@@ -27,6 +27,7 @@ add_library(
         texture.cpp
         image.cpp
         image_data.cpp
+        image_batch.cpp
         vector2.cpp
         vector3.cpp
         vector4.cpp
