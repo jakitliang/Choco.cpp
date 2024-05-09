@@ -97,7 +97,7 @@ bool CC::ImageBatch::Open(CC::Renderer * renderer, const void * buffer, CC::Size
     if (anime == nullptr) return false;
 
     Handle = SDL_CreateTextureFromSurface(
-        static_cast<SDL_Renderer *>(CC::Renderer::GetCurrent()->Handle), anime->frames[0]);
+        static_cast<SDL_Renderer *>(renderer->Handle), anime->frames[0]);
     Handle = RetainHandle(Handle);
     context->animeHandle = RetainHandle(anime);
     context->Frame = 0;
