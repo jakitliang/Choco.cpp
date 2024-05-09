@@ -96,8 +96,10 @@ bool CC::ImageBatch::Open(CC::Renderer * renderer, const void * buffer, CC::Size
 
     if (anime == nullptr) return false;
 
-    Handle = SDL_CreateTextureFromSurface(
-        static_cast<SDL_Renderer *>(renderer->Handle), anime->frames[0]);
+//    auto texture = SDL_CreateTextureFromSurface(
+//        static_cast<SDL_Renderer *>(renderer->Handle), anime->frames[0]);
+    Handle = SDL_CreateTexture(static_cast<SDL_Renderer *>(renderer->Handle),
+                               SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, anime->w, anime->h);
     Handle = RetainHandle(Handle);
     context->animeHandle = RetainHandle(anime);
     context->Frame = 0;
@@ -152,9 +154,7 @@ void CC::ImageBatch::Render(CC::Int32 x, CC::Int32 y) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    SDL_Rect ab = {x, y, anime->w, anime->h};
-
-    SDL_RenderCopy(renderer, texture, &ab, &ab);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 
     // Reset
     SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
