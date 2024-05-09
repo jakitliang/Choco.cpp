@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <cstring>
+#include <new>
 
 CC_C_BEGIN
 #if defined(_WINDOWS)
@@ -19,7 +20,6 @@ CC_C_END
 
 using namespace std;
 
-static bool init = false;
 using MemoryMapType = unordered_map<void *, CC::Zone::Record>;
 
 static MemoryMapType & MemoryMap() {
