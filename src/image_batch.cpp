@@ -99,7 +99,7 @@ bool CC::ImageBatch::Open(CC::Renderer * renderer, const void * buffer, CC::Size
     auto texture = SDL_CreateTexture(static_cast<SDL_Renderer *>(renderer->Handle),
                                      SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, anime->w, anime->h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureAlphaMod(texture, 255);
+//    SDL_SetTextureAlphaMod(texture, 255);
     Handle = texture;
     Handle = RetainHandle(Handle);
     context->animeHandle = RetainHandle(anime);
@@ -152,9 +152,10 @@ void CC::ImageBatch::Render(CC::Int32 x, CC::Int32 y) {
     SDL_GetRenderDrawColor(renderer, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
 
     SDL_SetRenderTarget(renderer, static_cast<SDL_Texture *>(Handle));
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 
     // Reset

@@ -56,6 +56,20 @@ struct MyWindow : Window {
 //        CC::Graphics::Geometry2D(nullptr, &vertex[0], 3, nullptr, 0);
         CC::Graphics::Geometry(nullptr, &vertex[0], 3, nullptr, 0);
 
+
+        CC::Rect rect = CC::Rect::Make(100, 200, 100, 50);
+        rect.SetColor({106, 136, 255, 255}, {106, 136, 255, 255}, {255, 255, 255, 255}, {255, 255, 255, 255});
+        CC::Graphics::Rectangle(rect, true);
+
+//        Vertex vertex[] = {
+//            {{100, 150, r}, Colors::Red},
+//            {{tWidth, 100, 0}, Colors::Green},
+//            {{100, 100, 0}, Colors::Blue}
+//        };
+//
+////        CC::Graphics::Geometry2D(nullptr, &vertex[0], 3, nullptr, 0);
+//        CC::Graphics::Geometry(nullptr, &vertex[0], 3, nullptr, 0);
+
         CC::Graphics::Print("那你很棒棒哦!", &font, 200, 200);
     }
 };

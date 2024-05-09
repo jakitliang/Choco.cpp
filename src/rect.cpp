@@ -20,28 +20,28 @@ void CC::Rect::SetColor(CC::Color topRight, CC::Color bottomRight, CC::Color bot
 CC::Rect CC::Rect::Make(CC::Float32 x, CC::Float32 y, CC::Float32 width, CC::Float32 height) {
     CC::Rect ret = {
         {
-            {
+            { // top right
                 {x + width, y, 0},
                 {0, 0, 0, 1},
                 {0, 0}
             },
-            {
+            { // bottom right
                 {x + width, y - height, 0},
                 {0, 0, 0, 1},
                 {0, 0}
             },
-            {
+            { // bottom left
                 {x, y - height, 0},
                 {0, 0, 0, 1},
                 {0, 0}
             },
-            {
+            { // top left
                 {x, y, 0},
                 {0, 0, 0, 1},
                 {0, 0}
             }
         },
-        {1, 2, 3, 4, 5, 6}
+        {0, 1, 3, 1, 2, 3}
     };
 
     return ret;
