@@ -158,6 +158,8 @@ void CC::ImageBatch::Render(CC::Int32 x, CC::Int32 y) {
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 
+    SDL_DestroyTexture(texture);
+
     // Reset
     SDL_SetRenderDrawColor(renderer, rgba[0], rgba[1], rgba[2], rgba[3]);
     SDL_SetRenderTarget(renderer, target);
