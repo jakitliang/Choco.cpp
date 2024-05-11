@@ -61,6 +61,22 @@ namespace CC {
 
         String & operator=(String && string) noexcept;
 
+        bool operator==(const char * cString) const;
+
+        bool operator==(const String & string) const;
+
+        bool operator!=(const char * cString) const;
+
+        bool operator!=(const String & string) const;
+
+        String operator+(const char * cString) const;
+
+        String operator+(const String &string) const;
+
+        String &operator+=(const char * cString);
+
+        String &operator+=(const String &string);
+
         char & operator[](Size index) override;
 
         const char & operator[](Size index) const override;

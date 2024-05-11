@@ -109,8 +109,8 @@ void CC::String::Insert(Size index, const char & t) {
     Insert(index, &t, 1);
 }
 
-void CC::String::Push(const char * str, Size length) {
-    Insert(Length(), str, length);
+void CC::String::Push(const char * str, Size len) {
+    Insert(Length(), str, len);
 }
 
 void CC::String::Push(const char * str) {
@@ -189,6 +189,44 @@ CC::String &CC::String::operator=(CC::String &&string) noexcept {
     Destroy(length);
     length = string.length;
     string.length = nullptr;
+
+    return *this;
+}
+
+bool CC::String::operator==(const char *cString) const {
+    return strncmp(object, cString, *length) == 0;
+}
+
+bool CC::String::operator==(const CC::String &string) const {
+    return strncmp(object, string.object, *length) == 0;
+}
+
+bool CC::String::operator!=(const char *cString) const {
+    return !operator==(cString);
+}
+
+bool CC::String::operator!=(const CC::String &string) const {
+    return !operator==(string);
+}
+
+CC::String CC::String::operator+(const char *cString) const {
+    String tmp(object);
+    return tmp.operator+=(cString);
+}
+
+CC::String CC::String::operator+(const CC::String &string) const {
+    String tmp(object);
+    return tmp.operator+=(string.object);
+}
+
+CC::String &CC::String::operator+=(const char *cString) {
+    Push(cString);
+
+    return *this;
+}
+
+CC::String &CC::String::operator+=(const CC::String &string) {
+    Push(string.object, *string.length);
 
     return *this;
 }
