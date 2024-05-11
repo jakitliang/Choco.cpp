@@ -16,16 +16,18 @@ CC::Font::Font() : Handle(nullptr) {
 
 CC::Font::Font(const CC::Font &font) : Handle(RetainHandle(font.Handle)) {}
 
-CC::Font::~Font() {
-    if (Handle == nullptr) return;
+CC::Font::Font(CC::Font &&font) noexcept : Handle(font.Handle) {
+    font.Handle = nullptr;
+}
 
-    Close();
+CC::Font::~Font() {
+    ReleaseHandle(Handle, FontFinalizer);
 }
 
 bool CC::Font::Open(const char *name, CC::Size size) {
     if (Handle) return true;
 
-    Handle = TTF_OpenFont(name, size);
+    Handle = RetainHandle(TTF_OpenFont(name, size));
 
     return Handle != nullptr;
 }
@@ -35,14 +37,12 @@ bool CC::Font::Open(const CC::Byte *bytes, Size bytesLength, CC::Size size) {
 
     auto rw = SDL_RWFromConstMem(bytes, bytesLength);
 
-    Handle = TTF_OpenFontRW(rw, 0, size);
+    Handle = RetainHandle(TTF_OpenFontRW(rw, 0, size));
 
     return Handle != nullptr;
 }
 
 void CC::Font::Close() {
-    if (Handle) return;
-
     ReleaseHandle(Handle, FontFinalizer);
     Handle = nullptr;
 }
@@ -50,8 +50,18 @@ void CC::Font::Close() {
 CC::Font &CC::Font::operator=(const CC::Font &font) {
     if (this == &font) return *this;
 
-    Close();
+    ReleaseHandle(Handle, FontFinalizer);
     Handle = RetainHandle(font.Handle);
+
+    return *this;
+}
+
+CC::Font &CC::Font::operator=(CC::Font &&font) noexcept {
+    if (this == &font) return *this;
+
+    ReleaseHandle(Handle, FontFinalizer);
+    Handle = font.Handle;
+    font.Handle = nullptr;
 
     return *this;
 }

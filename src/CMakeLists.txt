@@ -40,7 +40,7 @@ add_library(
         graphics.cpp
         rect.cpp
         ui_element.cpp
-)
+        dispatch_queue.cpp)
 
 target_include_directories(cc-foundation PUBLIC ../)
 target_include_directories(cc-graphics PUBLIC ../)

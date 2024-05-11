@@ -15,6 +15,8 @@ namespace CC {
 
         Font(const Font & font);
 
+        Font(Font && font) noexcept;
+
         ~Font();
 
         bool Open(const char * name, Size size);
@@ -24,6 +26,8 @@ namespace CC {
         void Close();
 
         Font & operator=(const Font & font);
+
+        Font & operator=(Font && font) noexcept;
     };
 }
 

@@ -10,9 +10,9 @@
 
 namespace CC {
     struct String : Var<char []> {
-        using Type = char *;
+        using Type = char;
 
-        Type & object;
+        Type * object;
         Size * length;
 
         String();

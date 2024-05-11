@@ -7,34 +7,43 @@
 #include <cstring>
 #include <iostream>
 
-CC::String::String() : Var<char []>(Make<char>(0)), object(*this->delegate), length(Make<Size>()) {}
+CC::String::String() : Var<char []>(), object(Make<char>(0)), length(Make<Size>()) {
+    *delegate = object;
+}
 
 CC::String::String(const String & str)
-    : Var<char []>(str), object(*this->delegate), length(Retain(str.length)) {}
+    : Var<char []>(str), object(Retain(str.object)), length(Retain(str.length)) {
+    *delegate = object;
+}
 
 CC::String::String(String && str) noexcept
-    : Var<char []>(static_cast<Var &&>(str)), object(*this->delegate), length(str.length) {
+    : Var<char []>(static_cast<Var &&>(str)), object(str.object), length(str.length) {
+    *delegate = object;
+    str.object = nullptr;
     str.length = nullptr;
 }
 
 CC::String::String(const char * str, Size length)
-    : Var<char []>(Alloc<char>(length)), object(*this->delegate), length(Clone(length)) {
+    : Var<char []>(), object(Alloc<char>(length)), length(Clone(length)) {
+    *delegate = object;
     CopyConstruct<char>(object, 0, str, length);
 }
 
 CC::String::String(const char *str)
-    : Var<char []>(Alloc<char>(strlen(str))), object(*this->delegate), length(Make<Size>()) {
+    : Var<char []>(), object(Alloc<char>(strlen(str))), length(Make<Size>()) {
     *length = strlen(str);
+    *delegate = object;
     CopyConstruct<char>(object, 0, str, *length);
 }
 
 CC::String::String(const CC::Byte *bytes, CC::Size length)
-    : Var<char []>(Alloc<char>(length)), object(*this->delegate), length(Clone(length)) {
+    : Var<char []>(), object(Alloc<char>(length)), length(Clone(length)) {
     CopyConstruct<char>(object, 0, (const char *) bytes, length);
+    *delegate = object;
 }
 
 CC::String::~String() {
-    if (delegate) Destroy(*delegate);
+    Destroy(object);
     Destroy(length);
 }
 
@@ -80,7 +89,8 @@ void CC::String::Insert(Size index, const char * str, Size len) {
     }
 
     if (indexEnd > Count()) {
-        *this->delegate = ReMake<char>(object, indexEnd);
+        object = ReMake<char>(object, indexEnd);
+        *delegate = object;
     }
 
     // Move the data [index .. Count()] to the end
@@ -123,8 +133,8 @@ void CC::String::Push(const char & t) {
 
 void CC::String::Delete(Size index, Size len) {
     auto count = Length();
-    if (len < 1) return;
 
+    if (len < 1) return;
     if (index >= count) return;
 
     // Erase
@@ -171,23 +181,31 @@ CC::Var<char []>::Iterator CC::String::end() const {
 //}
 
 CC::String &CC::String::operator=(const CC::String &string) {
-    Var<char []>::operator=(string);
-
     if (this == &string) return *this;
 
+    Var<char []>::operator=(string);
+
+    Destroy(object);
     Destroy(length);
+    object = Retain(string.object);
     length = Retain(string.length);
+    *delegate = object;
 
     return *this;
 }
 
 CC::String &CC::String::operator=(CC::String &&string) noexcept {
-    Var<char []>::operator=(static_cast<String &&>(string));
-
     if (this == &string) return *this;
 
+    Var<char []>::operator=(static_cast<String &&>(string));
+
+    Destroy(object);
     Destroy(length);
+    object = string.object;
     length = string.length;
+    *delegate = object;
+
+    string.object = nullptr;
     string.length = nullptr;
 
     return *this;

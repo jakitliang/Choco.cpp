@@ -7,6 +7,7 @@
 #include "window_context.h"
 #include "cc/ui_event.h"
 #include "cc/graphics.h"
+#include "cc/dispatch_queue.h"
 //#include "ui_context.h"
 //#include "window_context.h"
 #include "SDL2/SDL.h"
@@ -200,6 +201,8 @@ bool CC::Application::Run() {
 
         // On update
         ApplicationUpdate(tickDiff);
+
+        DispatchQueue::Process();
 
         // On draw
         ApplicationDraw();
