@@ -11,9 +11,9 @@
 
 namespace CC {
     struct Data : Var<Byte []> {
-        using Type = Byte *;
+        using Type = Byte;
 
-        Type & object;
+        Type * object;
 
         Size * length;
 
@@ -37,15 +37,42 @@ namespace CC {
 
         void Shift(Size length);
 
+        template<typename T>
+        void Shift(Size count) {
+            Shift(sizeof(T) * count);
+        }
+
         Size Count() const override;
 
         Size & Length();
 
         const Size & Length() const;
 
+        template<typename T>
+        Size Length() {
+            return Length() / sizeof(T);
+        }
+
+        template<typename T>
+        Size Length() const {
+            return Length() / sizeof(T);
+        }
+
         Byte * CData(Size index = 0);
 
         const Byte * CData(Size index = 0) const;
+
+        template<typename T>
+        T * CData(Size index = 0) {
+            if (index * sizeof(T) > Length()) return nullptr;
+            return reinterpret_cast<T *>(CData()) + index;
+        }
+
+        template<typename T>
+        const T * CData(Size index = 0) const {
+            if (index * sizeof(T) > Length()) return nullptr;
+            return reinterpret_cast<const T *>(CData()) + index;
+        }
 
         void Resize(Size size);
 

@@ -5,26 +5,35 @@
 #include "cc/data.h"
 #include <iostream>
 
-CC::Data::Data() : Var<Byte []>(Make<Byte>(0)), object(*this->delegate), length(Make<Size>()) {}
+CC::Data::Data() : Var<Byte []>(), object(Make<Byte>(0)), length(Make<Size>()) {
+    *delegate = object;
+}
 
 CC::Data::Data(const Data & data)
-    : Var<Byte []>(data), object(*this->delegate), length(Retain(data.length)) {}
+    : Var<Byte []>(data), object(Retain(data.object)), length(Retain(data.length)) {
+    *delegate = object;
+}
 
 CC::Data::Data(Data && data) noexcept
-    : Var<Byte []>(static_cast<Data &&>(data)), object(*this->delegate), length(data.length) {
+    : Var<Byte []>(static_cast<Data &&>(data)), object(data.object), length(data.length) {
+    *delegate = object;
+    data.object = nullptr;
     data.length = nullptr;
 }
 
 CC::Data::Data(const void * bytes, Size length)
-    : Var<Byte []>(Alloc<Byte>(length)), object(*this->delegate), length(Clone(length)) {
+    : Var<Byte []>(), object(Alloc<Byte>(length)), length(Clone(length)) {
+    *delegate = object;
     CopyConstruct<Byte>(object, 0, reinterpret_cast<const Byte *>(bytes), length);
 }
 
 CC::Data::Data(Size length)
-    : Var<Byte []>(Make<Byte>(length)), object(*this->delegate), length(Make<Size>()) {}
+    : Var<Byte []>(), object(Make<Byte>(length)), length(Make<Size>()) {
+    *delegate = object;
+}
 
 CC::Data::~Data() {
-    if (delegate) Destroy(*delegate);
+    Destroy(object);
     Destroy(length);
 }
 
@@ -37,11 +46,15 @@ void CC::Data::Move(CC::Size index, void * buffer, CC::Size len) {
 }
 
 void CC::Data::Push(const void * buffer, CC::Size len) {
-    auto indexEnd = Length() + len;
+    Size indexEnd;
+
     if (len < 1) return;
 
+    indexEnd = Length() + len;
+
     if (indexEnd > Count()) {
-        *this->delegate = ReMake<Byte>(object, indexEnd);
+        object = ReMake<Byte>(object, indexEnd);
+        *this->delegate = object;
     }
 
     CC::Copy<Byte>(object, Length(), static_cast<const Byte *>(buffer), len);
