@@ -76,9 +76,10 @@ bool CC::Application::Open() {
 }
 
 void CC::Application::Close() {
+    static SDL_Event quit{SDL_QUIT};
+
     if (CurrentApplication == nullptr) return;
-    SDL_Quit();
-    CurrentApplication = nullptr;
+    SDL_PushEvent(&quit);
 }
 
 void ProcessEvent(const SDL_Event & event) {

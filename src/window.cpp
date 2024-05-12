@@ -120,7 +120,7 @@ void CC::Window::SetTransparent(Byte opacity) {
     SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
     // Set transparency color
-    SetLayeredWindowAttributes(hWnd, 0, opacity, LWA_ALPHA);
+    SetLayeredWindowAttributes(hWnd, RGB(0, 0, 0), opacity, LWA_COLORKEY);
 #endif
 }
 
