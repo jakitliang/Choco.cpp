@@ -9,6 +9,7 @@ add_library(
         file_io.cpp
         channel.cpp
         file_channel.cpp
+        utils.cpp
 )
 
 add_library(

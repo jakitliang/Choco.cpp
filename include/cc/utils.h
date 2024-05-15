@@ -52,20 +52,19 @@ typedef CC_ENUM(unsigned long, CCRegKeyType) {
 };
 
 namespace CC {
-    String GetEnv(const char * varName);
+    String GetEnv(const String & varName);
 
     // Only for windows
     namespace Registry {
-        void * ReadValue(CCRegRoot root, const char * path, const char * key);
+        String ReadValue(CCRegRoot root, const String & path, const String & key);
 
         bool WriteValue(CCRegRoot root,
-                        const char * path,
-                        const char * key,
+                        const String & path,
+                        const String & key,
                         CCRegKeyType keyType,
-                        const void * value,
-                        Size sizeOfValue);
+                        const String & value);
 
-        bool CreatePath(CCRegRoot root, const char * path);
+        bool CreatePath(CCRegRoot root, const String & path);
     }
 }
 
