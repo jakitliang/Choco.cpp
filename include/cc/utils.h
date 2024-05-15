@@ -66,6 +66,8 @@ namespace CC {
 
         bool CreatePath(CCRegRoot root, const String & path);
     }
+
+    bool FileExist();
 }
 
 #endif //CHOCO_CPP_UTILS_H
