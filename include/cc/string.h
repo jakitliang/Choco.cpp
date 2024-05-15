@@ -89,6 +89,8 @@ namespace CC {
         friend OS & operator<<(OS &os, const String & str) {
             return os << str.CString();
         }
+
+        static String Format(const char * format, ...);
     };
 }
 

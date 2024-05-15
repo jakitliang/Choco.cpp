@@ -39,6 +39,9 @@ namespace CC {
     template<class T> struct Decay<T const volatile> : Decay<T> {};
     template<class T> struct Decay<T[]> : Decay<T> {};
     template<class T, int N> struct Decay<T[N]> : Decay<T> {};
+
+    template<typename T, typename F>
+    T To(const F & from);
 }
 
 #endif //CHOCO_CPP_TYPES_H

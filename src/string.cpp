@@ -4,7 +4,8 @@
 
 #include "cc/string.h"
 #include "cc/zone.h"
-#include <cstring>
+#include <cstdarg>
+#include <cstdlib>
 #include <iostream>
 
 CC::String::String() : Var<char []>(), object(Make<char>(0)), length(Make<Size>()) {
@@ -265,4 +266,28 @@ const char & CC::String::operator[](Size index) const {
     }
 
     return object[index];
+}
+
+CC::String CC::String::Format(const char *format, ...) {
+    static char smallBuffer[8];
+    String str;
+    auto length = sizeof(smallBuffer) - 1;
+    va_list args;
+
+    va_start(args, format);
+
+    length = std::vsnprintf(smallBuffer, length, format, args);
+
+    va_end(args);
+
+    str.object = ReMake<char>(str.object, length);
+    *str.delegate = str.object;
+
+    va_start(args, format);
+
+    vsnprintf(str.CString(), length + 1, format, args);
+
+    va_end(args);
+
+    return str;
 }

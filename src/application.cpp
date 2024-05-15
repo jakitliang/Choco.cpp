@@ -207,15 +207,6 @@ bool CC::Application::Run() {
 
         // On draw
         ApplicationDraw();
-
-        // Gives us a clear "canvas"
-//        SDL_SetRenderDrawColor(renderer,0,0,0xFF,SDL_ALPHA_OPAQUE);
-//        SDL_RenderClear(renderer);
-//
-//        SDL_RenderCopy(renderer,ourPNG,NULL,NULL);
-
-        // Finally show what we've drawn
-//        SDL_RenderPresent(renderer);
     }
 
     return true;
