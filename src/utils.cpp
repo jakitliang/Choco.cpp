@@ -31,7 +31,7 @@ CC::String GetEnv(const CC::String & varName) {
     // Get the value of the LIB environment variable.
     getenv_s(&requiredSize, var, requiredSize, varName.CString());
 #else
-    var = std::getenv(varName);
+    var = std::getenv(varName.CString());
 #endif
 
     strVar.Push(var);

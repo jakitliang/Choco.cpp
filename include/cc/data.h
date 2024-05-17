@@ -76,6 +76,10 @@ namespace CC {
 
         void Resize(Size size);
 
+        void ResizeBy(Int64 size);
+
+        void ResizeByNeeds(Int64 size);
+
         Byte & operator[](Size index) override;
 
         const Byte & operator[](Size index) const override;

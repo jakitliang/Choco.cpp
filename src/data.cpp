@@ -108,7 +108,40 @@ const CC::Byte *CC::Data::CData(CC::Size index) const {
 }
 
 void CC::Data::Resize(CC::Size size) {
-    ReMake<Byte>(object, size);
+    if (size == 0) return;
+
+    object = ReMake<Byte>(object, size);
+}
+
+void CC::Data::ResizeBy(CC::Int64 size) {
+    if (size == 0) return;
+
+    object = ReMake<Byte>(object, Count() + size);
+}
+
+void CC::Data::ResizeByNeeds(CC::Int64 size) {
+    if (size == 0) return;
+    auto count = Count();
+    auto len = Length();
+
+    // Increase
+    if (size > 0) {
+        auto indexEnd = len + size;
+
+        if (indexEnd > count) {
+            object = ReMake<Byte>(object, indexEnd);
+        }
+
+        return;
+    }
+
+    // Decrease
+    if (len == count) return;
+
+    auto indexEnd = count + size;
+    indexEnd = indexEnd < len ? len : indexEnd;
+
+    object = ReMake<Byte>(object, indexEnd);
 }
 
 CC::Var<CC::Byte[]>::Iterator CC::Data::end() {

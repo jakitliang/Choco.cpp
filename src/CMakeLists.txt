@@ -1,4 +1,6 @@
 
+include_directories(include)
+
 add_library(
         cc-foundation OBJECT
         intptr.cpp
@@ -6,11 +8,10 @@ add_library(
         string.cpp
         data.cpp
         handle.cpp
-        file_io.cpp
-        channel.cpp
-        file_channel.cpp
         utils.cpp
 )
+
+add_subdirectory(io)
 
 add_library(
         cc-graphics OBJECT
