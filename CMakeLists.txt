@@ -27,6 +27,7 @@ find_package(glm REQUIRED)
 
 include_directories(
         include
+        internal
         ${SDL2_INCLUDE_PATH}
         ${SDL2_TTF_INCLUDE_PATH}
         ${SDL2_IMAGE_INCLUDE_PATH}

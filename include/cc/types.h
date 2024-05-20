@@ -42,6 +42,27 @@ namespace CC {
 
     template<typename T, typename F>
     T To(const F & from);
+
+    template <typename T, unsigned long N = sizeof(T)>
+    struct Property {
+        T * operator->() {
+            return reinterpret_cast<T *>(data);
+        }
+
+        const T * operator->() const {
+            return reinterpret_cast<const T *>(data);
+        }
+
+        T & operator*() {
+            return *reinterpret_cast<T *>(data);
+        }
+
+        const T & operator*() const {
+            return *reinterpret_cast<const T *>(data);
+        }
+
+        CC_ALIGN_DECL(8, Byte data[N]);
+    };
 }
 
 #endif //CHOCO_CPP_TYPES_H
