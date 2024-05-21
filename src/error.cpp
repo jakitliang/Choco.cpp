@@ -10,7 +10,7 @@
 #include <cerrno>
 #endif
 
-CC::Error::Error() {
+CC::Error::Error() : From(SendFromSystem), Message{0} {
     Number = 0;
 }
 
@@ -26,4 +26,8 @@ CC::Error & CC::Error::Reset() {
     Number = 0;
 
     return *this;
+}
+
+CC::Error CC::Error::SystemError() {
+    return CC::Error().GetSystemError();
 }

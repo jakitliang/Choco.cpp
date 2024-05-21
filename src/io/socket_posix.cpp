@@ -13,7 +13,7 @@ extern "C" {
 #include <unistd.h>
 }
 
-#define ILLEGAL_FD (-1)
+#define INVALID_FD (-1)
 
 struct CC::IO::Socket::Context {
     int FD;
@@ -23,7 +23,7 @@ struct CC::IO::Socket::Context {
 CC::IO::Socket::Socket() : context() {
     IsNonBlock = false;
     IsShutdown = false;
-    context->FD = ILLEGAL_FD;
+    context->FD = INVALID_FD;
     memset(&context->Address, 0, sizeof(sockaddr_in));
 }
 
@@ -36,7 +36,7 @@ bool CC::IO::Socket::TCP() {
 
     int fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if (fd == ILLEGAL_FD) {
+    if (fd == INVALID_FD) {
         return false;
     }
 
@@ -50,7 +50,7 @@ bool CC::IO::Socket::UDP() {
 
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-    if (fd == ILLEGAL_FD) {
+    if (fd == INVALID_FD) {
         return false;
     }
 
@@ -60,7 +60,7 @@ bool CC::IO::Socket::UDP() {
 }
 
 CC::IO::Socket::Return CC::IO::Socket::Connect(const char *host, CC::UInt64 port) {
-    if (context->FD == ILLEGAL_FD) return CC::IO::Socket::ReturnFailed;
+    if (context->FD == INVALID_FD) return CC::IO::Socket::ReturnFailed;
 
     context->Address.sin_family = AF_INET;
     context->Address.sin_addr.s_addr = inet_addr(host);
@@ -72,7 +72,7 @@ CC::IO::Socket::Return CC::IO::Socket::Connect(const char *host, CC::UInt64 port
 }
 
 CC::IO::Socket::Return CC::IO::Socket::ConnectNonBlock(const char *host, CC::UInt64 port) {
-    if (context->FD == ILLEGAL_FD) return CC::IO::Socket::ReturnFailed;
+    if (context->FD == INVALID_FD) return CC::IO::Socket::ReturnFailed;
 
     context->Address.sin_family = AF_INET;
     context->Address.sin_addr.s_addr = inet_addr(host);
@@ -87,9 +87,9 @@ CC::IO::Socket::Return CC::IO::Socket::ConnectNonBlock(const char *host, CC::UIn
 }
 
 CC::IO::Socket::Return CC::IO::Socket::Bind(const char *host, CC::UInt64 port) {
-    if (context->FD == ILLEGAL_FD) return CC::IO::Socket::ReturnFailed;
+    if (context->FD == INVALID_FD) return CC::IO::Socket::ReturnFailed;
 
-    context->Address.sin_family =  AF_INET;
+    context->Address.sin_family = AF_INET;
     context->Address.sin_addr.s_addr = inet_addr(host);
     context->Address.sin_port = htons(port);
 
@@ -97,22 +97,56 @@ CC::IO::Socket::Return CC::IO::Socket::Bind(const char *host, CC::UInt64 port) {
 }
 
 CC::IO::Socket::Return CC::IO::Socket::Listen(CC::Int32 queue) {
-    if (context->FD == ILLEGAL_FD) return CC::IO::Socket::ReturnFailed;
+    if (context->FD == INVALID_FD) return CC::IO::Socket::ReturnFailed;
 
     return listen(context->FD, queue);
 }
 
+bool CC::IO::Socket::Accept(CC::IO::Socket *clientSocket) {
+    auto &clientContext = clientSocket->context;
+    socklen_t len = sizeof(sockaddr_in);
+    auto fd = accept(
+        context->FD, reinterpret_cast<sockaddr *>(&clientContext->Address), &len);
+
+    if (fd == INVALID_FD) return false;
+
+    clientContext->FD = fd;
+
+    return true;
+}
+
+bool CC::IO::Socket::AcceptNonBlock(CC::IO::Socket *clientSocket) {
+    auto &clientContext = clientSocket->context;
+    socklen_t len = sizeof(sockaddr_in);
+
+    SetNonBlock();
+    auto fd = accept(context->FD,
+                reinterpret_cast<sockaddr *>(&clientContext->Address),
+                &len);
+    SetBlock();
+
+    if (fd == INVALID_FD) return false;
+
+    clientContext->FD = fd;
+
+    return true;
+}
+
+CC::Int64 CC::IO::Socket::Receive(void *buffer, CC::UInt64 size) {
+    return recv(context->FD, buffer, size, 0);
+}
+
 bool CC::IO::Socket::Close() {
-    if (context->FD == ILLEGAL_FD) return true;
+    if (context->FD == INVALID_FD) return true;
 
     auto fd = context->FD;
-    context->FD = ILLEGAL_FD;
+    context->FD = INVALID_FD;
 
     return close(fd) == 0;
 }
 
 bool CC::IO::Socket::SetBlock() {
-    if (context->FD == ILLEGAL_FD) return false;
+    if (context->FD == INVALID_FD) return false;
 
     int flags = fcntl(context->FD, F_GETFL, 0);
     flags &= (~(O_NONBLOCK));
@@ -123,7 +157,8 @@ bool CC::IO::Socket::SetBlock() {
 }
 
 bool CC::IO::Socket::SetNonBlock() {
-    if (context->FD == ILLEGAL_FD) return false;
+    if (context->FD == INVALID_FD) return false;
+    if (IsNonBlock) return true;
 
     int flags = fcntl(context->FD, F_GETFL, 0);
     flags |= O_NONBLOCK;

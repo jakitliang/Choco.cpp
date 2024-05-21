@@ -4,9 +4,10 @@
 
 #include "cc/io/udp_channel.h"
 #include "cc/zone.h"
+#include <cstring>
 
 struct CC::IO::UDPChannel::Context {
-
+    ssize_t z;
 };
 
 CC::IO::UDPChannel::UDPChannel() : context(CC::Make<Context>()) {}
@@ -21,6 +22,10 @@ CC::IO::UDPChannel::UDPChannel(CC::IO::UDPChannel &&udpChannel) noexcept
 
 CC::IO::UDPChannel::~UDPChannel() {
     CC::Destroy(context);
+}
+
+bool CC::IO::UDPChannel::Connect(const char *host, int port) {
+
 }
 
 CC::IO::UDPChannel &CC::IO::UDPChannel::operator=(const CC::IO::UDPChannel &udpChannel) {

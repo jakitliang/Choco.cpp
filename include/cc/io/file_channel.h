@@ -25,13 +25,13 @@ namespace CC::IO {
 
         bool IsClosed() override;
 
-        Size Read(void * data, Size length) override;
+        Result Read(void * data, Size length, Size * bytesRead) override;
 
-        Size ReadNonBlock(void * data, Size length) override;
+        Result ReadNonBlock(void * data, Size length, Size * bytesRead) override;
 
-        Size Write(const void * data, Size length) override;
+        Result Write(const void * data, Size length, Size * bytesWritten) override;
 
-        Size WriteNonBlock(const void * data, Size length) override;
+        Result WriteNonBlock(const void * data, Size length, Size * bytesWritten) override;
 
         FileChannel & operator=(const FileChannel & fileChannel);
 
@@ -39,9 +39,9 @@ namespace CC::IO {
 
         static bool Exists(const char *dir);
 
-        static Size GetContents(const char *dir, void *data, Size length = 0);
+        static Result GetContents(const char *dir, void *data, Size length, Size * bytesRead);
 
-        static Size PutContents(const char *dir, const void *data, Size length);
+        static Result PutContents(const char *dir, const void *data, Size length, Size * bytesWritten);
 
         static bool MakeDir(const char *dir);
 

@@ -23,11 +23,14 @@ namespace CC {
 #if defined(_WINDOWS)
 #if defined(_WIN64)
     using Size = unsigned long long;
+    using SSize = long long;
 #elif defined(_WIN32)
     using Size = unsigned int;
+    using SSize = int;
 #endif
-#elif defined(__SIZE_TYPE__)
-    using Size = __SIZE_TYPE__;
+#else
+    using Size = unsigned long;
+    using SSize = long;
 #endif
 
     template<class T> struct Decay { typedef T Type; };

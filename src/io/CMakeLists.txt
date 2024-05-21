@@ -13,4 +13,5 @@ add_library(cc-io OBJECT
     tcp_channel.cpp
     tcp_server_channel.cpp
     udp_channel.cpp
+    named_channel.cpp
     ${socket_source})

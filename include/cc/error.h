@@ -25,6 +25,10 @@ namespace CC {
         Error & GetSystemError();
 
         Error & Reset();
+
+        static Error SystemError();
+
+        static Error Default;
     };
 }
 

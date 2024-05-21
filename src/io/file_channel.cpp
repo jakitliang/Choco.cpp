@@ -65,20 +65,22 @@ bool CC::IO::FileChannel::IsClosed() {
     return context == nullptr;
 }
 
-CC::Size CC::IO::FileChannel::Write(const void *data, CC::Size length) {
-    return fwrite(data, 1, length, static_cast<FILE *>(context));
+CC::IO::Result CC::IO::FileChannel::Read(void *data, CC::Size length, Size * bytesRead) {
+    *bytesRead = fread(data, 1, length, static_cast<FILE *>(context));
+    return ROK;
 }
 
-CC::Size CC::IO::FileChannel::WriteNonBlock(const void *data, CC::Size length) {
-    return Write(data, length);
+CC::IO::Result CC::IO::FileChannel::ReadNonBlock(void *data, CC::Size length, Size * bytesRead) {
+    return Read(data, length, bytesRead);
 }
 
-CC::Size CC::IO::FileChannel::Read(void *data, CC::Size length) {
-    return fread(data, 1, length, static_cast<FILE *>(context));
+CC::IO::Result CC::IO::FileChannel::Write(const void *data, CC::Size length, Size * bytesWritten) {
+    *bytesWritten = fwrite(data, 1, length, static_cast<FILE *>(context));
+    return ROK;
 }
 
-CC::Size CC::IO::FileChannel::ReadNonBlock(void *data, CC::Size length) {
-    return Read(data, length);
+CC::IO::Result CC::IO::FileChannel::WriteNonBlock(const void *data, CC::Size length, Size * bytesWritten) {
+    return Write(data, length, bytesWritten);
 }
 
 CC::IO::FileChannel &CC::IO::FileChannel::operator=(const CC::IO::FileChannel &fileChannel) {
@@ -104,7 +106,7 @@ bool CC::IO::FileChannel::Exists(const char *dir) {
     return std::ifstream(dir).good();
 }
 
-CC::Size CC::IO::FileChannel::GetContents(const char *dir, void *data, CC::Size length) {
+CC::IO::Result CC::IO::FileChannel::GetContents(const char *dir, void *data, CC::Size length, Size * bytesRead) {
     if (!Exists(dir)) return 0;
 
     std::ifstream f(dir);
@@ -119,17 +121,21 @@ CC::Size CC::IO::FileChannel::GetContents(const char *dir, void *data, CC::Size 
     // Read content
     f.read(static_cast<char *>(data), (std::streamsize) length);
 
-    return length;
+    
+
+    *bytesRead = length;
+
+    return ROK;
 }
 
-CC::Size CC::IO::FileChannel::PutContents(const char *dir, const void *data, CC::Size length) {
+CC::IO::Result CC::IO::FileChannel::PutContents(const char *dir, const void *data, CC::Size length, Size * bytesWritten) {
     std::ofstream f(dir, std::ios::binary);
 
     if (!f.is_open()) return 0;
 
     f.write(static_cast<const char *>(data), (std::streamsize) length);
 
-    return length;
+    return ROK;
 }
 
 bool CC::IO::FileChannel::MakeDir(const char *dir) {

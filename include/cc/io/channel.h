@@ -6,8 +6,13 @@
 #define CHOCO_CPP_CHANNEL_H
 
 #include "cc/types.h"
+#include "cc/error.h"
 
 namespace CC::IO {
+    typedef CC_ENUM(int, Result) {
+        ROK = 0
+    };
+
     struct IChannelEvent;
     struct IChannelReaderEvent;
     struct IChannelWriterEvent;
@@ -19,15 +24,15 @@ namespace CC::IO {
     };
 
     struct IChannelReader {
-        virtual Size Read(void * data, Size length) = 0;
+        virtual Result Read(void * data, Size length, Size * bytesRead) = 0;
 
-        virtual Size ReadNonBlock(void * data, Size length) = 0;
+        virtual Result ReadNonBlock(void * data, Size length, Size * bytesRead) = 0;
     };
 
     struct IChannelWriter {
-        virtual Size Write(const void * data, Size length) = 0;
+        virtual Result Write(const void * data, Size length, Size * bytesWritten) = 0;
 
-        virtual Size WriteNonBlock(const void * data, Size length) = 0;
+        virtual Result WriteNonBlock(const void * data, Size length, Size * bytesWritten) = 0;
     };
 
     struct IChannelEvent {
