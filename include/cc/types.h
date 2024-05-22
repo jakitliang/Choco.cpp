@@ -66,6 +66,26 @@ namespace CC {
 
         CC_ALIGN_DECL(8, Byte data[N]);
     };
+
+    template<typename T, int DefaultCode>
+    struct BasicResult {
+        BasicResult() : Code(DefaultCode) {}
+
+        // NOLINTNEXTLINE
+        BasicResult(int code) : Code(code) {}
+
+        // NOLINTNEXTLINE
+        operator bool() const { return Code == DefaultCode; }
+
+        BasicResult & operator=(const int & code) { Code = code; return *this; }
+
+        template<typename OS>
+        friend OS & operator<<(OS &os, const BasicResult & result) {
+            return os << result.Code;
+        }
+
+        int Code;
+    };
 }
 
 #endif //CHOCO_CPP_TYPES_H

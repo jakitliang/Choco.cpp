@@ -67,7 +67,7 @@ bool CC::IO::FileChannel::IsClosed() {
 
 CC::IO::Result CC::IO::FileChannel::Read(void *data, CC::Size length, Size * bytesRead) {
     *bytesRead = fread(data, 1, length, static_cast<FILE *>(context));
-    return ROK;
+    return Result::OK;
 }
 
 CC::IO::Result CC::IO::FileChannel::ReadNonBlock(void *data, CC::Size length, Size * bytesRead) {
@@ -76,7 +76,7 @@ CC::IO::Result CC::IO::FileChannel::ReadNonBlock(void *data, CC::Size length, Si
 
 CC::IO::Result CC::IO::FileChannel::Write(const void *data, CC::Size length, Size * bytesWritten) {
     *bytesWritten = fwrite(data, 1, length, static_cast<FILE *>(context));
-    return ROK;
+    return Result::OK;
 }
 
 CC::IO::Result CC::IO::FileChannel::WriteNonBlock(const void *data, CC::Size length, Size * bytesWritten) {
@@ -121,11 +121,9 @@ CC::IO::Result CC::IO::FileChannel::GetContents(const char *dir, void *data, CC:
     // Read content
     f.read(static_cast<char *>(data), (std::streamsize) length);
 
-    
-
     *bytesRead = length;
 
-    return ROK;
+    return Result::OK;
 }
 
 CC::IO::Result CC::IO::FileChannel::PutContents(const char *dir, const void *data, CC::Size length, Size * bytesWritten) {
@@ -135,7 +133,9 @@ CC::IO::Result CC::IO::FileChannel::PutContents(const char *dir, const void *dat
 
     f.write(static_cast<const char *>(data), (std::streamsize) length);
 
-    return ROK;
+    *bytesWritten = length;
+
+    return Result::OK;
 }
 
 bool CC::IO::FileChannel::MakeDir(const char *dir) {

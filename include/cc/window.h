@@ -53,6 +53,12 @@ namespace CC {
 
         virtual void Draw();
 
+        Vector2 GetPosition();
+
+        void SetPosition(const Vector2 & position);
+
+        void SetRelativePosition(const Vector2 & position);
+
         void SetTransparent(Byte opacity);
 
         Window & operator=(const Window & window) = delete;

@@ -108,6 +108,21 @@ void CC::Window::Draw() {
 //    SDL_RenderPresent(renderer.get<SDL_Renderer>());
 }
 
+void CC::Window::SetPosition(const CC::Vector2 & position) {
+    if (Handle == nullptr) return;
+
+    SDL_SetWindowPosition(static_cast<SDL_Window *>(Handle), (int) position.X, (int) position.Y);
+}
+
+void CC::Window::SetRelativePosition(const CC::Vector2 & position) {
+    if (Handle == nullptr) return;
+
+    int currentX, currentY;
+
+    SDL_GetWindowPosition(static_cast<SDL_Window *>(Handle), &currentX, &currentY);
+    SDL_SetWindowPosition(static_cast<SDL_Window *>(Handle), currentX + (int) position.X, currentY + (int) position.Y);
+}
+
 void CC::Window::SetTransparent(Byte opacity) {
 #ifdef _WINDOWS
     // Makes a window transparent by setting a transparency color.

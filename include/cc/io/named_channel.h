@@ -32,13 +32,13 @@ namespace CC::IO {
 
         bool IsClosed() override;
 
-        Size Read(void *data, Size length) override;
+        Result Read(void * data, Size length, Size * bytesRead) override;
 
-        Size ReadNonBlock(void *data, Size length) override;
+        Result ReadNonBlock(void * data, Size length, Size * bytesRead) override;
 
-        Size Write(const void *data, Size length) override;
+        Result Write(const void * data, Size length, Size * bytesWritten) override;
 
-        Size WriteNonBlock(const void *data, Size length) override;
+        Result WriteNonBlock(const void * data, Size length, Size * bytesWritten) override;
 
         NamedChannel & operator=(const NamedChannel & namedChannel);
 

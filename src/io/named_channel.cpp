@@ -19,6 +19,8 @@ extern "C" {
 
 #define INVALID (-1)
 
+using R = CC::IO::Result;
+
 struct CC::IO::NamedChannel::Context {
     int FD;
 
@@ -66,29 +68,31 @@ bool CC::IO::NamedChannel::IsClosed() {
     return context->FD == INVALID;
 }
 
-CC::Size CC::IO::NamedChannel::Read(void *data, CC::Size length) {
+CC::IO::Result CC::IO::NamedChannel::Read(void *data, CC::Size length, Size * bytesRead) {
 #ifdef _WIN32
-    _read(context->FD, data, length);
+    auto ret = _read(context->FD, data, length);
 #else
-    read(context->FD, data, length);
+    auto ret = read(context->FD, data, length);
 #endif
-    return 0;
+
+    return ret >= 0 ? R::EOF : R::Error;
 }
 
-CC::Size CC::IO::NamedChannel::ReadNonBlock(void *data, CC::Size length) {
-
-    return 0;
+CC::IO::Result CC::IO::NamedChannel::ReadNonBlock(void *data, CC::Size length, Size * bytesRead) {
+    return Read(data, length, bytesRead);
 }
 
-CC::Size CC::IO::NamedChannel::Write(const void *data, CC::Size length) {
+CC::IO::Result CC::IO::NamedChannel::Write(const void *data, CC::Size length, Size * bytesRead) {
 #ifdef _WIN32
-    _write(context->FD, ss.str().c_str(), 1);
+    auto ret = _write(context->FD, data, length);
 #else
+    auto ret = write(context->FD, data, length);
 #endif
-    return 0;
+
+    return ret == -1 ? R::Error : R::OK;
 }
 
-CC::Size CC::IO::NamedChannel::WriteNonBlock(const void *data, CC::Size length) {
+CC::IO::Result CC::IO::NamedChannel::WriteNonBlock(const void *data, CC::Size length, Size * bytesRead) {
     return 0;
 }
 

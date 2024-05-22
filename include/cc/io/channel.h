@@ -9,8 +9,22 @@
 #include "cc/error.h"
 
 namespace CC::IO {
-    typedef CC_ENUM(int, Result) {
-        ROK = 0
+    struct Result : BasicResult<Result, 0> {
+        enum {
+            Error = -1,
+            OK = 0,
+            EOF = 0
+        };
+
+        Result() : Code(0) {}
+
+        // NOLINTNEXTLINE
+        Result(int code) : Code(code) {}
+
+        // NOLINTNEXTLINE
+        operator int() const { return Code; }
+
+        int Code;
     };
 
     struct IChannelEvent;
