@@ -7,25 +7,23 @@
 
 #include "cc/types.h"
 #include "cc/error.h"
+#include "cc/result.h"
 
 namespace CC::IO {
-    struct Result : BasicResult<Result, 0> {
+    struct R {
         enum {
             Error = -1,
             OK = 0,
+            DEFAULT_CODE = OK,
             EOF = 0
         };
 
-        Result() : Code(0) {}
-
-        // NOLINTNEXTLINE
-        Result(int code) : Code(code) {}
-
-        // NOLINTNEXTLINE
-        operator int() const { return Code; }
-
-        int Code;
+        static bool Check(const int & code) {
+            return code == OK;
+        }
     };
+
+    using Result = BasicResult<R>;
 
     struct IChannelEvent;
     struct IChannelReaderEvent;
