@@ -65,6 +65,10 @@ namespace CC {
 
         Window & operator=(Window && window) noexcept;
 
+#ifdef _WIN32
+#else
+#endif
+
         static Window * Current();
     };
 }
