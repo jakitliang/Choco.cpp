@@ -139,12 +139,15 @@ void CC::Window::SetTransparent(Byte opacity) {
 #endif
 }
 
+#ifdef _WIN32
 HWND CC::Window::GetNativeWindow() {
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);  // Initialize wmInfo
     SDL_GetWindowWMInfo(static_cast<SDL_Window *>(Handle), &wmInfo);
     return wmInfo.info.win.window;
 }
+#else
+#endif
 
 CC::Window &CC::Window::operator=(CC::Window &&window) noexcept {
     if (this == &window) return *this;

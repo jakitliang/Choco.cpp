@@ -9,22 +9,63 @@
 
 namespace CC {
     struct Vector4 {
-        union {Float32 X; Float32 R;};
-        union {Float32 Y; Float32 G;};
-        union {Float32 Z; Float32 B; Float32 Width;};
-        union {Float32 W; Float32 A; Float32 Height;};
+        union {
+            struct {
+                union {
+                    Float32 X, R, S;
+                };
 
-        Vector4 & operator+(const Vector4 & another);
+                union {
+                    Float32 Y, G, T;
+                };
 
-        Vector4 & operator-(const Vector4 & another);
+                union {
+                    Float32 Z, B, P, Width;
+                };
 
-        Vector4 & operator*(Float32 num);
+                union {
+                    Float32 W, A, Q, Height;
+                };
+            };
 
-        Vector4 & operator/(Float32 num);
+            Float32 Row[4];
+        };
 
-        bool operator==(const Vector4 & another) const;
+        Vector4 operator+(Float32 rhs) const;
 
-        bool operator!=(const Vector4 & another) const;
+        Vector4 operator+(const Vector4 & rhs) const;
+
+        Vector4 operator-(Float32 rhs) const;
+
+        Vector4 operator-(const Vector4 & rhs) const;
+
+        Vector4 operator*(Float32 rhs) const;
+
+        Vector4 operator*(const Vector4 & rhs) const;
+
+        Vector4 operator/(Float32 rhs) const;
+
+        Vector4 & operator+=(Float32 rhs);
+
+        Vector4 & operator+=(const Vector4 & rhs);
+
+        Vector4 & operator-=(Float32 rhs);
+
+        Vector4 & operator-=(const Vector4 & rhs);
+
+        Vector4 & operator*=(Float32 rhs);
+
+        Vector4 & operator*=(const Vector4 & rhs);
+
+        Vector4 & operator/=(Float32 rhs);
+
+        bool operator==(const Vector4 & rhs) const;
+
+        bool operator!=(const Vector4 & rhs) const;
+
+        Float32 &operator[](Size index);
+
+        const Float32 &operator[](Size index) const;
 
         static Vector4 Zero();
     };

@@ -22,6 +22,9 @@ static CC::Font font;
 
 extern unsigned char hkyt_ttf[];
 extern unsigned int hkyt_ttf_len;
+static bool ButtonStatus = false;
+static Vector2 CurrentMouse;
+static Vector2 PreviousMouse;
 
 struct MyWindow : Window {
     void onStateChanged(UIWindowEvent &event) override {
@@ -32,6 +35,15 @@ struct MyWindow : Window {
 
     void Update(UInt64 deltaTime) override {
         Window::Update(deltaTime);
+
+        if (ButtonStatus) {
+            cout << CurrentMouse.X << ", " << CurrentMouse.Y << endl;
+            cout << PreviousMouse.X << ", " << PreviousMouse.Y << endl;
+//            if (CurrentMouse != PreviousMouse) {
+//                auto v = CurrentMouse - PreviousMouse;
+//                cout << v.X << ", " << v.Y << endl;
+//            }
+        }
     }
 
     void Draw() override {
@@ -72,6 +84,25 @@ struct MyWindow : Window {
 
         CC::Graphics::Print("那你很棒棒哦!", &font, 200, 200);
     }
+
+    void onMouseMotion(CC::UIMouseMotionEvent &event) override {
+//        cout << event.X << ", " << event.Y << endl;
+
+        if (ButtonStatus) {
+            CurrentMouse = Vector2{event.X * 1.f, event.Y * 1.f};
+        }
+    }
+
+    void onMouseButton(CC::UIMouseButtonEvent &event) override {
+        if (event.Button == UIEvent::ButtonStatePressed) {
+            ButtonStatus = true;
+            CurrentMouse = PreviousMouse = Vector2{event.X * 1.f, event.Y * 1.f};
+
+        } else if (event.Button == UIEvent::ButtonStateReleased) {
+            ButtonStatus = false;
+            CurrentMouse = PreviousMouse = Vector2{event.X * 1.f, event.Y * 1.f};
+        }
+    }
 };
 
 struct MyApp : Application {
@@ -103,6 +134,7 @@ struct MyApp : Application {
 
 int main() {
     MyApp app;
+    ButtonStatus = false;
 
     printf("ERROR --- %d%d%d\n", hkyt_ttf[10], hkyt_ttf[20], hkyt_ttf[30]);
 

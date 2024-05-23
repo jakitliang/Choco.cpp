@@ -9,23 +9,73 @@
 
 namespace CC {
     struct Vector3 {
-        Float32 X;
-        Float32 Y;
-        Float32 Z;
+        union {
+            struct {
+                union {
+                    Float32 X, R, S;
+                };
 
-        Vector3 & operator+(const Vector3 & another);
+                union {
+                    Float32 Y, G, T;
+                };
 
-        Vector3 & operator-(const Vector3 & another);
+                union {
+                    Float32 Z, B, P;
+                };
+            };
 
-        Vector3 & operator*(Float32 num);
+            Float32 Row[3];
+        };
 
-        Vector3 & operator/(Float32 num);
+        void Cross(const Vector3 &rhs);
 
-        bool operator==(const Vector3 & another) const;
+        void Normalize();
 
-        bool operator!=(const Vector3 & another) const;
+        Vector3 operator+(Float32 rhs) const;
+
+        Vector3 operator+(const Vector3 & rhs) const;
+
+        Vector3 operator-(Float32 rhs) const;
+
+        Vector3 operator-(const Vector3 & rhs) const;
+
+        Vector3 operator*(Float32 rhs) const;
+
+        Vector3 operator*(const Vector3 & rhs) const;
+
+        Vector3 operator/(Float32 rhs) const;
+
+        Vector3 operator/(const Vector3 & rhs) const;
+
+        Vector3 & operator+=(Float32 rhs);
+
+        Vector3 & operator+=(const Vector3 & rhs);
+
+        Vector3 & operator-=(Float32 rhs);
+
+        Vector3 & operator-=(const Vector3 & rhs);
+
+        Vector3 & operator*=(Float32 rhs);
+
+        Vector3 & operator*=(const Vector3 & rhs);
+
+        Vector3 & operator/=(Float32 rhs);
+
+        Vector3 & operator/=(const Vector3 & rhs);
+
+        bool operator==(const Vector3 & rhs) const;
+
+        bool operator!=(const Vector3 & rhs) const;
+
+        Float32 &operator[](Size index);
+
+        const Float32 &operator[](Size index) const;
 
         static Vector3 Zero();
+
+        static Vector3 Cross(const Vector3 &a, const Vector3 &b);
+
+        static Vector3 Normalize(const Vector3 &v);
     };
 }
 

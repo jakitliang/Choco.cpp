@@ -9,22 +9,59 @@
 
 namespace CC {
     struct Vector2 {
-        Float32 X;
-        Float32 Y;
+        union {
+            struct {
+                union {
+                    Float32 X, R, S, Width;
+                };
 
-        Float32 Distance(const Vector2 & from) const;
+                union {
+                    Float32 Y, G, T, Height;
+                };
+            };
 
-        Vector2 & operator+(const Vector2 & another);
+            Float32 Row[2];
+        };
 
-        Vector2 & operator-(const Vector2 & another);
+        Vector2 operator+(Float32 rhs) const;
 
-        Vector2 & operator*(Float32 num);
+        Vector2 operator+(const Vector2 & rhs) const;
 
-        Vector2 & operator/(Float32 num);
+        Vector2 operator-(Float32 rhs) const;
 
-        bool operator==(const Vector2 & another) const;
+        Vector2 operator-(const Vector2 & rhs) const;
 
-        bool operator!=(const Vector2 & another) const;
+        Vector2 operator*(Float32 num) const;
+
+        Vector2 operator*(const Vector2 & rhs) const;
+
+        Vector2 operator/(Float32 num) const;
+
+        Vector2 operator/(const Vector2 & rhs) const;
+
+        Vector2 & operator+=(Float32 rhs);
+
+        Vector2 & operator+=(const Vector2 & rhs);
+
+        Vector2 & operator-=(Float32 rhs);
+
+        Vector2 & operator-=(const Vector2 & rhs);
+
+        Vector2 & operator*=(Float32 num);
+
+        Vector2 & operator*=(const Vector2 & rhs);
+
+        Vector2 & operator/=(Float32 num);
+
+        Vector2 & operator/=(const Vector2 & rhs);
+
+        bool operator==(const Vector2 & rhs) const;
+
+        bool operator!=(const Vector2 & rhs) const;
+
+        Float32 & operator[](Size index);
+
+        const Float32 & operator[](Size index) const;
 
         static Vector2 Zero();
     };

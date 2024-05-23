@@ -25,6 +25,11 @@ struct CC::IO::NamedChannel::Context {
     int FD;
 
     Context() : FD(INVALID) {}
+
+    ~Context() {
+        if (FD != INVALID) close(FD);
+        FD = INVALID;
+    }
 };
 
 CC::IO::NamedChannel::NamedChannel() : context(CC::Make<Context>()) {}
@@ -37,7 +42,13 @@ CC::IO::NamedChannel::NamedChannel(CC::IO::NamedChannel &&namedChannel) noexcept
     namedChannel.context = nullptr;
 }
 
+CC::IO::NamedChannel::~NamedChannel() { {
+    CC::Destroy<Context>(context);
+}}
+
 bool CC::IO::NamedChannel::Open(const char *path, CC::IO::NamedChannel::Target target) {
+    if (context->FD != INVALID) return true;
+
     int fd;
     int flags = (target == TargetIn) ? O_RDONLY : (O_WRONLY | O_CREAT);
 
@@ -93,13 +104,13 @@ CC::IO::Result CC::IO::NamedChannel::Write(const void *data, CC::Size length, Si
 }
 
 CC::IO::Result CC::IO::NamedChannel::WriteNonBlock(const void *data, CC::Size length, Size * bytesRead) {
-    return 0;
+    return Write(data, length, bytesRead);
 }
 
 CC::IO::NamedChannel &CC::IO::NamedChannel::operator=(const CC::IO::NamedChannel &namedChannel) {
     if (this == &namedChannel) return *this;
 
-    CC::Destroy(context);
+    CC::Destroy<Context>(context);
     context = CC::Retain(namedChannel.context);
 
     return *this;
@@ -108,7 +119,7 @@ CC::IO::NamedChannel &CC::IO::NamedChannel::operator=(const CC::IO::NamedChannel
 CC::IO::NamedChannel &CC::IO::NamedChannel::operator=(CC::IO::NamedChannel &&namedChannel) noexcept {
     if (this == &namedChannel) return *this;
 
-    CC::Destroy(context);
+    CC::Destroy<Context>(context);
     context = namedChannel.context;
     namedChannel.context = nullptr;
 
