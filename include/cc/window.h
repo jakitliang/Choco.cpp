@@ -7,6 +7,9 @@
 
 #include "cc/flags.h"
 #include "cc/ui_event.h"
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 namespace CC {
     struct Window {
@@ -66,6 +69,7 @@ namespace CC {
         Window & operator=(Window && window) noexcept;
 
 #ifdef _WIN32
+        HWND GetNativeWindow();
 #else
 #endif
 

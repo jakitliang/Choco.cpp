@@ -17,7 +17,14 @@ CC::Error::Error() : From(SendFromSystem), Message{0} {
 CC::Error & CC::Error::GetSystemError() {
     Number = errno;
     memset(&Message[0], 0, MessageLength);
+
+#ifdef _WIN32
+    strerror_s(Message, MessageLength, Number);
+#else
     strerror_r(Number, &Message[0], MessageLength);
+#endif
+
+
 
     return *this;
 }
