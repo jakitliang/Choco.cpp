@@ -78,7 +78,7 @@ void CC::Window::onEvent(CC::UIEvent & event) {
             onMouseMotion(event.motion);
 
         } else if (event.Type == SDL_MOUSEBUTTONUP || event.Type == SDL_MOUSEBUTTONDOWN) {
-            onMouseButton(event.button);
+            onMouseButton(event.button, event.Type == SDL_MOUSEBUTTONUP ? true : false);
 
         } else if (event.Type == SDL_MOUSEWHEEL) {
             onMouseWheel(event.wheel);
@@ -92,7 +92,7 @@ void CC::Window::onKey(CC::UIKeyboardEvent &event) {}
 
 void CC::Window::onMouseMotion(CC::UIMouseMotionEvent &event) {}
 
-void CC::Window::onMouseButton(CC::UIMouseButtonEvent &event) {}
+void CC::Window::onMouseButton(CC::UIMouseButtonEvent &event, bool isReleased) {}
 
 void CC::Window::onMouseWheel(CC::UIMouseWheelEvent &event) {}
 

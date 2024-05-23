@@ -44,7 +44,7 @@ namespace CC {
 
         virtual void onMouseMotion(UIMouseMotionEvent & event);
 
-        virtual void onMouseButton(UIMouseButtonEvent & event);
+        virtual void onMouseButton(UIMouseButtonEvent & event, bool isReleased);
 
         virtual void onMouseWheel(UIMouseWheelEvent & event);
 

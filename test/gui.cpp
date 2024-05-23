@@ -37,12 +37,12 @@ struct MyWindow : Window {
         Window::Update(deltaTime);
 
         if (ButtonStatus) {
-            cout << CurrentMouse.X << ", " << CurrentMouse.Y << endl;
-            cout << PreviousMouse.X << ", " << PreviousMouse.Y << endl;
-//            if (CurrentMouse != PreviousMouse) {
-//                auto v = CurrentMouse - PreviousMouse;
-//                cout << v.X << ", " << v.Y << endl;
-//            }
+//            cout << CurrentMouse.X << ", " << CurrentMouse.Y << endl;
+//            cout << PreviousMouse.X << ", " << PreviousMouse.Y << endl;
+            if (CurrentMouse != PreviousMouse) {
+                auto v = CurrentMouse - PreviousMouse;
+                cout << v.X << ", " << v.Y << endl;
+            }
         }
     }
 
@@ -93,14 +93,16 @@ struct MyWindow : Window {
         }
     }
 
-    void onMouseButton(CC::UIMouseButtonEvent &event) override {
-        if (event.Button == UIEvent::ButtonStatePressed) {
+    void onMouseButton(CC::UIMouseButtonEvent &event, bool isReleased) override {
+        if (!isReleased) {
             ButtonStatus = true;
             CurrentMouse = PreviousMouse = Vector2{event.X * 1.f, event.Y * 1.f};
+            cout << "Start Mouse" << endl;
 
-        } else if (event.Button == UIEvent::ButtonStateReleased) {
+        } else {
             ButtonStatus = false;
             CurrentMouse = PreviousMouse = Vector2{event.X * 1.f, event.Y * 1.f};
+            cout << "End Mouse" << endl;
         }
     }
 };
